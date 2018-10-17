@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script src="js/vue.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		<h1>{{ count }}</h1>
+		<button @click="updateEvent">Update</button>
+	</div>
+
+	<button id="del">Del</button>
+
+
+
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				count: 0	
+			},
+
+			methods: {
+				updateEvent: function(){
+					this.count += 1;
+				}
+			},
+
+			beforeCreate: function(){
+				// 元件实体刚被建立，属性计算之前。
+				console.log('beforeCreate - this.count: ', this.count);		// undefined
+				console.log('beforeCreate - this.$el: ', this.$el);			// undefined
+			},
+			created: function(){
+				// 元件实体已建立，属性已绑定，但 DOM 还没生成。
+				console.log('created - this.count: ', this.count);			// 0
+				console.log('created - this.$el: ', this.$el);				// undefined
+			},
+			beforeMount: function(){
+				// 模板 (template) 编译或挂载至 HTML 之前					// DOM内的代码仍然是Vue源码，DOM内的 data 属性尚未编译，仍是{{ count }}
+				console.log('beforeMount - this.$el: ', this.$el);		// <div id="app"></div>
+			},
+			mounted: function(){
+				// 模板 (template) 编译或挂载至 HTML 之后					// DOM内的代码已编译，DOM内的 data 属性尚已编译，替换为需要的 0
+				console.log('mounted - this.$el: ', this.$el);			// <div id="app"></div>
+			},
+			beforeUpdate: function(){
+				// 元件被更新之前
+				console.log('beforeUpdate: ',
+					this.$el.querySelector('h1').innerText,
+					this.count );
+			},
+			updated: function(){
+				// 元件被更新之后
+				console.log('updated: ',
+					this.$el.querySelector('h1').innerText,
+					this.count );
+			},
+			// activated: function(){
+			// 	// keep-alive 用，元件被启动时呼叫
+			// },
+			// deactivated: function(){
+			// 	// keep-alive 用，元件被移除时呼叫
+			// },
+			beforeDestroy: function(){
+				// 移除 vue instance (实例) 之前
+				console.log('beforeDestroy');
+			},
+			destroyed: function(){
+				// 移除 vue instance (实例) 之后
+				console.log('destroyed');
+
+				// destroy 做的事情就是，把 watch，child components 和 event listeners 拿掉，
+				// 让 vue 和 DOM 脱钩(不相互关联)，但是不会移除它生成的 DOM，这个 vue 实例无法再对DOM操作
+			}
+		});
+
+		document.getElementById('del').addEventListener('click',function(){
+			vm.$destroy();
+		})
+
+
+
+
+		// Vue.js 教學 - 從 Vuejs 初探 Web Component 的世界 (HD)
+		// https://www.youtube.com/watch?v=T2JsTE0Hq58&list=PLYrA-SsMvTPNPhv8KeSNtPTY8q85-SSJA&index=3
+		// 40:22
+		// 2018-10-12 19:17:25
+	</script>
+
+</body>
+</html>

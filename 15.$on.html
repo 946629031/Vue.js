@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="js/vue.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		{{ message }}
+	</div>
+
+	<script>
+		var vm = new Vue({
+			el: "#app",
+			data: {
+				message: "hello!"
+			},
+			mounted: function(){
+				console.log('mounted');
+			}
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script src="./js/vue.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		Parent: {{ message }} <input v-model="message">
+
+		<hr>
+
+		Child: <my-component :parent-message="message"></my-component>
+	</div>
+
+	<script>
+		Vue.component('my-component', {
+			props: {
+				parentMessage: String
+			},
+			template: "<span>\
+						{{ parentMessage }}\
+						<input v-model='message'>\
+						<button @click='update'>update</button>\
+					  </span>",
+			data: function(){
+				return {
+					message: this.parentMessage
+				}
+			},
+			methods: {
+				update: function(){
+					this.$parent.$emit('update', this.message)
+				}
+			}
+		});
+
+		var vm = new Vue({
+			el: "#app",
+			data: {
+				message : "hello!"
+			},
+			methods: {
+				updateSel: function(val){
+					this.message = val;
+				}
+			},
+			mounted: function(){
+				this.$on('update', this.updateSel)
+			},
+		});
+	</script>
+
+</body>
+</html>
