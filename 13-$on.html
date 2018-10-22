@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="js/vue.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		{{ message }}	<button @click="single_click">single_click</button>
+		<child_component></child_component>
+	</div>
+
+	<script>
+		Vue.component("child_component", {
+			template: 
+				"<div>this is child component <button @click='child_click'>child_click</button></div>",
+			methods: {
+				child_click: function(){
+					this.$parent.$emit('child_click','child_click_one!')
+				}
+			}
+		});
+
+		var vm = new Vue({
+			el: "#app",
+			data: {
+				message: "hello!"
+			},
+			methods: {
+				single_click: function(){
+					alert("You are click the single_click event!")
+				},
+				child_click: function(val){
+					console.log(val);
+				}
+			},
+			mounted: function(){
+				this.$on('child_click', this.child_click)
+			}
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/vue.js"></script>
+</head>
+<body>
+
+    <div id="xm">
+        <custom-elem1></custom-elem1>
+        <hr>
+        <custom-elem2></custom-elem2>
+    </div>
+
+    <script>
+        // 教程实例 https://youtu.be/T2JsTE0Hq58
+
+        // event bus
+        var bus = new Vue();
+
+        Vue.component('custom-elem1', {
+            template: "<div class='custom-elem1'> elem1\
+                        <input v-model='msg'> <button @click='submit'>Submit</button>\
+                        </div>",
+            methods: {
+                submit(){
+                    bus.$emit('receive', this.msg)
+                }
+            },
+            data(){
+                return {
+                    msg: '456'
+                }
+            }
+        });
+
+        Vue.component('custom-elem2', {
+            template: "<div class='custom-elem2'> elem2 {{ msg }} </div>",
+            created(){
+                var that = this;
+                bus.$on('receive', function(newMsg){
+                    that.msg = newMsg;
+                })
+            },
+            data(){
+                return {
+                    msg: '123'
+                }
+            }
+        });
+
+        var xm = new Vue({
+            el: "#xm"
+        })
+    </script>
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<hr>
+
+    自己写的 No.2
+    要求： 获取一个组件的信息传到另一个组件，并且alert()出来。
+    
+    <div id="app">
+        Parent: {{ message }} <input v-model="message">
+
+        <hr>
+
+        Child: <my-component :parent-message="message"></my-component>
+    </div>
+
+    <script>
+        var bus2 = new Vue();
+
+        // register
+        Vue.component('my-component', {
+            props:{
+                parentMessage: String
+            },
+            template: "\
+                <div>\
+                    {{ childMessage }}\
+                    {{ parentMessage }}\
+                    <input v-model='childMessage'></input>\
+                    <button @click='submitOn'>提交</button>\
+                </div>\
+            ",
+            methods:{
+                submitOn: function(){
+                    bus2.$emit('submitOn', this.childMessage);
+                }
+            },
+            data: function(){
+                return {
+                    childMessage: "dady"
+                }
+            }
+        });
+
+        var vm =new Vue({
+            el: '#app',
+            data: {
+                message: "hello!"
+            },
+            methods: {
+                alertMsg: function(getMsg){
+                    alert('parent msg:'+getMsg)
+                }
+            },
+            created: function(){
+                bus2.$on('submitOn', this.alertMsg)
+            }
+        });
+    </script>
+
+
+
+
+
+
+
+<!-- 自己写的 No.1
+<div id="app">
+    Parent: {{ message }} <input v-model="message">
+
+    <hr>
+
+    Child: <my-component :parent-message="message"></my-component>
+</div>
+
+<script>
+    // register
+    Vue.component('my-component', {
+        props:{
+            parentMessage: String
+        },
+        template: "\
+            <div>\
+                {{ childMessage }}\
+                {{ parentMessage }}\
+                <input v-model='childMessage'></input>\
+                <button>提交</button>\
+            </div>\
+        ",
+        data: function(){
+            return {
+                childMessage: "dady"
+            }
+        }
+    });
+
+    var vm =new Vue({
+        el: '#app',
+        data: {
+            message: "hello!"
+        }
+    });
+</script> -->
+</body>
+</html>
