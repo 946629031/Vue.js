@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="js/vue.js"></script>
+</head>
+<body>
+
+<div id="app3">
+	<my-component></my-component>
+</div>
+
+<script type="text/x-template" id="my-components">
+	// 模板的最外层只能有一个标签包着（根节点）
+	<div>
+		<div class="component">1 A custom component of Vue!</div>
+		<div class="component">2 A custom component of Vue!</div>
+		<div class="component">3 A custom component of Vue!</div>
+		<div class="component">4 A custom component of Vue!</div>
+	</div>
+</script>
+
+<script>
+	Vue.component('my-component', {
+		template: '#my-components'
+	});
+
+	// create a root instance 创建一个根实例
+	new Vue({
+		el: '#app3'
+	})
+</script>
+
+</body>
+</html>

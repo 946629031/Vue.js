@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="js/vue.js"></script>
+</head>
+<body>
+
+	<div id="toDoList">
+		<input type="text" v-model='newTodo' v-on:keyup.enter='addTodo(newTodo)'> {{newTodo}}
+		<ul>
+			<li v-for='todo in todos'>
+				{{todo.content}} <a v-on:click.prevent='removeTodo(thisTodo)' style="color: red;">delete</a>
+			</li>
+		</ul>
+	</div>
+
+
+	<script>
+		var app = new Vue({
+			el: '#toDoList',
+			data: {
+				// todos: ['1','2','3'],
+				todos: [
+					{'content':"去修车", 'complete':false},
+					{'content':"取快递", 'complete':false}
+				],
+				newTodo: ''
+			},
+			methods:{
+				addTodo: function(newTodo){
+					this.todos.push({'content':newTodo, 'complete':false});
+				},
+				removeTodo: function(thisTodo){
+					// console.log(this.todos.indexOf(thisTodo));
+					this.todos.splice(this.todos.indexOf(thisTodo),1)
+				}
+			}
+		})
+	</script>
+	
+</body>
+</html>

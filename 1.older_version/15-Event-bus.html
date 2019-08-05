@@ -123,46 +123,5 @@
 
 
 
-
-
-
-
-<!-- 自己写的 No.1
-<div id="app">
-    Parent: {{ message }} <input v-model="message">
-
-    <hr>
-
-    Child: <my-component :parent-message="message"></my-component>
-</div>
-
-<script>
-    // register
-    Vue.component('my-component', {
-        props:{
-            parentMessage: String
-        },
-        template: "\
-            <div>\
-                {{ childMessage }}\
-                {{ parentMessage }}\
-                <input v-model='childMessage'></input>\
-                <button>提交</button>\
-            </div>\
-        ",
-        data: function(){
-            return {
-                childMessage: "dady"
-            }
-        }
-    });
-
-    var vm =new Vue({
-        el: '#app',
-        data: {
-            message: "hello!"
-        }
-    });
-</script> -->
 </body>
 </html>
