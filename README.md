@@ -33,7 +33,7 @@
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    - (MV* 示意图)[]
+    - (MV* 示意图)[https://github.com/946629031/Vue.js/blob/master/img/1.jpg]
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
