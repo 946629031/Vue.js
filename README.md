@@ -1,9 +1,9 @@
-# Vue 从零基础入门到实战项目 - 2.5开发去哪儿网App
-Node.js 各种语法 入门讲解
+# Vue 语法入门
+Vue 各种语法 入门讲解
 
 从零开始掌握大型互联网公司NodeJS实际使用
 
-[【视频地址】慕课网 Node.js入门到企业Web开发中的应用](https://coding.imooc.com/class/203.html)
+[【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
 
 课程出品时间：未知
 
@@ -13,7 +13,7 @@ Node.js 各种语法 入门讲解
 
 **目录**
 - [第2章 Vue 起步](#第1章-导学)
-    - [2-2 hello world]()
+    - [2-2 hello world](#2-2-hello-world)
     - []()
 - [第5章 项目初始化]()
     - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
