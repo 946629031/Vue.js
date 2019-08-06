@@ -5,7 +5,7 @@ Vue 各种语法 入门讲解
 
 [【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
 
-课程出品时间：未知
+课程出品时间：2017.x ~ 2018.4
 
 看视频整理要点笔记：
 
@@ -85,6 +85,57 @@ Vue 各种语法 入门讲解
             el: '#app',
             data: {
                 message: 'hello world'
+            }
+        })
+
+        // 2s后 将'hello world' 改为 'bye world'
+        setTimeout(function(){
+            app.$data.message = 'bye world'
+        }, 2000)
+    </script>
+</body>
+</html>
+```
+
+- ### 2-3 开发TodoList（v-model、v-for、v-on）
+    - 数据双向绑定
+        - 这个案例里
+            - v-model='inputValue'，的意思是
+            - 将该input 的数据与 Vue实例中 app.$data.inputValue 绑定
+        - 只要 该input 值改变，app.$data.inputValue 也会跟着改变
+        - 验证方法：
+            - 在控制台里app.$data.inputValue = '123...', 则该input 值也同步变成了 '123...'
+            - 或者，在该input里输入'666', 则 Vue实例中 app.$data.inputValue 也等于 '666'
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model='inputValue'>
+        <button v-on:click="handleBtnClick">提交</button>
+        <ul>
+            <li v-for="item in list">{{item}}</li>
+        </ul>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                list: ['第一课内容','第二课内容','2333'],
+                inputValue: ''
+            },
+            methods: {
+                handleBtnClick: function(){
+                    this.list.push(this.inputValue)
+                    this.inputValue = ''
+                }
             }
         })
     </script>
