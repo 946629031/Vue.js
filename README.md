@@ -1,4 +1,28 @@
-# Vue
+# Vue 从零基础入门到实战项目 - 2.5开发去哪儿网App
+Node.js 各种语法 入门讲解
+
+从零开始掌握大型互联网公司NodeJS实际使用
+
+[【视频地址】慕课网 Node.js入门到企业Web开发中的应用](https://coding.imooc.com/class/203.html)
+
+课程出品时间：未知
+
+看视频整理要点笔记：
+
+----
+
+**目录**
+- [第2章 Vue 起步](#第1章-导学)
+    - [2-2 hello world]()
+    - []()
+- [第5章 项目初始化]()
+    - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
+    - [5-2 ESLint](https://github.com/946629031/hello-node.js#5-2-eslint)
+    - []()
+    - []()
+
+----
+
 
 ## Vue 和 React 相同点
 - 利用虚拟 DOM 实现快速渲染
@@ -33,9 +57,37 @@
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
+    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
         - 因此，在 MV* 模式下，不会操作 DOM, 不会操作 class
         - 更多的去关注我们的数据，通过改变变量 来控制视图
+
+
+
+## 第2章 Vue 起步
+- ### 2-2 hello world
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+</head>
+<body>
+    <div id="app">{{message}}</div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                message: 'hello world'
+            }
+        })
+    </script>
+</body>
+</html>
+```
