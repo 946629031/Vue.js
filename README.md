@@ -14,6 +14,10 @@ Vue 各种语法 入门讲解
 **目录**
 - [第2章 Vue 起步](#第1章-导学)
     - [2-2 hello world](#2-2-hello-world)
+    - [2-3 开发TodoList（v-model、v-for、v-on）](#2-3-开发todolistv-modelv-forv-on)
+    - [2-4 MVVM模式]()
+    - [2-5 前端组件化]()
+    - []()
     - []()
 - [第5章 项目初始化]()
     - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
@@ -142,3 +146,35 @@ Vue 各种语法 入门讲解
 </body>
 </html>
 ```
+
+- ### 2-4 MVVM模式
+    - 在 MVP / MVC 模式下
+        - 名词解释
+            - Model - 数据层
+            - Control - 控制层
+            - View - 视图层
+        - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
+
+    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
+
+    - 在 MVVM 模式下
+        - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
+        - 我们只需要关注，Model 数据层、View 视图层 即可
+        - MVVM 这种模式下 最重的一层 是 Model 层
+            - 以前，我们使用 jquery 开发时候，我们是面向 DOM 做开发
+            - 现在，我们使用 MVVM 这种模式开发的时候，我们是 **面向 Model 数据层 做开发**
+    - 在 Vue 中
+        - Model - 就是 Vue 实例中的 data
+        - View - 就是 html 文件中的 html 结构
+        - vue 实例中的 function 都是在对数据进行操作
+        - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
+
+- ### 2-5 前端组件化
+    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
+
+    - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
+    - **组件化**
+        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
+        - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
+        - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
+        - 每一个组件的**维护就会相对更容易些，降低维护成本**
