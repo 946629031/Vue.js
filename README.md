@@ -15,8 +15,11 @@ Vue 各种语法 入门讲解
 - [第2章 Vue 起步](#第1章-导学)
     - [2-2 hello world](#2-2-hello-world)
     - [2-3 开发TodoList（v-model、v-for、v-on）](#2-3-开发todolistv-modelv-forv-on)
-    - [2-4 MVVM模式]()
-    - [2-5 前端组件化]()
+    - [2-4 MVVM模式](#2-4-mvvm模式)
+    - [2-5 前端组件化](#2-5-前端组件化)
+    - [2-6 使用组件改造TodoList](#2-6-使用组件改造TodoList)
+    - [2-7 简单的组件间传值](#2-7-简单的组件间传值)
+    - []()
     - []()
     - []()
 - [第5章 项目初始化]()
@@ -155,7 +158,7 @@ Vue 各种语法 入门讲解
             - View - 视图层
         - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
 
-    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
+    <!-- ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg) -->
 
     - 在 MVVM 模式下
         - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
@@ -170,11 +173,117 @@ Vue 各种语法 入门讲解
         - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
 
 - ### 2-5 前端组件化
-    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
+    <!-- ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg) -->
 
+    - 看上面的例子
     - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
     - **组件化**
-        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
+        <!-- - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png) -->
         - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
         - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
+
+
+- ### 2-6 使用组件改造TodoList
+    - 在 [2-3](#2-3-开发todolistv-modelv-forv-on) 中，里面的 List 是通过 li 标签来循环的
+    - 现在，我们要把 li 标签变成一个组件，来看看应该怎么做
+    ```html
+    <div id="app">
+        <input type="text" v-model='inputValue'>
+        <button v-on:click="handleBtnClick">提交</button>
+        <ul>
+            <!-- <li v-for="item in list">{{item}}</li> -->
+
+            <todo-item v-bind:content="item" v-for="item in list"></todo-item>
+        </ul>
+    </div>
+
+    <script>
+        Vue.component('TodoItem', {
+            props: ['content'],
+            template: "<li>{{content}}</li>"
+        })
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                list: ['第一课内容','第二课内容','2333'],
+                inputValue: ''
+            },
+            methods: {
+                handleBtnClick: function(){
+                    this.list.push(this.inputValue)
+                    this.inputValue = ''
+                }
+            }
+        })
+    </script>
+    ```
+
+    - ```Vue.component()``` - 全局组件注册方法
+        ```html
+        Vue.component('TodoItem', {
+            props: ['content'],
+            template: "<li>{{content}}</li>"
+        })
+        ```
+    - #### 通过 ```v-bind``` 传递内容给子组件 ( 父组件传值给子组件 )
+        - 1.```v-for="item in list"``` list 数组的个数决定循环出多少个 item
+        - 2.```v-bind:content="item"``` 将 ```item``` 赋值 给 ```content```
+        - 3.在子组件注册的地方，通过 ```props: ['content'],``` 接收 ```content``` 变量
+        - 4.最后，在 ```template: "<li>{{content}}</li>"``` 通过插值表达式插入 组件内容中
+
+    - 局部组件注册方法
+        - 1.注册局部组件
+            ```js
+                var TodoItem = {
+                    props: ['content'],
+                    template: "<li>{{content}}</li>"
+                }
+            ```
+        - 2.在 Vue 实例中，接收该 局部组件
+            ```js
+            var app = new Vue({
+                el: '#app',
+                components: {
+                    TodoItem: TodoItem
+                }
+            })
+            ```
+        ```html
+        <div id="app">
+            <input type="text" v-model='inputValue'>
+            <button v-on:click="handleBtnClick">提交</button>
+            <ul>
+                <todo-item v-bind:content="item" v-for="item in list"></todo-item>
+            </ul>
+        </div>
+
+        <script>
+            var TodoItem = {
+                props: ['content'],
+                template: "<li>{{content}}</li>"
+            }
+
+            var app = new Vue({
+                el: '#app',
+                components: {
+                    TodoItem: TodoItem
+                },
+                data: {
+                    list: ['第一课内容','第二课内容','2333'],
+                    inputValue: ''
+                },
+                methods: {
+                    handleBtnClick: function(){
+                        this.list.push(this.inputValue)
+                        this.inputValue = ''
+                    }
+                }
+            })
+        </script>
+        ```
+
+- ### 2-7 简单的组件间传值
+    - 上一节，我们讲解了，父组件如何传值给子组件
+    - 那么，子组件如何传值给父组件呢？
