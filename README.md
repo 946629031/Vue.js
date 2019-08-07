@@ -290,7 +290,8 @@ Vue 各种语法 入门讲解
     - 我们先来看，如何实现这样的一个功能
         - 在我们点击 TodoList 中的每一项时，就把该项删除掉
         - 这时候，就涉及到 子组件向父组件传值的问题了
-    > ```v-on:click="handleBtnClick"``` 可以简写成  ```@click="handleBtnClick"```
+
+    > ```v-on:click="handleBtnClick"``` 可以简写成  ```@click="handleBtnClick"``` <br>
     > ```v-bind:content="item"``` 可以简写成 ```:content="item"```
 
     - 数据放在父组件里 ( ```app.$data.list``` )，父组件决定子组件显示多少个
@@ -298,6 +299,16 @@ Vue 各种语法 入门讲解
     
     - #### 子组件如何传值给父组件呢？
         - 1.子组件传值，我们可以通过 ```this.$emit("delete")``` 的方式来向外触发事件
+            ```js
+            var TodoItem = {
+                template: "<li>content</li>",
+                methods: {
+                    handleItemClick: function(){
+                        this.$emit('delete', this.index)    // 触发 delete 事件的同时，将 参数 this.index 带出去
+                    }
+                }
+            }
+            ```
         - 2.在子组件上，监听 delete 事件， ```<todo-item @delete="handleItemDelete"></todo-item>```
             - 一但监听到 ```delete``` 事件，就会执行父组件里 ```handleItemDelete``` 方法
         - 3.在父组件里定义 handleItemDelete 方法
