@@ -64,7 +64,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
+    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -158,7 +158,7 @@ Vue 各种语法 入门讲解
             - View - 视图层
         - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
 
-    <!-- ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg) -->
+    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
 
     - 在 MVVM 模式下
         - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
@@ -173,12 +173,12 @@ Vue 各种语法 入门讲解
         - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
 
 - ### 2-5 前端组件化
-    <!-- ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg) -->
+    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
 
     - 看上面的例子
     - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
     - **组件化**
-        <!-- - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png) -->
+        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
         - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
         - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
@@ -284,6 +284,75 @@ Vue 各种语法 入门讲解
         </script>
         ```
 
-- ### 2-7 简单的组件间传值
-    - 上一节，我们讲解了，父组件如何传值给子组件
+- ### 2-7 子组件传值给父组件
+    - [上一节](#通过-v-bind-传递内容给子组件--父组件传值给子组件-)，我们讲解了，父组件如何传值给子组件
     - 那么，子组件如何传值给父组件呢？
+    - 我们先来看，如何实现这样的一个功能
+        - 在我们点击 TodoList 中的每一项时，就把该项删除掉
+        - 这时候，就涉及到 子组件向父组件传值的问题了
+    > ```v-on:click="handleBtnClick"``` 可以简写成  ```@click="handleBtnClick"```
+    > ```v-bind:content="item"``` 可以简写成 ```:content="item"```
+
+    - 数据放在父组件里 ( ```app.$data.list``` )，父组件决定子组件显示多少个
+    - 所以删除子组件的时候，我们点击子组件，子组件把绑定的内容传给父组件，让父组件去改变数据，父组件的数据改变了，子组件就会消失
+    
+    - #### 子组件如何传值给父组件呢？
+        - 1.子组件传值，我们可以通过 ```this.$emit("delete")``` 的方式来向外触发事件
+        - 2.在子组件上，监听 delete 事件， ```<todo-item @delete="handleItemDelete"></todo-item>```
+            - 一但监听到 ```delete``` 事件，就会执行父组件里 ```handleItemDelete``` 方法
+        - 3.在父组件里定义 handleItemDelete 方法
+            ```js
+            var app = new Vue({
+                el: '#app',
+                methods: {
+                    handleItemDelete: function(index){
+                        this.list.splice(index, 1)
+                    }
+                }
+            })
+            ```
+    - 完整代码
+    ```html
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    <div id="app">
+        <input type="text" v-model='inputValue'>
+        <button v-on:click="handleBtnClick">提交</button>
+        <ul>
+            <todo-item v-bind:content="item" 
+                        v-bind:index="index"
+                        v-for="(item, index) in list" 
+                        @delete="handleItemDelete"></todo-item>
+        </ul>
+    </div>
+    <script>
+        var TodoItem = {
+            props: ['content', 'index'],
+            template: "<li @click='handleItemClick'>{{content}}</li>",
+            methods: {
+                handleItemClick: function(){
+                    this.$emit('delete', this.index)    // 触发 delete 事件的同时，将 参数 this.index 带出去
+                }
+            }
+        }
+
+        var app = new Vue({
+            el: '#app',
+            components: {
+                TodoItem: TodoItem
+            },
+            data: {
+                list: ['第一课内容','第二课内容','2333'],
+                inputValue: ''
+            },
+            methods: {
+                handleBtnClick: function(){
+                    this.list.push(this.inputValue)
+                    this.inputValue = ''
+                },
+                handleItemDelete: function(index){
+                    this.list.splice(index, 1)
+                }
+            }
+        })
+    </script>
+    ```
