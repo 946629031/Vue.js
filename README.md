@@ -18,7 +18,11 @@ Vue 各种语法 入门讲解
     - [2-4 MVVM模式](#2-4-mvvm模式)
     - [2-5 前端组件化](#2-5-前端组件化)
     - [2-6 使用组件改造TodoList](#2-6-使用组件改造TodoList)
-    - [2-7 简单的组件间传值](#2-7-简单的组件间传值)
+    - [2-7 子组件传值给父组件](#2-7-子组件传值给父组件)
+- [第3章 Vue 基础精讲]()
+    - [3-1 Vue实例](#3-1-Vue实例)
+    - [3-2 Vue实例生命周期](#3-2-Vue实例生命周期)
+    - []()
     - []()
     - []()
     - []()
@@ -64,7 +68,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
+    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -158,7 +162,7 @@ Vue 各种语法 入门讲解
             - View - 视图层
         - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
 
-    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
+    <!-- ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg) -->
 
     - 在 MVVM 模式下
         - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
@@ -173,12 +177,12 @@ Vue 各种语法 入门讲解
         - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
 
 - ### 2-5 前端组件化
-    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
+    <!-- ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg) -->
 
     - 看上面的例子
     - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
     - **组件化**
-        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
+        <!-- - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png) -->
         - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
         - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
@@ -367,3 +371,20 @@ Vue 各种语法 入门讲解
         })
     </script>
     ```
+
+    
+- ### 3-1 Vue实例
+    ```js
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            message: 'hello'
+        }
+    })
+    ```
+    - ```vm.$data.message```
+    - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
+
+- ### 3-2 Vue实例生命周期
+    <!-- ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg) -->
+    - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
