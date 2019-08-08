@@ -386,5 +386,5 @@ Vue 各种语法 入门讲解
     - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
 
 - ### 3-2 Vue实例生命周期
-    <!-- ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg) -->
+    ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg)
     - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
