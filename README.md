@@ -17,13 +17,13 @@ Vue 各种语法 入门讲解
     - [2-3 开发TodoList（v-model、v-for、v-on）](#2-3-开发todolistv-modelv-forv-on)
     - [2-4 MVVM模式](#2-4-mvvm模式)
     - [2-5 前端组件化](#2-5-前端组件化)
-    - [2-6 使用组件改造TodoList](#2-6-使用组件改造TodoList)
+    - [2-6 父组件传值给子组件](#2-6-父组件传值给子组件)
     - [2-7 子组件传值给父组件](#2-7-子组件传值给父组件)
 - [第3章 Vue 基础精讲]()
     - [3-1 Vue实例](#3-1-Vue实例)
     - [3-2 Vue实例生命周期](#3-2-Vue实例生命周期)
-    - []()
-    - []()
+    - [3-3 Vue的模版语法](#3-3-Vue的模版语法)
+    - [3-4 计算属性,方法与侦听器](#3-4-计算属性,方法与侦听器)
     - []()
     - []()
 - [第5章 项目初始化]()
@@ -188,7 +188,8 @@ Vue 各种语法 入门讲解
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
 
 
-- ### 2-6 使用组件改造TodoList
+- ### 2-6 父组件传值给子组件
+    - 下面我们 使用组件改造TodoList
     - 在 [2-3](#2-3-开发todolistv-modelv-forv-on) 中，里面的 List 是通过 li 标签来循环的
     - 现在，我们要把 li 标签变成一个组件，来看看应该怎么做
     ```html
@@ -386,5 +387,169 @@ Vue 各种语法 入门讲解
     - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
 
 - ### 3-2 Vue实例生命周期
-    ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg)
+    <!-- ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg) -->
     - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
+    ```html
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    <div id="app"></div>
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            template: '<div>{{message}}</div>',
+            data: {
+                message: 'hello world'
+            },
+            beforeCreate: function(){
+                console.log('beforeCreate')
+            },
+            created: function(){
+                console.log('created')
+            },
+            beforeMount: function(){
+                console.log(this.$el)
+                console.log('beforeMount')
+            },
+            mounted: function(){
+                console.log(this.$el)
+                console.log('mounted')
+            },
+            beforeDestroy: function(){          // vm.$destroy()
+                console.log('beforeDestroy')
+            },
+            destroyed: function(){
+                console.log('destroyed')
+            },
+            beforeUpdate: function(){           // 当改变 vm.$data 里面的数据时
+                console.log('beforeUpdate')
+            },
+            updated: function(){
+                console.log('updated')
+            }
+        })
+    </script>
+    ```
+
+- ### 3-3 Vue的模版语法
+    ```html
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+    <div id="app">
+        {{msg}}
+        <div v-text='msg'></div>
+        <div v-html='msg'></div>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                msg: '<h1>Dell</h1>'
+            }
+        })
+    </script>
+    ```
+    - 执行结果
+    <!-- ![Vue的模版语法](https://github.com/946629031/Vue.js/blob/master/img/3-3.jpg) -->
+    - 凡是 像 ```v-text='msg'```  ```v-html='msg'``` 以 v-什么 开头的指令，后面引号内都是 跟JS表达式
+
+
+- ### 3-4 计算属性,方法与侦听器
+    - 需求：根据给定的元数据 ```firstName, lastName```，在页面中自动生成 ```fullName``` ( fullName = firstName + lastName)。并且，如果元数据改变，fullName 也跟着改变
+
+    - 实现方法一
+        ```html
+        <div id="app">
+            {{firstName + ' ' + lastName}}
+        </div>
+        <script>
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee'
+                }
+            })
+        </script>
+        ```
+        - 分析：这种方式虽然能实现，但是，在你的模板里面却包含了逻辑，一般情况下，我们不希望在模版里面 写表达式，而是直接展示结果就好
+    - 实现方法二 - computed
+        ```html
+        <div id="app">
+            {{fullName}}
+        </div>
+        <script>
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee'
+                },
+                // 计算属性
+                computed: {
+                    fullName: function(){
+                        return this.firstName + ' ' + this.lastName
+                    }
+                }
+            })
+        </script>
+        ```
+        - #### 计算属性缓存
+            - computed 计算属性 是有缓存的，只要他依赖的变量不改变，系统就会一直用他已经计算好的缓存，来提高性能
+    - 实现方法三 - methods
+        ```html
+        <div id="app">
+            {{fullName()}}
+            {{age}}
+        </div>
+        <script>
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee',
+                    age: 27
+                },
+                methods: {
+                    fullName: function(){
+                        console.log('计算了一次')
+                        return this.firstName + ' ' + this.lastName
+                    }
+                }
+            })
+        </script>
+        ```
+        - 分析：这种方式虽然也能实现需求，但是这种方式是没有缓存的，如果我改变 ```age: 27``` 页面被重新渲染，则 methods 也被重新执行了一次，而不是像 computed 一样继续读取缓存
+        - **很明显 methods 的方法实现，没有 computed 的性能好**
+
+    - 实现方法四 - watch
+        ```html
+        <div id="app">
+            {{fullName}}
+            {{age}}
+        </div>
+        <script>
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee',
+                    fullName: 'Dell Lee',
+                    age: 27
+                },
+                watch: {
+                    firstName: function(){
+                        console.log('计算了一次')
+                        this.fullName = this.firstName + ' ' + this.lastName
+                    },
+                    lastName: function(){
+                        console.log('计算了一次')
+                        this.fullName = this.firstName + ' ' + this.lastName
+                    }
+                }
+            })
+        </script>
+        ```
+        - 分析：虽然 watch 这种方式也能实现需求，但是却造成了代码冗余，所以还是 computed 比较好
+    - 总结：如果一个功能，可以通过 watch, methods, computed 这三种方法实现，那么优先使用 computed 来实现
+
+
+

@@ -8,54 +8,32 @@
 </head>
 <body>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
-    <div id="app">
-        <input type="text" v-model='inputValue'>
-        <button v-on:click="handleBtnClick">提交</button>
-        <ul>
-            <!-- <li v-for="item in list">{{item}}</li> -->
 
-            <todo-item v-bind:content="item" 
-                       v-bind:index="index"
-                       v-for="(item, index) in list" 
-                       @delete="handleItemDelete"></todo-item>
-        </ul>
+    <div id="app">
+        {{fullName}}
+        {{age}}
     </div>
     <script>
-
-        // Vue.component('TodoItem', {
-        //     props: ['content'],
-        //     template: "<li>{{content}}</li>"
-        // })
-
-        var TodoItem = {
-            props: ['content', 'index'],
-            template: "<li @click='handleItemClick'>{{content}}</li>",
-            methods: {
-                handleItemClick: function(){
-                    this.$emit('delete', this.index)    // 触发 delete 事件的同时，将 参数 this.index 带出去
-                }
-            }
-        }
-
-        var app = new Vue({
+        var vm = new Vue({
             el: '#app',
-            components: {
-                TodoItem: TodoItem
-            },
             data: {
-                list: ['第一课内容','第二课内容','2333'],
-                inputValue: ''
+                firstName: 'Dell',
+                lastName: 'Lee',
+                fullName: 'Dell Lee',
+                age: 27
             },
-            methods: {
-                handleBtnClick: function(){
-                    this.list.push(this.inputValue)
-                    this.inputValue = ''
+            watch: {
+                firstName: function(){
+                    console.log('计算了一次')
+                    this.fullName = this.firstName + ' ' + this.lastName
                 },
-                handleItemDelete: function(index){
-                    this.list.splice(index, 1)
+                lastName: function(){
+                    console.log('计算了一次')
+                    this.fullName = this.firstName + ' ' + this.lastName
                 }
             }
         })
     </script>
+    
 </body>
 </html>
