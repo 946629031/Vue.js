@@ -24,7 +24,7 @@ Vue 各种语法 入门讲解
     - [3-2 Vue实例生命周期](#3-2-Vue实例生命周期)
     - [3-3 Vue的模版语法](#3-3-Vue的模版语法)
     - [3-4 计算属性,方法与侦听器](#3-4-计算属性,方法与侦听器)
-    - []()
+    - [3-5 计算属性的 getter 和 setter](#3-5-计算属性的-getter-和-setter)
     - []()
 - [第5章 项目初始化]()
     - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
@@ -296,8 +296,8 @@ Vue 各种语法 入门讲解
         - 在我们点击 TodoList 中的每一项时，就把该项删除掉
         - 这时候，就涉及到 子组件向父组件传值的问题了
 
-    > ```v-on:click="handleBtnClick"``` 可以简写成  ```@click="handleBtnClick"``` <br>
-    > ```v-bind:content="item"``` 可以简写成 ```:content="item"```
+    > ```@click="handleBtnClick"``` 是 ```v-on:click="handleBtnClick"``` 的简写<br>
+    > ```:content="item"``` 是 ```v-bind:content="item"``` 的简写
 
     - 数据放在父组件里 ( ```app.$data.list``` )，父组件决定子组件显示多少个
     - 所以删除子组件的时候，我们点击子组件，子组件把绑定的内容传给父组件，让父组件去改变数据，父组件的数据改变了，子组件就会消失
@@ -551,5 +551,191 @@ Vue 各种语法 入门讲解
         - 分析：虽然 watch 这种方式也能实现需求，但是却造成了代码冗余，所以还是 computed 比较好
     - 总结：如果一个功能，可以通过 watch, methods, computed 这三种方法实现，那么优先使用 computed 来实现
 
+- ### 3-5 计算属性的 getter 和 setter
+    - 计算属性默认只有 getter 
+        - 默认写法
+            ```js
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee'
+                },
+                computed: {
+                    fullName: function(){
+                        return this.firstName + ' ' + this.lastName
+                    }
+                }
+            })
+            ```
+        - 完整写法
+            ```js
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee'
+                },
+                computed: {
+                    fullName: {
+                        // getter
+                        get: function(){
+                            return this.firstName + ' ' + this.lastName
+                        }
+                    }
+                }
+            })
+            ```
+        - 这两种写法是完全一模一样的
+    - 计算属性中的 setter
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
 
+        <div id="app">
+            {{fullName}}
+        </div>
+        <script>
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    firstName: 'Dell',
+                    lastName: 'Lee'
+                },
+                computed: {
+                    fullName: {
+                        // getter 当读取 fullName值 的时候，执行 getter function
+                        get: function(){
+                            return this.firstName + ' ' + this.lastName
+                        },
+                        // setter 当设置 fullName值 的时候，执行 setter function
+                        set: function(value){
+                            let arr = value.split(' ');
+                            this.firstName = arr[0];
+                            this.lastName = arr[1];
+                        }
+                    }
+                }
+            })
+        </script>
+        ```
+        - 当改变 fullName ( vm.fullName = 'Mike Wang' ), 即执行 setter function 时
+        - setter function 里的 ```this.firstName``` 和 ```this.lastName``` 都被改变了
+        - 而 firstName 和 lastName 又是 getter funciton 的依赖变量
+        - 所以，引发了 getter function 重新执行，更新缓存
+        - 最后，得到的结果重新渲染到页面上
 
+- ### 3-6 Vue中的样式绑定
+    - Vue 中如何绑定 class?
+        - 需求：点击一下 toggle 字体颜色
+    - #### 绑定方式一 - 对象语法
+        ```html
+        <style> .red{ color: red;} </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+        <div id="app">
+            <div v-bind:class="{red: isActivated}" @click="handleClick">hello</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    isActivated: false
+                },
+                methods: {
+                    handleClick: function(){
+                        this.isActivated = !this.isActivated
+                    }
+                }
+            })
+        </script>
+        ```
+        - 绑定class
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-bind:class="{}">hello</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app'
+            })
+        </script>
+        ```
+        - ![绑定 class]((https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg))
+    - #### 绑定方式二 - 数组语法
+        ```html
+        <style> .activated{ color: red;} </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+        <div id="app">
+            <div v-bind:class="[activated, bold]" @click="handleClick">hello</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    activated: '',
+                    bold: 'bold'
+                },
+                methods: {
+                    handleClick: function(){
+                        this.activated = this.activated === 'activated' ? '' : 'activated'
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 绑定方式三 - 绑定内联样式 style - 对象语法
+        ```html
+        <style> .activated{ color: red;} </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+        <div id="app">
+            <div v-bind:style="styleObj" @click="handleClick">hello</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    styleObj: {
+                        color: 'black',
+                        display: 'block'
+                    }
+                },
+                methods: {
+                    handleClick: function(){
+                        this.styleObj.color = this.styleObj.color === 'red' ? 'black' : 'red'
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 绑定方式四 - 绑定内联样式 style - 数组语法
+        ```html
+        <style> .activated{ color: red;} </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-bind:style="[styleObj, {fontSize: '20px'}]" @click="handleClick">hello</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    styleObj: {
+                        color: 'black',
+                        display: 'block'
+                    }
+                },
+                methods: {
+                    handleClick: function(){
+                        this.styleObj.color = this.styleObj.color === 'red' ? 'black' : 'red'
+                    }
+                }
+            })
+        </script>
+        ```
+        - 注意： v-bind:style="[styleObj, {fontSize: '20px'}]"
+        - 由于这里不能写：{font-size: '20px'}
+        - 所以 要写成：{fontSize: '20px'}
