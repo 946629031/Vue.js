@@ -5,29 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <style>
-        .activated{ color: red;}
-    </style>
 </head>
 <body>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
     
     <div id="app">
-        <div v-bind:style="[styleObj, {fontSize: '20px'}]" @click="handleClick">hello</div>
+        <template v-for="(item, index) of list" :key="item.id">
+            <div>
+                {{item.text}} --- {{index}}
+            </div>
+            <span>{{item.text}}</span>
+        </template>
     </div>
     <script>
         var app = new Vue({
             el: '#app',
             data: {
-                styleObj: {
-                    color: 'black',
-                    display: 'block'
-                }
-            },
-            methods: {
-                handleClick: function(){
-                    this.styleObj.color = this.styleObj.color === 'red' ? 'black' : 'red'
-                }
+                list: [{
+                        id: '231123',
+                        text: 'hello'
+                    },{
+                        id: '231124',
+                        text: 'Dell'
+                    },{
+                        id: '231125',
+                        text: 'Lee'
+                    }
+                ]
             }
         })
     </script>

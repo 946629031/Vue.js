@@ -25,6 +25,10 @@ Vue 各种语法 入门讲解
     - [3-3 Vue的模版语法](#3-3-Vue的模版语法)
     - [3-4 计算属性,方法与侦听器](#3-4-计算属性,方法与侦听器)
     - [3-5 计算属性的 getter 和 setter](#3-5-计算属性的-getter-和-setter)
+    - [3-6 Vue中的样式绑定](#3-6-Vue中的样式绑定)
+    - [3-7 Vue中的条件渲染](#3-7-Vue中的条件渲染)
+    - []()
+    - []()
     - []()
 - [第5章 项目初始化]()
     - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
@@ -662,7 +666,7 @@ Vue 各种语法 入门讲解
             })
         </script>
         ```
-        - ![绑定 class]((https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg))
+    <!-- ![绑定 class](https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg) -->
     - #### 绑定方式二 - 数组语法
         ```html
         <style> .activated{ color: red;} </style>
@@ -739,3 +743,241 @@ Vue 各种语法 入门讲解
         - 注意： v-bind:style="[styleObj, {fontSize: '20px'}]"
         - 由于这里不能写：{font-size: '20px'}
         - 所以 要写成：{fontSize: '20px'}
+
+- ### 3-7 Vue中的条件渲染
+    - 条件渲染 v-if
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-if="show">{{message}}</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    show: false,
+                    message: 'hello world'
+                }
+            })
+        </script>
+        ```
+        - 这里，```<div v-if="show">{{message}}</div>``` 这个标签的渲染与否，是由 ```show``` 决定的
+            - ```show: false``` 为不渲染
+            - ```show: true``` 为渲染
+
+    - 条件渲染 v-show
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+        <div id="app">
+            <div v-if="show" data-test="v-if">{{message}}</div>
+            <div v-show="show" data-test="v-show">{{message}}</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    show: false,
+                    message: 'hello world'
+                }
+            })
+        </script>
+        ```
+    - 总结：
+        - ```v-if``` 和 ```v-show``` 都能控制元素是否显示
+        - 但是，```v-if``` 为 false 时，该标签压根不存在于 DOM 之上了
+        - 而，```v-show``` 为 false 时，该标签存在于 DOM 之上，只是 ```display: none;``` 了而已
+        - 而且，```v-show``` 的性能更优，因为 ```v-if``` 是直接操作 DOM 的
+
+    - 条件渲染 v-if v-else-if v-else
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-if="show === 'a'">This is A</div>
+            <div v-else-if="show === 'b'">This is B</div>
+            <div v-else>This is Others</div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    show: 'a'
+                }
+            })
+        </script>
+        ```
+    - Vue 中的key值
+        - 用 key 管理可复用的元素
+        - Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。
+        - 存在的问题：
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+            <div id="app">
+                <div v-if="show">
+                    用户名：<input />
+                </div>
+                <div v-else>
+                    邮箱名：<input />
+                </div>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#app',
+                    data: {
+                        show: true
+                    }
+                })
+            </script>
+            ```
+            - 如上面这个例子，当我们 在 input 中输入内容，如 "123" 时
+            - 我们将 ```app.show = false``` 改为了 false 时，我们的预期：显示 v-else 的内容，并清空 input 框
+            - 但是，我们实际得到的结果：显示了 "邮箱名："，但是 input 框没有清空
+            - 那么，如果解决这个问题呢？
+        - 解决问题
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+            <div id="app">
+                <div v-if="show">
+                    用户名：<input key="username"/>
+                </div>
+                <div v-else>
+                    邮箱名：<input key="password"/>
+                </div>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#app',
+                    data: {
+                        show: true
+                    }
+                })
+            </script>
+            ```
+            - 当你给 **标签** 加上 **key值** 后
+            - vue 就会对比 key值 是否相同，只有相同的 key值 的标签，才会被复用
+            - tips: key值 的内容可以随便取
+- ### 3-8 Vue中的列表渲染
+    - 1.在使用 key值 的时候，每个循环项上最好都带一个 key值，来提高性能
+        - 如何性能能达到最优呢？
+            - **key值 要唯一，同时不要使用 index 作为 key值**
+            - 虽然使用 index 昨晚 key值，也不会报错，但是性能没有那么好
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-for="(item, index) of list" :key="item.id">
+                {{item.text}} --- {{index}}
+            </div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    list: [{
+                            id: '231123',
+                            text: 'hello'
+                        },{
+                            id: '231124',
+                            text: 'Dell'
+                        },{
+                            id: '231125',
+                            text: 'Lee'
+                        }
+                    ]
+                }
+            })
+        </script>
+        ```
+    - 2.数组的变异方法
+        - 不能通过下标的方式来改变数组内容，这样不会更新到页面上
+            - 如：```app.list[4] = {id: '001', text: '2'}```
+        - 要通过 **数组变异方法** 来改变数组内容，这样才能更新到页面上
+            - 如：```app.list.push({id: '001', text: '2'})```
+            - **数组变异方法**：push, pop, shift, unshift, splice, sort, reverse
+    - 3.除了通过数组变异方法 可以改变页面上的内容，还可以通过**改变数组的引用**，来更新页面上的内容
+        - 改变数组的引用 即 重新赋值
+        - 如：
+            ```js
+            app.list = [{
+                            id: '231123',
+                            text: 'hello'
+                        },{
+                            id: '2311241111',
+                            text: 'Dellxxxxx'
+                        },{
+                            id: '231125',
+                            text: 'Lee'
+                        }
+                    ]
+            ```
+    - 4.循环中的 template 占位符
+        - 先看存在的问题
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+            <div id="app">
+                <div v-for="(item, index) of list" :key="item.id">
+                    <div>
+                        {{item.text}} --- {{index}}
+                    </div>
+                    <span>{{item.text}}</span>
+                </div>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#app',
+                    data: {
+                        list: [{
+                                id: '231123',
+                                text: 'hello'
+                            },{
+                                id: '231124',
+                                text: 'Dell'
+                            },{
+                                id: '231125',
+                                text: 'Lee'
+                            }
+                        ]
+                    }
+                })
+            </script>
+            ```
+    - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg)
+    - 渲染结果，每个循环项里，都被一个 div 标签包裹着
+    - 但是，如果我不希望，循环项被这一个多余的标签包裹着，怎么办呢？
+    ```html
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+    <div id="app">
+        <template v-for="(item, index) of list" :key="item.id">
+            <div>
+                {{item.text}} --- {{index}}
+            </div>
+            <span>{{item.text}}</span>
+        </template>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                list: [{
+                        id: '231123',
+                        text: 'hello'
+                    },{
+                        id: '231124',
+                        text: 'Dell'
+                    },{
+                        id: '231125',
+                        text: 'Lee'
+                    }
+                ]
+            }
+        })
+    </script>
+    ```
+    - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg)
+    - 把包裹的 div 改成 template 即可，其中 template 只是占位符，不会被渲染到页面上
