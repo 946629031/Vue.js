@@ -19,7 +19,7 @@ Vue 各种语法 入门讲解
     - [2-5 前端组件化](#2-5-前端组件化)
     - [2-6 父组件传值给子组件](#2-6-父组件传值给子组件)
     - [2-7 子组件传值给父组件](#2-7-子组件传值给父组件)
-- [第3章 Vue 基础精讲]()
+- [第3章 Vue 基础精讲](#第3章-Vue-基础精讲)
     - [3-1 Vue实例](#3-1-Vue实例)
     - [3-2 Vue实例生命周期](#3-2-Vue实例生命周期)
     - [3-3 Vue的模版语法](#3-3-Vue的模版语法)
@@ -27,12 +27,20 @@ Vue 各种语法 入门讲解
     - [3-5 计算属性的 getter 和 setter](#3-5-计算属性的-getter-和-setter)
     - [3-6 Vue中的样式绑定](#3-6-Vue中的样式绑定)
     - [3-7 Vue中的条件渲染](#3-7-Vue中的条件渲染)
+    - [3-8 Vue中的列表渲染](#3-8-Vue中的列表渲染)
+    - [3-9 Vue中的set方法](#3-9-Vue中的set方法)
+- [第4章 深入理解 Vue 组件](#第4章-深入理解-Vue-组件)
+    - [4-1 使用组件的细节点](#4-1-使用组件的细节点)
+    - [4-2 父子组件间的数据传递](#4-2-父子组件间的数据传递)
+    - [4-3 组件参数校验与非 props 特性](#4-3-组件参数校验与非-props-特性)
+    - [4-4 给组件绑定原生事件](#4-4-给组件绑定原生事件)
+    - [4-5 非父子组件间的传值](#4-5-非父子组件间的传值)
+    - [4-6 在Vue中使用插槽](#4-6-在Vue中使用插槽)
+    - [4-7 作用域插槽](#4-7-作用域插槽)
+    - [4-8 动态组件与 v-once 指令](#4-8-动态组件与-v-once-指令)
+- [第5章 Vue 中的动画特效](#第5章-Vue-中的动画特效)
     - []()
     - []()
-    - []()
-- [第5章 项目初始化]()
-    - [5-1 .gitignore .npmignore .EditorConfig](https://github.com/946629031/hello-node.js#5-1-gitignore)
-    - [5-2 ESLint](https://github.com/946629031/hello-node.js#5-2-eslint)
     - []()
     - []()
 
@@ -378,6 +386,7 @@ Vue 各种语法 入门讲解
     ```
 
     
+## 第3章 Vue 基础精讲
 - ### 3-1 Vue实例
     ```js
     var vm = new Vue({
@@ -946,38 +955,215 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-    - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg)
-    - 渲染结果，每个循环项里，都被一个 div 标签包裹着
-    - 但是，如果我不希望，循环项被这一个多余的标签包裹着，怎么办呢？
-    ```html
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
-    
-    <div id="app">
-        <template v-for="(item, index) of list" :key="item.id">
-            <div>
-                {{item.text}} --- {{index}}
+        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg) -->
+        - 渲染结果，每个循环项里，都被一个 div 标签包裹着
+        - 但是，如果我不希望，循环项被这一个多余的标签包裹着，怎么办呢？
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <template v-for="(item, index) of list" :key="item.id">
+                <div>
+                    {{item.text}} --- {{index}}
+                </div>
+                <span>{{item.text}}</span>
+            </template>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    list: [{
+                            id: '231123',
+                            text: 'hello'
+                        },{
+                            id: '231124',
+                            text: 'Dell'
+                        },{
+                            id: '231125',
+                            text: 'Lee'
+                        }
+                    ]
+                }
+            })
+        </script>
+        ```
+        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg) -->
+        - 把包裹的 div 改成 template 即可，其中 template 只是占位符，不会被渲染到页面上
+    - 5.对象循环
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="app">
+            <div v-for="(item, key, index) of userInfo">
+                {{item}} -- {{key}} -- {{index}}
             </div>
-            <span>{{item.text}}</span>
-        </template>
-    </div>
-    <script>
-        var app = new Vue({
-            el: '#app',
-            data: {
-                list: [{
-                        id: '231123',
-                        text: 'hello'
-                    },{
-                        id: '231124',
-                        text: 'Dell'
-                    },{
-                        id: '231125',
-                        text: 'Lee'
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    userInfo: {
+                        name: "Dell",
+                        age: 28,
+                        gander: "male",
+                        salary: "secret"
                     }
-                ]
-            }
-        })
-    </script>
-    ```
-    - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg)
-    - 把包裹的 div 改成 template 即可，其中 template 只是占位符，不会被渲染到页面上
+                }
+            })
+        </script>
+        ```
+        - 1.修改对象已有的信息，```app.userInfo.name = 'Dell Lee'```, 这种方法是可以修改的
+        - 2.新增对象内容
+            - ```app.userInfo.address = 'Beijing'```, 这种方法虽然不会报错，但是新增内容没有被更新到页面上
+            - 通过修改对象的引用 - 重新赋值
+                ```js
+                app.userInfo = {
+                        name: "Dell",
+                        age: 28,
+                        gander: "male",
+                        salary: "secret",
+                        address: "Beijing"
+                    }
+                ```
+                - 通过重新赋值的方法，会被自动更新到页面上
+        
+- ### 3-9 Vue中的set方法
+    - #### 1.对象的 set方法
+        - 存在的问题
+            - 在上一节[3-8 Vue中的列表渲染](#3-8-Vue中的列表渲染) 中, 我们提到，如果要修改 Object 对象的内容，只能通过 重新赋值 (修改引用) 的方法
+            - 其实，还可以通过 ```Vue.set()``` 方法，来修改 Object 对象的内容
+        - ```Vue.set()``` 例子
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+            
+            <div id="app">
+                <div v-for="(item, key, index) of userInfo">
+                    {{item}} -- {{key}} -- {{index}}
+                </div>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#app',
+                    data: {
+                        userInfo: {
+                            name: "Dell",
+                            age: 28,
+                            gander: "male",
+                            salary: "secret"
+                        }
+                    }
+                })
+            </script>
+            ```
+        - ```Vue.set()``` 全局方法
+            - 然后在 控制台里输入 ```Vue.set(app.userInfo, 'address', 'beijing')```
+            - 对象内容新增成功，页面也同时更新
+        - ```app.$set()``` 实例方法
+            - ```app.$set(app.userInfo, 'address', 'beijing')```
+            - 对象内容新增成功，页面也同时更新
+            - ```Vue.set()``` 和 ```app.$set()``` 是完全一模一样的
+    
+    - #### 2.数组的 set方法
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+    
+        <div id="app">
+            <div v-for="(item, index) of userInfo">
+                {{item}}
+            </div>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    userInfo: [0,1,2,3,4]
+                }
+            })
+        </script>
+        ```
+        - ```app.$set(app.userInfo, 1, 5)```, 实例方法
+            - 数组内容新增成功，页面也同时更新  
+        - ```Vue.set(app.userInfo, 1, 5)```, 全局方法
+            - 数组内容新增成功，页面也同时更新
+
+## 第4章 深入理解 Vue 组件
+- ### 4-1 使用组件的细节点
+    - #### 4-1-1 问题1 is=""
+        - 1.存在问题
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+            <div id="app">
+                <table>
+                    <tbody>
+                        <row></row>
+                        <row></row>
+                        <row></row>
+                    </tbody>
+                </table>
+            </div>
+            <script>
+                Vue.component('row', {
+                    template: '<tr><td>this is a row</td></tr>'
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9.Component_problems.jpg) -->
+
+            - 原本我们的预期：row子组件，被包含于 tbody 中
+            - 但是我们得到的：row子组件，跑到 tbody 外面去了
+        - 2.如何解决这个问题？ is=""
+            - H5规范 规定，tbody 里只能写 tr
+            - 然后，我们使用 ```is="row"``` 使其绑定 子组件即可
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+            <div id="app">
+                <table>
+                    <tbody>
+                        <tr is="row"></tr>
+                        <tr is="row"></tr>
+                        <tr is="row"></tr>
+                    </tbody>
+                </table>
+            </div>
+            <script>
+                Vue.component('row', {
+                    template: '<tr><td>this is a row</td></tr>'
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9-1.Component_problems.jpg) -->
+            - 同理，以下标签 里面，如果要放子组件，也是同理
+                ```html
+                <ul>
+                    <li is="row"></li>
+                    <li is="row"></li>
+                    <li is="row"></li>
+                </ul>
+                ```
+                ```html
+                <ol>
+                    <li is="row"></li>
+                    <li is="row"></li>
+                    <li is="row"></li>
+                </ol>
+                ```
+                ```html
+                <select>
+                    <option is="row"></option>
+                    <option is="row"></option>
+                    <option is="row"></option>
+                </select>
+                ```
+    - #### 4-1-2 问题2
+06:40

@@ -8,31 +8,23 @@
 </head>
 <body>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
-    
+
     <div id="app">
-        <template v-for="(item, index) of list" :key="item.id">
-            <div>
-                {{item.text}} --- {{index}}
-            </div>
-            <span>{{item.text}}</span>
-        </template>
+        <table>
+            <tbody>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+            </tbody>
+        </table>
     </div>
     <script>
-        var app = new Vue({
-            el: '#app',
-            data: {
-                list: [{
-                        id: '231123',
-                        text: 'hello'
-                    },{
-                        id: '231124',
-                        text: 'Dell'
-                    },{
-                        id: '231125',
-                        text: 'Lee'
-                    }
-                ]
-            }
+        Vue.component('row', {
+            template: '<tr><td>this is a row</td></tr>'
+        })
+
+        var vm = new Vue({
+            el: '#app'
         })
     </script>
 </body>
