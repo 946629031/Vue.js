@@ -10,21 +10,36 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
 
     <div id="app">
-        <table>
-            <tbody>
-                <tr is="row"></tr>
-                <tr is="row"></tr>
-                <tr is="row"></tr>
-            </tbody>
-        </table>
+        <counter ref='one' @change='handleChange'></counter>
+        <counter ref='two' @change='handleChange'></counter>
+        <div>{{total}}</div>
     </div>
     <script>
-        Vue.component('row', {
-            template: '<tr><td>this is a row</td></tr>'
+        Vue.component('counter', {
+            data: function(){
+                return {
+                    number: 0
+                }
+            },
+            template: '<div @click="handle">{{number}}</div>',
+            methods: {
+                handle: function(){
+                    this.number++;
+                    this.$emit('change')
+                }
+            }
         })
 
         var vm = new Vue({
-            el: '#app'
+            el: '#app',
+            data: {
+                total: 0
+            },
+            methods: {
+                handleChange: function(){
+                    this.total = this.$refs.one.number + this.$refs.two.number
+                }
+            }
         })
     </script>
 </body>

@@ -31,6 +31,8 @@ Vue 各种语法 入门讲解
     - [3-9 Vue中的set方法](#3-9-Vue中的set方法)
 - [第4章 深入理解 Vue 组件](#第4章-深入理解-Vue-组件)
     - [4-1 使用组件的细节点](#4-1-使用组件的细节点)
+        - [is=""]()
+        - [子组件的 data，必须是 **函数返回值**]()
     - [4-2 父子组件间的数据传递](#4-2-父子组件间的数据传递)
     - [4-3 组件参数校验与非 props 特性](#4-3-组件参数校验与非-props-特性)
     - [4-4 给组件绑定原生事件](#4-4-给组件绑定原生事件)
@@ -1089,7 +1091,7 @@ Vue 各种语法 入门讲解
 
 ## 第4章 深入理解 Vue 组件
 - ### 4-1 使用组件的细节点
-    - #### 4-1-1 问题1 is=""
+    - #### 4-1-1 问题1 - is=""
         - 1.存在问题
             ```html
             <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
@@ -1165,5 +1167,150 @@ Vue 各种语法 入门讲解
                     <option is="row"></option>
                 </select>
                 ```
-    - #### 4-1-2 问题2
-06:40
+    - #### 4-1-2 问题2 - 子组件的 data，必须是 **函数返回值**
+        - 1.先看代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <table>
+                <tbody>
+                    <tr is="row"></tr>
+                    <tr is="row"></tr>
+                    <tr is="row"></tr>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            Vue.component('row', {
+                data: {
+                    content: 'this is a row'
+                },
+                template: '<tr><td>{{content}}</td></tr>'
+            })
+
+            var vm = new Vue({
+                el: '#app'
+            })
+        </script>
+        ```
+        - 2.报错 ```[Vue warn]: The "data" option should be a function that returns a per-instance value in component definitions.```
+            - data 应该是一个 function 
+            - 而不是
+                ```js
+                Vue.component('row', {
+                    data: {
+                        content: 'this is a row'
+                    },
+                    template: '<tr><td>{{content}}</td></tr>'
+                })
+                ```
+        - 3.原因
+            - 1.在根组件里 ```new Vue({})``` , 如果定义 ```data: {}``` 这样不会任何的问题
+            - 2.但是，如果你在非根组件 ( 子组件 ) 里，定义 data 时，就不能这样定义了。子组件里定义 data 时，要求data 必须是 **函数的返回值**
+                ```js
+                Vue.component('row', {
+                    data: function(){
+                        return {
+                            content: 'this is a row'
+                        }
+                    },
+                    template: '<tr><td>{{content}}</td></tr>'
+                })
+                ```
+            - 3.之所以这么设计，是因为
+                - 一个子组件 不会像 根组件只会被调用一次，子组件可能会被调用多次。
+                - 那么，每一个子组件的数据，我不希望他 和其他子组件产生冲突, 希望他是**独立的数据**
+                - 通过 **函数返回值** 的方式，就可以做到，每个子组件拥有独立的数据存储
+        - 4.正确的完整代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <table>
+                <tbody>
+                    <tr is="row"></tr>
+                    <tr is="row"></tr>
+                    <tr is="row"></tr>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            Vue.component('row', {
+                data: function(){
+                    return {
+                        content: 'this is a row'
+                    }
+                },
+                template: '<tr><td>{{content}}</td></tr>'
+            })
+
+            var vm = new Vue({
+                el: '#app'
+            })
+        </script>
+        ```
+    - #### 4-1-3 问题3 - ref Vue中如何操作DOM
+        - 存在的问题：单靠Vue中的数据绑定这种方式，在某些及其复杂的情况下，是处理不了的。所以，在有些必要的情况下仍然需要操作DOM
+        - 1.先看一段代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <div ref='hello' @click='handleClick'>hello world</div>
+            </div>
+            <script>
+                var vm = new Vue({
+                    el: '#app',
+                    methods: {
+                        handleClick: function(){
+                            console.log(this.$refs.hello.innerHTML)
+                        }
+                    }
+                })
+            </script>
+            ```
+            - ref 引用
+                - 给该标签，起一个引用的名字，叫做 'hello'
+                - ```this.$refs``` 指的是 Vue实例 中所有的引用
+                - ```this.$refs.hello``` 获得 名叫 'hello' 的DOM节点
+                    - 如果 ref 写在组件上，如 ```<com ref='demo'></com>```，则是获取组件的引用
+        - 2.案例2
+            - 需求：实现一个计数器，每点击一次 i++，然后把所有的计数器实时计算总和
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <counter ref='one' @change='handleChange'></counter>
+                <counter ref='two' @change='handleChange'></counter>
+                <div>{{total}}</div>
+            </div>
+            <script>
+                Vue.component('counter', {
+                    data: function(){
+                        return {
+                            number: 0
+                        }
+                    },
+                    template: '<div @click="handle">{{number}}</div>',
+                    methods: {
+                        handle: function(){
+                            this.number++;
+                            this.$emit('change')
+                        }
+                    }
+                })
+
+                var vm = new Vue({
+                    el: '#app',
+                    data: {
+                        total: 0
+                    },
+                    methods: {
+                        handleChange: function(){
+                            this.total = this.$refs.one.number + this.$refs.two.number
+                        }
+                    }
+                })
+            </script>
+            ```
