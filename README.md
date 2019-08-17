@@ -33,7 +33,11 @@ Vue 各种语法 入门讲解
     - [4-1 使用组件的细节点](#4-1-使用组件的细节点)
         - [is=""]()
         - [子组件的 data，必须是 **函数返回值**]()
+        - [ref Vue中如何操作DOM]()
     - [4-2 父子组件间的数据传递](#4-2-父子组件间的数据传递)
+        - [4-2-1 父组件 如何向 子组件 传递数据](#4-2-1-父组件-如何向-子组件-传递数据)
+        - [单向数据流](#单向数据流)
+        - [4-2-2 子组件 如何向 父组件 传递数据](#4-2-2-子组件-如何向-父组件-传递数据)
     - [4-3 组件参数校验与非 props 特性](#4-3-组件参数校验与非-props-特性)
     - [4-4 给组件绑定原生事件](#4-4-给组件绑定原生事件)
     - [4-5 非父子组件间的传值](#4-5-非父子组件间的传值)
@@ -1314,3 +1318,271 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
+- ### 4-2 父子组件间的数据传递
+    - 现在我们继续实现一个需求：
+        - 实现一个计数器，每点击一次 i++，然后把所有的计数器实时计算总和
+    - #### 4-2-1 父组件 如何向 子组件 传递数据
+        - ##### 父组件通过属性的方式，向子组件传递数据
+            - 这种方式传递给子组件的 0 或 1 会变成一个 **字符串**
+                ```html
+                <div id="app">
+                    <counter count='0'></counter>
+                    <counter count='1'></counter>
+                </div>
+                ```
+
+            - 这种方式传递给子组件的 0 或 1 会变成一个 **数字**
+                - 加了 : 冒号后，引号里面的内容就变成 **js表达式** 了，而不是一个字符串了
+                ```html
+                <div id="app">
+                    <counter :count='0'></counter>
+                    <counter :count='1'></counter>
+                </div>
+                ```
+        - ##### 然后 子组件 通过 props 接收数据
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <counter count='2'></counter>
+                <counter count='1'></counter>
+            </div>
+            <script>
+                let counter = {
+                    props: ['count'],
+                    template: '<div>{{count}}</div>'
+                }
+
+                var vm = new Vue({
+                    el: '#app',
+                    components: {
+                        counter: counter
+                    }
+                })
+            </script>
+            ```
+        - ##### 单向数据流
+            - 先看问题
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+                <div id="app">
+                    <counter count='2'></counter>
+                    <counter count='1'></counter>
+                </div>
+                <script>
+                    let counter = {
+                        props: ['count'],
+                        template: '<div @click="handleClick">{{count}}</div>',
+                        methods: {
+                            handleClick: function(){
+                                this.count ++
+                            }
+                        }
+                    }
+
+                    var vm = new Vue({
+                        el: '#app',
+                        components: {
+                            counter: counter
+                        }
+                    })
+                </script>
+                ```
+            - 这样写，虽然能实现点击就 i++ 的功能，但是 控制台会报错
+                - [Vue warn]: Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's value. Prop being mutated: "count"
+                - 意思是说，你**子组件 不要直接修改 父组件传递过来的数据**
+                - 因为，如果父组件传递过来的 是非基础类型的数据，而是引用类型的数据，如 {}
+                    - 你在子组件里改变了数据的内容，而这个数据有可能 被其他子组件所使用
+                    - 这样的话，你的修改 不仅影响了你自己，还有可能影响其他 子组件
+                - 那我们又确实要改变 父组件传过来的数据，改怎么办呢？
+                    - 在子组件里，写个变量 接收一下
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+                <div id="app">
+                    <counter count='2'></counter>
+                    <counter count='1'></counter>
+                </div>
+                <script>
+                    let counter = {
+                        props: ['count'],
+                        data: function(){
+                            return {
+                                number: this.count  // 写个变量 接收一下 父组件传过来的数据
+                            }
+                        },
+                        template: '<div @click="handleClick">{{number}}</div>',
+                        methods: {
+                            handleClick: function(){
+                                this.number ++
+                            }
+                        }
+                    }
+
+                    var vm = new Vue({
+                        el: '#app',
+                        components: {
+                            counter: counter
+                        }
+                    })
+                </script>
+                ```
+    - #### 4-2-2 子组件 如何向 父组件 传递数据
+        - 1.子组件向外触发事件的方式，向外传递数据
+            ```js
+            this.$emit('change', 2)    // 向外触发一个change事件，并且可以携带多个参数
+            ```
+        - 2.父组件监听该事件
+            ```html
+            <div id="app">
+                <counter count='2' @change='handleChange'></counter>
+                <counter count='1'></counter>
+            </div>
+            ```
+            - 一但监听到 change 事件，我就执行 handleChange 方法
+        - 3.在父组件里 接收参数
+            ```js
+            methods: {
+                handleChange: function(number){
+                    console.log(number)
+                }
+            }
+            ```
+        - 完整代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <counter count='0' @change='handleChange'></counter>
+                <counter count='0' @change='handleChange'></counter>
+                <div>{{total}}</div>
+            </div>
+            <script>
+                let counter = {
+                    props: ['count'],
+                    data: function(){
+                        return {
+                            number: this.count
+                        }
+                    },
+                    template: '<div @click="handleClick">{{number}}</div>',
+                    methods: {
+                        handleClick: function(){
+                            this.number ++;
+                            this.$emit('change', 1, this.number)    // 向外触发一个change事件，并且可以携带多个参数
+                        }
+                    }
+                }
+
+                var vm = new Vue({
+                    el: '#app',
+                    data: {
+                        total: 0
+                    },
+                    components: {
+                        counter: counter
+                    },
+                    methods: {
+                        handleChange: function(step, number){
+                            this.total += step
+                            console.log(number)
+                        }
+                    }
+                })
+            </script>
+            ```
+- ### 4-3 组件参数校验与非 props 特性
+    - 1.组件参数校验
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child parent-msg='hello world'></child>
+        </div>
+        <script>
+            Vue.component('child', {
+                props: {
+                    parentMsg: null,	// null 代表不验证类别
+                    propA: Number,	  // 限定数字
+                    propB: [String, Number],	// 多重条件可用 [] 隔开
+                    propC: {
+                        type: String,
+                        require: true	// 为true时，意思是必须要传，不传就报错
+                    },
+                    propD: {
+                        // 数字类型，且有预设值
+                        type: Number,
+                        default: 100
+                    },
+                    propE: {
+                        // Object 类型，代表可接受的是对象或者数组
+                        type: Object,
+                        default: function(){
+                            return {
+                                message: 'hello'
+                            }
+                        }
+                    },
+                    propF: {
+                        // 自定义的条件验证
+                        validator: function(value){
+                            return value > 10
+                        }
+                    }
+                },
+                template: '<div>{{parentMsg}}</div>'
+            })
+
+            var vm = new Vue({
+                el: '#app',
+            })
+        </script>
+        ```
+    - 2.非 props 特性
+        - #### 什么是 props 特性？
+            ```html
+            <div id="app">
+                <child content='hello world'></child>
+            </div>
+            <script>
+                Vue.component('child', {
+                    props: ['content'],
+                    template: '<div>{{content}}</div>'
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            - 1.props 特性1 - 不显示在 DOM 上
+                - 1.你在 html 中写了 ```content='hello world'```
+                - 2.但是，由于你在子组件上 props 接收了 content
+                - 3.所以， ```content='hello world'``` 不会在最终渲染完后 显示在　DOM 上
+            - 2.props 特性2
+                - 当你 ```props: ['content']``` 接收了 content 以后
+                - 你就可以直接在 ```template: '<div>{{content}}</div>'``` 中使用该值了
+        - #### 什么是 非 props 特性？
+            ```html
+            <div id="app">
+                <child content='hello world'></child>
+            </div>
+            <script>
+                Vue.component('child', {
+                    // props: ['content'],
+                    template: '<div>{{content}}</div>'
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            - 当你父组件传递属性 ```content='hello world'``` 的时候
+            - 你没有用 ```props: ['content']``` 去接收
+            - 非 props 特性1：
+                - 这时候，```content='hello world'``` 就会被渲染显示在  最终的 DOM 上
+            - 非 props 特性2：
+                - 而且，在 ```template: '<div>{{content}}</div>'``` 这里也没法用，因为没有接收
+- ### 4-4 给组件绑定原生事件

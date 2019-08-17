@@ -28,9 +28,8 @@
 				propA: Number,	  // 限定数字
 				propB: [String, Number],	// 多重条件可用 [] 隔开
 				propC: {
-					// 必要栏位，且限定字串类别
 					type: String,
-					require: true
+					require: true	// 为true时，意思是必须要传，不传就报错
 				},
 				propD: {
 					// 数字类型，且有预设值
