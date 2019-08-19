@@ -10,44 +10,22 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
 
     <div id="app">
-        <child parent-msg='hello world'></child>
-    </div>
+		<child>
+			<div class="headerx" slot="header">header</div>
+			<div class="footerx" slot="footer">footer</div>
+		</child>
+	</div>
     <script>
-        Vue.component('child', {
-            props: {
-				parentMsg: null,	// null 代表不验证类别
-				propA: Number,	  // 限定数字
-				propB: [String, Number],	// 多重条件可用 [] 隔开
-				propC: {
-					type: String,
-					require: true	// 为true时，意思是必须要传，不传就报错
-				},
-				propD: {
-					// 数字类型，且有预设值
-					type: Number,
-					default: 100
-				},
-				propE: {
-					// Object 类型，代表可接受的是对象或者数组
-					type: Object,
-					default: function(){
-						return {
-							message: 'hello'
-						}
-					}
-				},
-				propF: {
-					// 自定义的条件验证
-					validator: function(value){
-						return value > 10
-					}
-				}
-			},
-            template: '<div>{{parentMsg}}</div>'
-        })
+		Vue.component('child', {
+			template: `<div>
+							<slot name="header">默认内容</slot>
+							<p>hello</p>
+							<slot name="footer"></slot>
+					   </div>`
+		})
 
         var vm = new Vue({
-            el: '#app',
+            el: '#app'
         })
     </script>
 </body>

@@ -1585,4 +1585,434 @@ Vue 各种语法 入门讲解
                 - 这时候，```content='hello world'``` 就会被渲染显示在  最终的 DOM 上
             - 非 props 特性2：
                 - 而且，在 ```template: '<div>{{content}}</div>'``` 这里也没法用，因为没有接收
+                
 - ### 4-4 给组件绑定原生事件
+    - 存在的问题
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <div @click='clickx'>div</div>
+            <child @click='clickx'></child>
+        </div>
+        <script>
+            Vue.component('child', {
+                template: '<div>child</div>'
+            })
+
+            var vm = new Vue({
+                el: '#app',
+                methods: {
+                    clickx: function(){
+                        alert(12)
+                    }
+                }
+            })
+        </script>
+        ```
+        - 执行代码发现
+            - 绑在原生节点上的 ```<div @click='clickx'>div</div>``` 事件可以被正常触发
+            - 但是，同一个事件，绑在组件上 却**不能触发**
+    - 分析
+        - 当我给组件绑定一个事件的时候，```<child @click='clickx'></child>```，这个 click 实际上是一个自定义的事件
+        - 如果你要触发 组件上的自定义事件，就要这样
+            - 1.先触发子组件的 div 上的 ```@click="handleChildClick"``` 事件 
+            - 2.handleChildClick 再去向外触发这个自定义的 click 事件 ```this.$emit('click')```
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <div @click='clickxx'>div</div>
+                <child @click='clickxx'></child>
+            </div>
+            <script>
+                Vue.component('child', {
+                    template: '<div @click="handleChildClick">child</div>',
+                    methods: {
+                        handleChildClick: function(){
+                            alert('handleChildClick')
+                            this.$emit('click')
+                        }
+                    }
+                })
+
+                var vm = new Vue({
+                    el: '#app',
+                    methods: {
+                        clickxx: function(){
+                            alert(12)
+                        }
+                    }
+                })
+            </script>
+            ```
+    - #### 总结 - 给组件绑定原生事件
+        - 你会发现，用上面的方法来实现该功能，会显得非常复杂
+        - 所以，我们要用更简洁的方法， **给组件绑定原生事件**
+        - 给绑在组件上的原生事件后，加个 ```.native``` 即可
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <div @click='clickx'>div</div>
+            <child @click.native='clickx'></child>
+        </div>
+        <script>
+            Vue.component('child', {
+                template: '<div>child</div>'
+            })
+
+            var vm = new Vue({
+                el: '#app',
+                methods: {
+                    clickx: function(){
+                        alert(12)
+                    }
+                }
+            })
+        </script>
+        ```
+- ### 4-5 非父子组件间的传值
+    - 存在的问题
+    <!-- - ![非父子组件间的传值](https://github.com/946629031/Vue.js/blob/master/img/4-5.jpg) -->
+    - 如上图所示
+        - 根据我们前面学习的内容，父子组件间传值，是可以实现的
+            - 父传子，通过 ```props```
+            - 子传父，通过 ```this.$emit()```
+        - 但是，如果我们要实现 ```1 跟 3``` 或者 ```3 跟 3``` 之间的传值，该怎么办呢？
+            - 显然，如果通过一层层往上传，然后再一层层往下传，这种方式虽然可以实现，但是非常复杂，这不是个好的解决方案
+    - 解决方法
+        - 1.借助 Vuex
+        - 2.发布订阅模式 ( Bus / 总线机制 / 观察者模式 )
+    - 解决方法 - Bus
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child content='Dell'></child>
+            <child content='Lee'></child>
+        </div>
+        <script>
+            Vue.component('child', {
+                props: {
+                    content: String
+                },
+                template: '<div>{{content}}</div>'
+            })
+
+            var vm = new Vue({
+                el: '#app',
+                methods: {
+                    clickxx: function(){
+                        alert(12)
+                    }
+                }
+            })
+        </script>
+        ```
+        - 看上面的代码，如何才能实现这样一个功能？
+            - 当我点击 Dell 的时候，其他的都变成 Dell
+            - 当我点击 Lee 的时候，其他的都变成 Lee
+        - 分析
+            - 如果要实现这个功能，那么就意味着，他们之间不是 父子组件的关系，而是兄弟组件的关系
+            - 如何才能实现，非父子组件间的传值问题呢？
+        - 1.```Vue.prototype.bus = new Vue()```
+            - 第一步，我先创建一个 vue实例，然后挂载到 Vue 这个类的 prototype 上，并且取名为 bus
+                - 这样做的话，后面，不管我使用哪一个 vue实例，上面都会有 bus 这个属性
+        - 2.在子组件上绑定点击事件
+            ```js
+            template: '<div @click="handleClick">{{content}}</div>',
+			methods: {
+				handleClick: function(){
+					alert(this.content)
+				}
+			}
+            ```
+        - 3.接下来，我要把我的内容，传递给另外一个组件，该怎么传？
+            - ```this.bus.$emit('change', this.content)```
+            - 在自己这个组件上，向自己 vue实例 的bus 上触发 change事件，并且带去一个 this.content 参数
+            ```js
+            template: '<div @click="handleClick">{{content}}</div>',
+			methods: {
+				handleClick: function(){
+					this.bus.$emit('change', this.content)
+				}
+			}
+            ```
+        - 4.我这个组件触发事件，另外的组件是不是应该监听呀？
+            - 监听事件
+            ```js
+            mounted: function(){
+				this.bus.$on('change', function(msg){
+					alert(msg)
+				})
+			}
+            ```
+            - 到当前这一步的完整代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <child content='Dell'></child>
+                <child content='Lee'></child>
+            </div>
+            <script>
+                Vue.prototype.bus = new Vue()
+
+                Vue.component('child', {
+                    props: {
+                        content: String
+                    },
+                    template: '<div @click="handleClick">{{content}}</div>',
+                    methods: {
+                        handleClick: function(){
+                            this.bus.$emit('change', this.content)
+                        }
+                    },
+                    mounted: function(){
+                        this.bus.$on('change', function(msg){
+                            alert(msg)
+                        })
+                    }
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            - 当你点击子组件的时候，之所以 ```alert(msg)``` 被弹出两次，是因为有两个组件都在监听
+        - 5.第五步，监听并接收到 msg 后，是不是应该 把自己的内容都改成 msg 呢？
+            ```js
+            mounted: function(){
+				this.bus.$on('change', function(msg){
+					this.content = msg  // 如果你这样写
+				})
+			}
+            ```
+            - 如果你这样写，你会发现，你修改不了
+            - 原因：function 里面的 this 作用域发生了变化
+            ```js
+            mounted: function(){
+				var this_ = this;  // 将 this 保存一份
+				this.bus.$on('change', function(msg){
+					this_.content = msg
+				})
+			}
+            ```
+            - 这样写了之后，你会发现，功能就实现了
+                - 当我点击 Dell 的时候，其他的都变成 Dell
+                - 当我点击 Lee 的时候，其他的都变成 Lee
+        - 6.但是，真的实现了吗？
+            - 打开控制台后，你会发现，Vue 报了警告
+            - [Vue warn]: Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's value. Prop being mutated: "content"
+            - 报错原因，违反了 **单向数据流** 的原则
+            - 解决办法，在组件中，新建一个变量，接收该变量就行
+            ```js
+            Vue.component('child', {
+                data: function(){
+                    return {
+                        selfContent: this.content
+                    }
+                },
+                props: {
+                    content: String
+                }
+            })
+            ```
+    - 最终完整代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child content='Dell'></child>
+            <child content='Lee'></child>
+        </div>
+        <script>
+            Vue.prototype.bus = new Vue()
+
+            Vue.component('child', {
+                data: function(){
+                    return {
+                        selfContent: this.content
+                    }
+                },
+                props: {
+                    content: String
+                },
+                template: '<div @click="handleClick">{{selfContent}}</div>',
+                methods: {
+                    handleClick: function(){
+                        this.bus.$emit('change', this.selfContent)
+                    }
+                },
+                mounted: function(){
+                    var this_ = this;  // 将 this 保存一份
+                    this.bus.$on('change', function(msg){
+                        this_.selfContent = msg
+                    })
+                }
+            })
+
+            var vm = new Vue({
+                el: '#app'
+            })
+        </script>
+        ```
+- ### 4-6 在Vue中使用插槽 slot
+    - 存在的问题
+        - 先来看这段代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <child></child>
+            </div>
+            <script>
+                Vue.component('child', {
+                    template: '<div><p>hello</p></div>'
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+        - 现在有这么一个问题
+            - 现在子组件内，除了展示 ```<p>hello</p>``` 以外
+            - **我还需要展示一段内容，但是这段内容不是我子组件所决定的，而是父组件传递过来的**
+        - 尝试解决问题
+            - 按照我们过去的方法，可能会想到这样
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="app">
+                <child content='<p>Dell</p>'></child>
+            </div>
+            <script>
+                Vue.component('child', {
+                    props: ['content'],
+                    template: `<div>
+                                    <p>hello</p>
+                                    <div v-html='this.content'></div>
+                            </div>`
+                })
+
+                var vm = new Vue({
+                    el: '#app'
+                })
+            </script>
+            ```
+            - 分析
+                - 虽然这样 好像能解决问题了
+                - 问题1：
+                    - 但是 ```<p>Dell</p>``` 的外层多了一个 div 标签
+                        - 有的同学会想到这样 ```<template v-html='this.content'></template>```
+                        - 把 div 改成 template 模板占位符
+                        - 但是执行结果发现，这样并不能实现功能
+                        - 所以，还是得多包一层 div ```<div v-html='this.content'></div>```
+                - 问题2：
+                    - 当你这样传递的内容很少的时候还行
+                    - 如果传递的内容很多的时候，就会变成这样
+                        ```html
+                        <div id="app">
+                            <child content='<p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p><p>Dell</p>'></child>
+                        </div>
+                        ```
+                    - 就会代码变得非常难以阅读
+    - 插槽 slot
+        - 什么是 插槽 slot？
+            - 由于 上面案例中 的解决方法存在的问题，所以 我们引入了 **插槽slot** 的概念
+            - 用于 **将父组件传递 DOM内容 给子组件的** 优雅解决方案
+        - 插槽 slot 的使用方法
+            - 第一步
+                - 在子组件的标签之间，写入 DOM内容，如 ```<p>Dell</p>```
+                ```html
+                <div id="app">
+                    <child>
+                        <p>Dell</p>
+                    </child>
+                </div>
+                ```
+            - 第二步
+                - 在子组件的 template 中，用 ```<slot></slot>``` 标签接收内容即可
+                ```html
+                Vue.component('child', {
+                    template: `<div>
+                                    <slot></slot>
+                                    <p>hello</p>
+                            </div>`
+                })
+                ```
+            - 完整代码
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+                <div id="app">
+                    <child>
+                        <p>Dell</p>
+                    </child>
+                </div>
+                <script>
+                    Vue.component('child', {
+                        template: `<div>
+                                        <slot></slot>
+                                        <p>hello</p>
+                                </div>`
+                    })
+
+                    var vm = new Vue({
+                        el: '#app'
+                    })
+                </script>
+                ```
+        - 插槽 slot 的一些特性
+            - 特性1 - 默认值
+                - 当你 父组件不传入任何内容的时候，在子组件的 slot插槽可以定义默认内容，如 ```<slot>默认内容</slot>```
+                - 这样子的话，就会显示插槽内的默认内容
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+                <div id="app">
+                    <child></child>
+                </div>
+                <script>
+                    Vue.component('child', {
+                        template: `<div>
+                                        <slot>默认内容</slot>
+                                        <p>hello</p>
+                                </div>`
+                    })
+
+                    var vm = new Vue({
+                        el: '#app'
+                    })
+                </script>
+                ```
+            - 特性2 - **具名插槽**
+                - 具名插槽
+                    - 给插槽取名字，然后根据名字取用插槽内容
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+                <div id="app">
+                    <child>
+                        <div class="headerx" slot="header">header</div>
+                        <div class="footerx" slot="footer">footer</div>
+                    </child>
+                </div>
+                <script>
+                    Vue.component('child', {
+                        template: `<div>
+                                        <slot name="header">默认内容</slot>
+                                        <p>hello</p>
+                                        <slot name="footer"></slot>
+                                </div>`
+                    })
+
+                    var vm = new Vue({
+                        el: '#app'
+                    })
+                </script>
+                ```
+- ### 4-7 作用域插槽
