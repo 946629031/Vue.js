@@ -7,25 +7,33 @@
     <title>Document</title>
 </head>
 <body>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
 
     <div id="app">
-		<child>
-			<div class="headerx" slot="header">header</div>
-			<div class="footerx" slot="footer">footer</div>
-		</child>
+		<component :is='type'></component>
+		<!-- <child-one v-if='type === "child-one"'></child-one>
+		<child-two v-if='type === "child-two"'></child-two> -->
+		<button @click='handleClick'>toggle</button>
 	</div>
     <script>
-		Vue.component('child', {
-			template: `<div>
-							<slot name="header">默认内容</slot>
-							<p>hello</p>
-							<slot name="footer"></slot>
-					   </div>`
+		Vue.component('child-one', {
+			template: '<div>child-one</div>'
+		})
+
+		Vue.component('child-two', {
+			template: '<div>child-two</div>'
 		})
 
         var vm = new Vue({
-            el: '#app'
+            el: '#app',
+			data: {
+				type: 'child-one'
+			},
+			methods: {
+				handleClick: function(){
+					this.type = this.type === 'child-one' ? 'child-two' : 'child-one'
+				}
+			}
         })
     </script>
 </body>

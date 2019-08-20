@@ -41,10 +41,28 @@ Vue 各种语法 入门讲解
     - [4-3 组件参数校验与非 props 特性](#4-3-组件参数校验与非-props-特性)
     - [4-4 给组件绑定原生事件](#4-4-给组件绑定原生事件)
     - [4-5 非父子组件间的传值](#4-5-非父子组件间的传值)
-    - [4-6 在Vue中使用插槽](#4-6-在Vue中使用插槽)
+    - [4-6 在Vue中使用插槽 slot](#4-6-在Vue中使用插槽-slot)
     - [4-7 作用域插槽](#4-7-作用域插槽)
     - [4-8 动态组件与 v-once 指令](#4-8-动态组件与-v-once-指令)
 - [第5章 Vue 中的动画特效](#第5章-Vue-中的动画特效)
+    - [5-1 Vue动画 - Vue中CSS动画原理]()
+    - [5-2 在Vue中使用 animate.css 库]()
+    - [5-3 在Vue中同时使用过渡和动画]()
+    - [5-4 Vue中的 Js 动画与 Velocity.js 的结合]()
+    - [5-5 Vue中多个元素或组件的过渡]()
+    - [5-6 Vue中的列表过渡]()
+    - [5-7 Vue中的动画封装]()
+    - [5-8 本章小节]()
+- [第6章 Vue 项目预热](#第6章-Vue-项目预热)
+    - [6-1 Vue项目预热 - 环境配置](#6-1-Vue项目预热---环境配置)
+    - [6-2 Vue项目预热 - 项目代码介绍](#6-2-Vue项目预热---项目代码介绍)
+    - [6-3 Vue项目预热 - 单文件组件与Vue中的路由](#6-3-Vue项目预热---单文件组件与Vue中的路由)
+    - [6-4 Vue项目预热 - 单页应用VS多页应用](#6-4-Vue项目预热---单页应用VS多页应用)
+    - [6-5 Vue项目预热 - 项目代码初始化](#6-5-Vue项目预热---项目代码初始化)
+- [第7章 项目实战 - 旅游网站首页开发](#第7章-项目实战---旅游网站首页开发)
+    - []()
+    - []()
+    - []()
     - []()
     - []()
     - []()
@@ -1923,7 +1941,7 @@ Vue 各种语法 入门讲解
     - 插槽 slot
         - 什么是 插槽 slot？
             - 由于 上面案例中 的解决方法存在的问题，所以 我们引入了 **插槽slot** 的概念
-            - 用于 **将父组件传递 DOM内容 给子组件的** 优雅解决方案
+            - 用于 **父组件 将要传递的 DOM内容 给到子组件的** 优雅解决方案
         - 插槽 slot 的使用方法
             - 第一步
                 - 在子组件的标签之间，写入 DOM内容，如 ```<p>Dell</p>```
@@ -2016,3 +2034,164 @@ Vue 各种语法 入门讲解
                 </script>
                 ```
 - ### 4-7 作用域插槽
+    - 什么是作用域插槽？
+        - **作用域插槽**：能够让插槽内容能够访问子组件中才有的数据。
+    - 先来看一段代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child></child>
+        </div>
+        <script>
+            Vue.component('child', {
+                data: function(){
+                    return {
+                        list: [1,2,3,4]
+                    }
+                },
+                template: `<div>
+                            <ul>
+                                <li v-for='item of list'>{{item}}</li>
+                            </ul>
+                        </div>`
+            })
+
+            var vm = new Vue({
+                el: '#app' 
+            })
+        </script>
+        ```
+    - 存在的问题
+        - 如上代码，如果我需要的不一定是以 ```<li></li>``` 为标签包裹的
+        - 要什么标签包裹，我要在父组件来确定，你子组件只需要把数据传给父组件就好
+        - 如果是这种需求，该怎么实现呢？
+    - 这时候，就需要用到 **作用域插槽**
+        - **作用域插槽 的执行逻辑**
+            - 父组件调用子组件的时候，传递了一个插槽
+            - 这个插槽叫做 **作用域插槽**
+                - 1.从子组件 传递数据 到父组件，```<slot v-for='item of list' :msg=item></slot>```
+                - 2.作用域插槽必须以 ```<template></template>``` 开头结尾
+                - 3.从子组件接收的数据都放在 props 里面，```slot-scope='props'``` 这个名字可以随意取
+                - 4.你还应该告诉子组件，你接收的 props 应该怎么展示，这里以 ```<li>{{props.msg}}</li>``` 的方式展示
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child>
+                <template slot-scope='props'>
+                    <li>{{props.msg}}</li>
+                </template>
+            </child>
+        </div>
+        <script>
+            Vue.component('child', {
+                data: function(){
+                    return {
+                        list: [1,2,3,4]
+                    }
+                },
+                template: `<div>
+                            <ul>
+                                <slot v-for='item of list' :msg=item></slot>
+                            </ul>
+                        </div>`
+            })
+
+            var vm = new Vue({
+                el: '#app' 
+            })
+        </script>
+        ```
+- ### 4-8 动态组件与 v-once 指令
+    - 先来看下面这段代码, 实现一个 toggle 切换 组件的功能
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="app">
+            <child-one v-if='type === "child-one"'></child-one>
+            <child-two v-if='type === "child-two"'></child-two>
+            <button @click='handleClick'>toggle</button>
+        </div>
+        <script>
+            Vue.component('child-one', {
+                template: '<div>child-one</div>'
+            })
+
+            Vue.component('child-two', {
+                template: '<div>child-two</div>'
+            })
+
+            var vm = new Vue({
+                el: '#app',
+                data: {
+                    type: 'child-one'
+                },
+                methods: {
+                    handleClick: function(){
+                        this.type = this.type === 'child-one' ? 'child-two' : 'child-one'
+                    }
+                }
+            })
+        </script>
+        ```
+    - 那么，除了上面这张方法，有没有更优雅的方法呢？
+    - 有的，**动态组件**
+    - 动态组件逻辑
+        - 1.```<component></component>``` 是 Vue 的 动态组件 保留关键字
+        - 2.动态组件会根据 ```:is=''``` 里面的数据，来动态变化
+            - 如 ```:is='child-one'```，动态组件就显示 child-one 组件
+            - 如 ```:is='child-two'```，动态组件就显示 child-two 组件
+    ```html
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+    <div id="app">
+        <component :is='type'></component>
+        <!-- <child-one v-if='type === "child-one"'></child-one>
+        <child-two v-if='type === "child-two"'></child-two> -->
+        <button @click='handleClick'>toggle</button>
+    </div>
+    <script>
+        Vue.component('child-one', {
+            template: '<div>child-one</div>'
+        })
+
+        Vue.component('child-two', {
+            template: '<div>child-two</div>'
+        })
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                type: 'child-one'
+            },
+            methods: {
+                handleClick: function(){
+                    this.type = this.type === 'child-one' ? 'child-two' : 'child-one'
+                }
+            }
+        })
+    </script>
+    ```
+    - v-once
+        - 你可以在根元素上添加 v-once 特性以确保这些内容只计算一次然后缓存起来
+            - 优点：会缓存起来，提高性能
+        - 尽量少用
+        - 缺点：使用 v-once 但也会出现一些问题，具体查看 [官方文档](https://cn.vuejs.org/v2/guide/components-edge-cases.html#%E9%80%9A%E8%BF%87-v-once-%E5%88%9B%E5%BB%BA%E4%BD%8E%E5%BC%80%E9%94%80%E7%9A%84%E9%9D%99%E6%80%81%E7%BB%84%E4%BB%B6)
+
+## 第5章 Vue 中的动画特效
+- ### 5-1 Vue动画 - Vue中CSS动画原理
+- ### 5-2 在Vue中使用 animate.css 库
+- ### 5-3 在Vue中同时使用过渡和动画
+- ### 5-4 Vue中的 Js 动画与 Velocity.js 的结合
+- ### 5-5 Vue中多个元素或组件的过渡
+- ### 5-6 Vue中的列表过渡
+- ### 5-7 Vue中的动画封装
+- ### 5-8 本章小节
+
+## 第6章 Vue 项目预热
+- ### 6-1 Vue项目预热 - 环境配置
+- ### 6-2 Vue项目预热 - 项目代码介绍
+- ### 6-3 Vue项目预热 - 单文件组件与Vue中的路由
+- ### 6-4 Vue项目预热 - 单页应用VS多页应用
+- ### 6-5 Vue项目预热 - 项目代码初始化
