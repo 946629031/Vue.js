@@ -2191,7 +2191,238 @@ Vue 各种语法 入门讲解
 
 ## 第6章 Vue 项目预热
 - ### 6-1 Vue项目预热 - 环境配置
+    - 1.安装node
+    - 2.链接 git 仓库
+        - 1.生成 sshkey
+            ```ssh-keygen -t rsa -C "xxxxx@xxxxx.com"```
+        - 2.查看公钥
+            ```cat ~/.ssh/id_rsa.pub```
+        - 3.在github仓库中 - 设置 - SSH公钥中，添加该公钥
+    - 3.项目初始化
+        ```
+        # 全局安装 vue-cli
+        $ npm install --global vue-cli
+
+        # 创建一个基于 webpack 模板的新项目
+        $ vue init webpack my-project
+
+        # 安装依赖, 走你
+        $ cd my-project
+        $ npm install
+        $ npm run dev
+        ```
+        - 项目初始化时的 **问题翻译**
+            ```
+            $ vue init webpack travel
+
+            ? Target directory exists. Continue? (Y/n) yes
+            ? Target directory exists. Continue? Yes
+            ? Project name (travel)     // 回车默认选择，或者重新输入
+            ? Project name travel
+            ? Project description (A Vue.js project)
+            ? Project description A Vue.js project
+            ? Author (username <xxxxxxx@qq.com>)
+            ? Author username <xxxxxxx@qq.com>
+
+            ? Vue build runtime standalone
+            > Runtime + Compiler: recommended for most users
+
+            ? Install vue-router? (Y/n) y
+            ? Install vue-router? Yes
+            ? Use ESLint to lint your code? (Y/n) y
+            ? Use ESLint to lint your code? Yes
+            ? Pick an ESLint preset (Use arrow keys)
+            ? Pick an ESLint preset Standard
+            ? Set up unit tests (Y/n) n     // 单元测试
+            ? Set up unit tests No
+            ? Setup e2e tests with Nightwatch? (Y/n) n  // e2e tests 端到端测试又叫功能测试，站在用户视角，使用各种功能
+            ? Setup e2e tests with Nightwatch? No
+            ? Should we run `npm install` for you after the project has been created? (recom
+            ? Should we run `npm install` for you after the project has been created? (recom
+            mended) npm
+            ```
+
+
 - ### 6-2 Vue项目预热 - 项目代码介绍
+    - [参考链接](http://vuejs-templates.github.io/webpack/structure.html)
+
 - ### 6-3 Vue项目预热 - 单文件组件与Vue中的路由
+    - #### 6-3-1 单文件组件
+        - App.vue **是整个应用的根组件**
+        - 下面这段代码，就是 单文件组件
+        - 由三部分组成 template, script, style
+        ```html
+        // src/App.vue
+        <template>
+            <div id="app">
+                <img src="./assets/logo.png">
+                <router-view/>
+                <!-- 显示的是当前路由地址所对应的内容 -->
+            </div>
+        </template>
+
+        <script>
+            export default {
+                name: 'App'
+            }
+        </script>
+
+        <style>
+        #app {
+            font-family: 'Avenir', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 60px;
+        }
+        </style>
+        ```
+
+    - #### 6-3-2 Vue中的路由
+        - 什么是路由？
+            - 路由就是根据网址的不同，返回不同的内容给用户
+        - 在 ```src/App.vue``` 文件中，有个 ```<router-view/>``` 标签
+        - 我们先回到入口文件 ```src/main.js```
+            ```js
+            // src/main.js
+            import Vue from 'vue'
+            import App from './App'
+            import router from './router'   // 引入路由配置文件 router/index.js
+
+            Vue.config.productionTip = false
+
+            new Vue({
+                el: '#app',
+                router,    // 使用 router。这里是es6语法，等于 router: router
+                components: { App },
+                template: '<App/>'
+            })
+            ```
+        - 再看 **路由配置文件**
+            ```js
+            // src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import HelloWorld from '@/components/HelloWorld'    // @ 指的就是 src 目录
+
+            Vue.use(Router)
+
+            export default new Router({
+                routes: [
+                    {
+                    path: '/',      // 如果访问跟路径
+                    name: 'HelloWorld',
+                    component: HelloWorld     // 就加载 HelloWorld 组件
+                    }
+                ]
+            })
+            ```
+
+
 - ### 6-4 Vue项目预热 - 单页应用VS多页应用
+    - #### 6-4-1 多页应用
+        - 每次页面跳转，都返回新的 HTML
+        - 优点：首屏时间快，SEO效果好
+        - 缺点：页面切换慢
+    - #### 6-4-2 单页应用
+        - 页面跳转，通过js渲染
+        - 优点：页面切换快
+        - 缺点：首屏时间稍慢，SEO差 (vue服务器端渲染 可解决SEO问题)
+        - 它是如何做到，不请求 HTML，但是页面却会跟着变呢？
+            - js 监控 url 变化，切换页面时，通过js 清除页面内容，然后再把 新页面的内容挂载到页面上
+            - 这时候，路由不是后端来做了，而是前端来做的
+    - Vue 中的 **跳转链接**
+        - 在过去，我们都是用 ```<a></a>``` 标签 来做跳转的
+        - 但是，在Vue中，由于是单页面应用，所以不能用 ```<a></a>``` 标签
+        - 要用 ```<router-link></router-link>```
+        ```html
+        <template>
+            <div>
+                <div>home</div>
+                <router-link to="/list">列表页</router-link>
+            </div>
+        </template>
+
+        <script>
+        export default {
+            name: 'Home'
+        }
+        </script>
+
+        <style></style>
+        ```
+        - 但是由于 **单页面组件** 中的 ```<template></template>``` 只能有一个根标签，所以外层还需要包一个 ```<div></div>```
+
 - ### 6-5 Vue项目预热 - 项目代码初始化
+    - 1.限制缩放
+        ```html
+        // index.html
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        ```
+    - 2.重置样式
+        - ```npm i minireset.css```
+        - 在入口文件 引入
+            ```js
+            // src/main.js
+            import Vue from 'vue'
+            import App from './App'
+            import router from './router'
+            import 'minireset.css'    // 引入重置样式
+
+            Vue.config.productionTip = false
+
+            new Vue({
+                el: '#app',
+                router,
+                components: { App },
+                template: '<App/>'
+            })
+            ```
+        - 此外重置样式还有：normalize.css, reset.css, minireset.css
+    - 3.1px像素边框的问题
+        - 解决方案
+            - [border.css](https://blog.csdn.net/qq_36407748/article/details/80958774)
+            - [border-1px](https://github.com/yscoder/border-1px)
+        - 用法
+            ```js
+            // src/main.js
+            import Vue from 'vue'
+            import App from './App'
+            import router from './router'
+            import 'minireset.css'
+            import '@/assets/styles/border.css'     // 在这里直接引入即可
+
+            Vue.config.productionTip = false
+
+            new Vue({
+                el: '#app',
+                router,
+                components: { App },
+                template: '<App/>'
+            })
+            ```
+    - 4.移动端 300毫秒 点击延迟问题
+        - 问题：在移动端开发中，在某些机型、某些浏览器，当你使用 click事件 的时候，这个click事件 会延迟 300毫秒 才执行，这样的话用户体验就不是特别好了
+        - 解决方案：fastClick
+        - 安装 ```npm i fastclick```
+        - 使用
+            ```js
+            // src/main.js
+            import Vue from 'vue'
+            import App from './App'
+            import router from './router'
+            import fastClick from 'fastclick'       // 引入
+            import 'minireset.css'
+            import '@/assets/styles/border.css'
+
+            Vue.config.productionTip = false
+            fastClick.attach(document.body)         // 配置使用
+
+            new Vue({
+                el: '#app',
+                router,
+                components: { App },
+                template: '<App/>'
+            })
+            ```
