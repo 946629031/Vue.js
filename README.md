@@ -59,10 +59,21 @@ Vue 各种语法 入门讲解
     - [6-3 Vue项目预热 - 单文件组件与Vue中的路由](#6-3-Vue项目预热---单文件组件与Vue中的路由)
     - [6-4 Vue项目预热 - 单页应用VS多页应用](#6-4-Vue项目预热---单页应用VS多页应用)
     - [6-5 Vue项目预热 - 项目代码初始化](#6-5-Vue项目预热---项目代码初始化)
+        - [1.限制缩放](#1.限制缩放)
+        - [2.重置样式](#2.重置样式)
+        - [3.1px像素边框的问题](#3.1px像素边框的问题)
+        - [4.移动端 300毫秒 点击延迟问题](#4.移动端-300毫秒-点击延迟问题)
 - [第7章 项目实战 - 旅游网站首页开发](#第7章-项目实战---旅游网站首页开发)
-    - []()
-    - []()
-    - []()
+    - [7-1 Vue项目首页 - header区域开发](#7-1-Vue项目首页---header区域开发)
+    - [7-2 Vue项目首页 - iconfont 的使用和代码优化](#7-2-Vue项目首页---iconfont-的使用和代码优化)
+    - [7-3 Vue项目首页 - 首页轮播图](#7-3-Vue项目首页---首页轮播图)
+    - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
+    - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
+    - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
+    - [7-7 Vue项目首页 - 开发周末游组件](#7-7-Vue项目首页---开发周末游组件)
+    - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
+    - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
+- []()
     - []()
     - []()
     - []()
@@ -2245,6 +2256,30 @@ Vue 各种语法 入门讲解
 
 - ### 6-2 Vue项目预热 - 项目代码介绍
     - [参考链接](http://vuejs-templates.github.io/webpack/structure.html)
+    
+    ```
+    Vue.js 目录结构
+    + |- /build             // 项目构建(webpack)相关代码
+    + |- /config            // 配置目录，包括端口号等
+    + |- /node_modules
+    + |- /src
+        + |- /assets        // 放置一些图片，如logo等
+        + |- /components    // 组件文件，可以不用。
+        + |- /router
+            |- App.vue
+            |- main.js
+    + |- /static            // 静态资源目录，如图片、字体等。
+    |- .babelrc
+    |- .editorconfig
+    |- .eslintignore
+    |- .eslintrc.js
+    |- .gitignore
+    |- .postcssrc.js
+    |- index.html.json
+    |- package-lock.json
+    |- package.json
+    |- README.md
+    ```
 
 - ### 6-3 Vue项目预热 - 单文件组件与Vue中的路由
     - #### 6-3-1 单文件组件
@@ -2355,12 +2390,12 @@ Vue 各种语法 入门讲解
         - 但是由于 **单页面组件** 中的 ```<template></template>``` 只能有一个根标签，所以外层还需要包一个 ```<div></div>```
 
 - ### 6-5 Vue项目预热 - 项目代码初始化
-    - 1.限制缩放
+    - #### 1.限制缩放
         ```html
         // index.html
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
         ```
-    - 2.重置样式
+    - #### 2.重置样式
         - ```npm i minireset.css```
         - 在入口文件 引入
             ```js
@@ -2380,7 +2415,7 @@ Vue 各种语法 入门讲解
             })
             ```
         - 此外重置样式还有：normalize.css, reset.css, minireset.css
-    - 3.1px像素边框的问题
+    - #### 3.1px像素边框的问题
         - 解决方案
             - [border.css](https://blog.csdn.net/qq_36407748/article/details/80958774)
             - [border-1px](https://github.com/yscoder/border-1px)
@@ -2402,7 +2437,7 @@ Vue 各种语法 入门讲解
                 template: '<App/>'
             })
             ```
-    - 4.移动端 300毫秒 点击延迟问题
+    - #### 4.移动端 300毫秒 点击延迟问题
         - 问题：在移动端开发中，在某些机型、某些浏览器，当你使用 click事件 的时候，这个click事件 会延迟 300毫秒 才执行，这样的话用户体验就不是特别好了
         - 解决方案：fastClick
         - 安装 ```npm i fastclick```
@@ -2430,3 +2465,123 @@ Vue 各种语法 入门讲解
             
 ## 第7章 项目实战 - 旅游网站首页开发
 - ### 7-1 Vue项目首页 - header区域开发
+    - 7-1-1 安装 ```npm i stylus stylus-loader```
+    - 7-1-2 我们先来看一下要做的首页UI设计图
+        <!-- ![首页UI设计图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
+    - 7-1-3 首页 header 部分的开发
+        - 下面我们来讲，怎么将首页拆分成组件
+        ```
+        项目目录
+        + |- /build
+        + |- /config
+        + |- /node_modules
+        + |- /src
+            + |- /assets
+            + |- /pages
+                + |- /home
+                    + |- /components
+                        |- Header.vue       // 首页 header 组件
+                      |- Home.vue
+            + |- /router
+              |- App.vue
+              |- main.js
+        + |- /static
+        |- .babelrc
+        |- .editorconfig
+        |- .eslintignore
+        |- .eslintrc.js
+        |- .gitignore
+        |- .postcssrc.js
+        |- index.html.json
+        |- package-lock.json
+        |- package.json
+        |- README.md
+        ```
+
+    ```html
+    // /src/pages/home/Home.vue
+    <template>
+    <div>
+        <home-header></home-header>  <!-- 使用 HomeHeader 组件 -->
+    </div>
+    </template>
+
+    <script>
+    import HomeHeader from './components/Header'
+    export default {
+    name: 'Home',
+        components: {
+            HomeHeader // 将组件Header，注册位局部组件
+        }
+    }
+    </script>
+
+    <!-- Add "scoped" attribute to limit CSS to this component only -->
+    <style scoped>
+    </style>
+    ```
+
+    ```html
+    // /src/pages/home/components/Header.vue
+    <template>
+    <div class="header">
+        <div class="header-left">返回</div>
+        <div class="header-input">输入城市/景点/游玩主题</div>
+        <div class="header-right">城市</div>
+    </div>
+    </template>
+
+    <script>
+    export default {
+        name: 'Home'
+    }
+    </script>
+
+    <!-- 添加“scoped”属性以仅将CSS限制到此组件 -->
+    <style lang="stylus" scoped>
+        .header
+            display: flex
+            line-height: .86rem
+            background: #00bcd4
+            color: #fff
+            font-size: 16px
+
+            .header-left
+                width: .64rem
+                float: left
+            .header-input
+                flex: 1
+                background: #fff
+                height: .64rem
+                line-height: .64rem
+                margin: .12rem 0 0 .2rem
+                border-radius: .1rem
+                color: #ccc
+            .header-right
+                width: 1.24rem
+                float: right
+    </style>
+    ```
+    - 7-1-4 遇到的问题
+        - #### 如何在手机上预览vue项目
+            - 1.修改config文件夹下的index.js文件:
+                ```js
+                module.exports = {
+                    dev: {
+                        host: '0.0.0.0' // 原为: host: 'localhost'
+                    }
+                }
+                ```
+            - 2.查询本地局域网ip
+                - window: ctrl+r输入cmd回车,打开命令提示符,输入ipconfig,查看本地ip 
+                - mac：点右上角状态wifi图标，选择更多偏好设置即可看见本机局域网ip
+
+
+- ### 7-2 Vue项目首页 - iconfont 的使用和代码优化和代码优化)
+- ### 7-3 Vue项目首页 - 首页轮播图
+- ### 7-4 Vue项目首页 - 图标区域页面布局
+- ### 7-5 Vue项目首页 - 图标区域逻辑实现
+- ### 7-6 Vue项目首页 - 热销推荐组件开发
+- ### 7-7 Vue项目首页 - 开发周末游组件
+- ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求)
+- ### 7-9 Vue项目首页 - 首页父子组组件间传值
