@@ -2828,7 +2828,7 @@ Vue 各种语法 入门讲解
                 ```
                 - **注意**：当修改了 webpack 配置项的时候，需要重启服务器，才能生效
             - 3.第二步，使用该别名
-                - 下面3中引入 css 的方式都是等价的
+                - 下面3种引入 css 的方式都是等价的
                     ```html
                     <template>
                     <div class="header"></div>
@@ -2845,6 +2845,7 @@ Vue 各种语法 入门讲解
                         // @import '../../../assets/styles/varibles.styl' // 引入 css变量文件
                         // @import '~@/assets/styles/varibles.styl' // 引入 css变量文件
                         @import '~styles/varibles.styl' // 引入 css变量文件
+
                         .header
                             display: flex
                             line-height: .86rem
@@ -2875,6 +2876,46 @@ Vue 各种语法 入门讲解
 
 
 - ### 7-3 Vue项目首页 - 首页轮播图
+    - #### 7-3-1 在 git 新分支上开发新功能，然后合并
+        - 背景：为什么？
+            - 为什么要在 git 新分支上开发新功能，然后合并？
+            - 1.在真正的企业级别开发之中，我们每开发一个功能，实际上是要创建一个 git 分支的
+            - 2.然后在分支上开发新功能 ( 或者修复Bug )
+            - 3.当我们代码开发完成之后，我们再把 分支上的代码 合并到 master 主分支上
+        - 7-3-1-2 怎么新建分支？
+            - 1.打开 [github 项目链接](https://github.com/946629031/Travel)
+            - 2.在左上方，找到 ```Branch: master``` 按钮
+            - 3.点开该按钮，在里面输入 新分支名，然后确认创建即可
+        - 7-3-1-3 创建完新分支，下一步呢？
+            - 1.将远程仓库的代码 pull 到本地
+                ```shell
+                $ git pull
+                From https://github.com/946629031/Travel
+                * [new branch]      index-swiper -> origin/index-swiper
+                Already up to date.
+                ```
+            - 2.切换到新分支下
+                ```shell
+                $ git checkout index-swiper
+                Switched to branch 'index-swiper'
+                ```
+            - 3.检查各分支状态
+                - 如果有修改了，但未提交的文件，```git status``` 后会被标红
+                ```shell
+                $ git status
+                On branch index-swiper
+                Your branch is up to date with 'origin/index-swiper'.
+
+                nothing to commit, working tree clean
+                ```
+            - 4.进入开发模式
+                ```shell
+                $ npm run dev
+                ```
+- 2:50
+
+
+
 - ### 7-4 Vue项目首页 - 图标区域页面布局
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
