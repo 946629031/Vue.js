@@ -69,6 +69,8 @@ Vue 各种语法 入门讲解
         - [7-2-2 在vue中 定义css变量](#7-2-2-在vue中-定义css变量)
         - [7-2-3-3 vue项目中 给目录取别名，例如 @ 代表 src 目录一样](#7-2-3-3-vue项目中-给目录取别名例如--代表-src-目录一样)
     - [7-3 Vue项目首页 - 首页轮播图](#7-3-Vue项目首页---首页轮播图)
+        - [7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7.CSS-利用-padding-bottom-实现固定比例的容器---(-轮播图-网速慢-加载时-占位问题-))
+        - [8.vue 中 css 穿透问题](#8.vue-中-css-穿透问题)
     - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
     - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
@@ -2531,7 +2533,7 @@ Vue 各种语法 入门讲解
     export default {
     name: 'Home',
         components: {
-            HomeHeader // 将组件Header，注册位局部组件
+            HomeHeader // 将组件Header，注册到局部组件
         }
     }
     </script>
@@ -2912,8 +2914,271 @@ Vue 各种语法 入门讲解
                 ```shell
                 $ npm run dev
                 ```
-- 2:50
+    - #### 7-3-2 轮播图 开发
+        - 1.轮播图使用的插件 [vue-awesome-swiper](https://github.com/surmon-china/vue-awesome-swiper)
+        - 2.安装插件 ```npm install vue-awesome-swiper@2.6.7 --save```
+        - 3.配置
+            ```js
+            // src/main.js
+            import Vue from 'vue'
+            import VueAwesomeSwiper from 'vue-awesome-swiper'
 
+            // require styles
+            import 'swiper/dist/css/swiper.css'
+
+            Vue.use(VueAwesomeSwiper, /* { default global options } */)
+            ```
+        - 4.新建 Swiper.vue 文件
+            ```
+            项目目录
+            + |- /build
+            + |- /config
+            + |- /node_modules
+            + |- /src
+                + |- /assets
+                + |- /pages
+                    + |- /home
+                        + |- /components
+                            |- Header.vue
+                            |- Swiper.vue       // 创建 Swiper.vue 文件
+                        |- Home.vue
+                + |- /router
+                |- App.vue
+                |- main.js
+            + |- /static
+            |- index.html
+            |- package.json
+            |- README.md
+            ```
+        - 5.Swiper.vue
+            ```html
+            // src/pages/home/components/Swiper.vue<template>
+            <swiper :options="swiperOption">
+                <swiper-slide>
+                    <img src="url.jpg">
+                </swiper-slide>
+                <swiper-slide>
+                    <img src="url.jpg">
+                </swiper-slide>
+                <div class="swiper-pagination"  slot="pagination"></div>
+            </swiper>
+            </template>
+
+            <script>
+            export default {
+                name: 'HomeSwiper',
+                data () {
+                    return {
+                        swiperOption: {
+                            loop: true
+                        }
+                    }
+                }
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+            </style>
+            ```
+            ```js
+            // 对象的扩展
+            {
+                data () {               // es6 写法
+                    return {}
+                }
+            }
+
+            // 等同于
+
+            {
+                data: function () {     // es5 写法
+                    return {}
+                }
+            }
+            ```
+        - 6.将 Swiper.vue 组件注册到 Home.vue 中，并使用
+            ```html
+            // src/pages/home/Home.vue
+            <template>
+            <div>
+                <home-header></home-header>
+                <home-swiper></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
+            </div>
+            </template>
+
+            <script>
+            import HomeHeader from './components/Header'
+            import HomeSwiper from './components/Swiper'
+            export default {
+            name: 'Home',
+                components: {
+                    HomeHeader,
+                    HomeSwiper // 将组件HomeSwiper，注册到局部组件
+                }
+            }
+            </script>
+
+            <style scoped>
+            </style>
+            ```
+        - ##### 7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )
+            - 问题描述
+                - 1.在 Home.vue 中加个 div
+                    ```html
+                    // src/pages/home/Home.vue
+                    <template>
+                    <div>
+                        <home-header></home-header>
+                        <home-swiper></home-swiper>
+                        <div>test</div>  <!-- 加个 div -->
+                    </div>
+                    </template>
+                    ```
+                - 2.然后在 chrome 控制台 network 右侧 找到 ```no throttling``` 然后选择 ```Slow 3G```
+                    - 意思是，让项目在低网速的环境下访问
+                - 3.这时候，强制刷新 ```shift + f5```
+                    - 你会看到
+                        - 起初，```<home-swiper>``` 是不占位的，因为图片没有加载到
+                            - 这时候，```<div>test</div>``` 的位置是在 ```<home-swiper>``` 的位置上
+                        - 然后，```<home-swiper>``` 里的图片，加载到一半
+                            - ```<div>test</div>``` 也往下移动一半
+                        - 最后，```<home-swiper>``` 里的图片，加载完全
+                            - ```<div>test</div>``` 才回到它应该在位置
+                    - **也就是说，从头到尾，随着图片的加载，页面元素的位置是不断发生变化的**
+                        - 而这种情况，会让用户感觉到不适
+            - 问题解决
+                - 参考文章：
+                    - [《巧用margin/padding的百分比值实现高度自适应（多用于占位，避免闪烁）》](https://segmentfault.com/a/1190000004231995)
+                    - [《CSS 利用 `padding-bottom` 实现固定比例的容器》](https://www.cnblogs.com/Wayou/p/css_keep_ratio_by_padding_bottom.html)
+                    - 本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 ```百分比``` 的值时，无论是left/right，还是 ```top/bottom```，都是以 ```父元素的width``` 为参照物的！
+                - 1.因为 轮播图 宽高比是 750:200，所以 200/750 = 26.66%
+                - 2.实现 固定比例的容器
+                    - 这种方式 实现 **固定比例的容器**，无论 用户屏幕多大，都能完美适配
+                    ```html
+                    // src/pages/home/components/Swiper.vue<template>
+                    <template>
+                        <div class="wrapper">
+                            <swiper :options="swiperOption">
+                                <swiper-slide>
+                                    <img src="url.jpg">
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <img src="url.jpg">
+                                </swiper-slide>
+                                <div class="swiper-pagination"  slot="pagination"></div>
+                            </swiper>
+                        </div>
+                    </template>
+
+                    <script>
+                    export default {
+                        name: 'HomeSwiper',
+                        data () {
+                            return {
+                                swiperOption: {
+                                    loop: true
+                                }
+                            }
+                        }
+                    }
+                    </script>
+
+                    <style lang="stylus" scoped>
+                        .wrapper
+                            overflow: hidden
+                            width: 100%                // 相对于 父元素的width
+                            height: 0
+                            padding-bottom: 26.66%     // 相对于 父元素的width
+                    </style>
+                    ```
+                - 3.另一种写法
+                    - 利用 vw 也是可以的，但是可能存在一定的兼容问题
+                    ```html
+                    <style lang="stylus" scoped>
+                        .wrapper
+                            width: 100%
+                            height: 26.66vw
+                    </style>
+                    ```
+        - ##### 8.vue 中 css 穿透问题
+            - 1.轮播图底部的 小白点
+                ```html
+                <template>
+                <div class="wrapper">
+                    <swiper :options="swiperOption">
+                    <swiper-slide>
+                        <img src="url.jpg">
+                    </swiper-slide>
+                    <swiper-slide>
+                        <img src="url.jpg">
+                    </swiper-slide>
+                    <div class="swiper-pagination"  slot="pagination"></div>
+                    </swiper>
+                </div>
+                </template>
+
+                <script>
+                export default {
+                    name: 'HomeSwiper',
+                    data () {
+                        return {
+                            swiperOption: {
+                                pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                                loop: true
+                            }
+                        }
+                    }
+                }
+                </script>
+
+                <style lang="stylus" scoped>
+                .wrapper
+                    overflow: hidden
+                    width: 100%
+                    height: 0
+                    padding-bottom: 26.66%
+                    .swiper-pagination-bullet-active
+                        background: #fff    // 这样设置是无效的
+                </style>
+                ```
+            - 2.设置了 轮播图底部的 小白点 后发现，他的点是蓝色的
+                - 1.原因是因为 swiper 插件 他的 swiper.css 默认设置为 
+                    ```css
+                    .swiper-pagination-bullet-active {
+                        background: blue;
+                    }
+                    ```
+                - 2.尝试解决
+                    ```stylus
+                    <style lang="stylus" scoped>
+                    .wrapper
+                        overflow: hidden
+                        width: 100%
+                        height: 0
+                        padding-bottom: 26.66%
+                        .swiper-pagination-bullet-active
+                            background: #fff    // 这样设置是无效的
+                    </style>
+                    ```
+                    - 无效的原因：
+                        - 1.因为 ```<style lang="stylus" scoped>``` 设定了 scoped (作用域)，该作用域只对 该 .vue 文件有效
+                        - 2.而 ```.swiper-pagination-bullet-active``` 是 swiper 插件自动生成的，不在当前的 .vue 文件中
+                        - 3.所以 这样设置是无效的
+                - 3.解决方法
+                    - scoped 样式穿透 以后，就不受 scoped 作用域 的限制了
+                    ```stylus
+                    <style lang="stylus" scoped>
+                        .wrapper >>> .swiper-pagination-bullet-active  // scoped 穿透 写法
+                            background: #fff
+                        .wrapper
+                            overflow: hidden
+                            width: 100%
+                            height: 0
+                            padding-bottom: 26.66%
+                    </style>
+                    ```
+
+- 23:20
 
 
 - ### 7-4 Vue项目首页 - 图标区域页面布局
