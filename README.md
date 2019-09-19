@@ -66,6 +66,7 @@ Vue 各种语法 入门讲解
 - [第7章 项目实战 - 旅游网站首页开发](#第7章-项目实战---旅游网站首页开发)
     - [7-1 Vue项目首页 - header区域开发](#7-1-Vue项目首页---header区域开发)
     - [7-2 Vue项目首页 - iconfont 的使用和代码优化](#7-2-Vue项目首页---iconfont-的使用和代码优化)
+        - [7-2-7 在vue中 定义css变量](#7-2-7-在vue中-定义css变量)
     - [7-3 Vue项目首页 - 首页轮播图](#7-3-Vue项目首页---首页轮播图)
     - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
@@ -2492,7 +2493,7 @@ Vue 各种语法 入门讲解
         |- .eslintrc.js
         |- .gitignore
         |- .postcssrc.js
-        |- index.html.json
+        |- index.html
         |- package-lock.json
         |- package.json
         |- README.md
@@ -2577,11 +2578,182 @@ Vue 各种语法 入门讲解
                 - mac：点右上角状态wifi图标，选择更多偏好设置即可看见本机局域网ip
 
 
-- ### 7-2 Vue项目首页 - iconfont 的使用和代码优化和代码优化)
+- ### 7-2 Vue项目首页 - iconfont 的使用和代码优化和代码优化
+    - 7-2-1 iconfont下载流程
+        - 1.选择需要的图标 -> 加入到购物车 -> 点开购物车 -> 将所选图标 添加至项目 -> 打开 [我的项目](https://www.iconfont.cn/manage/index) -> 下载至本地
+    - 7-2-2 哪些文件有用？
+        - 下载解压后，发现有很多文件
+        - 我们保留
+            - 字体文件  ( .eot .svg .ttf .woff )
+            - iconfont.css
+    - 7-2-3 将 iconfont 放进项目里
+        ```
+        项目目录
+        + |- /build
+        + |- /config
+        + |- /node_modules
+        + |- /src
+            + |- /assets
+                + |- /styles
+                    + |- /iconfont          // 添加文件夹
+                        |- iconfont.eot     // 添加文件
+                        |- iconfont.svg
+                        |- iconfont.ttf
+                        |- iconfont.woff
+                        |- iconfont.woff2
+                      |- iconfont.css       // 添加文件
+            + |- /pages
+            + |- /router
+              |- App.vue
+              |- main.js
+        + |- /static
+        |- index.html
+        |- package.json
+        |- README.md
+        ```
+    - 7-2-4 将 iconfont.css 里 字体文件 地址修改正确
+        - 如 在各个字体文件前，加 ./iconfont/
+        ```css
+        @font-face {font-family: "iconfont";
+            src: url('./iconfont/iconfont.eot?t=1568849960214'); /* IE9 */
+            src: url('./iconfont/iconfont.eot?t=1568849960214#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('data:application/x-font-woff2;charset=utf-8;base64,....') format('woff2'),
+            url('./iconfont/iconfont.woff?t=1568849960214') format('woff'),
+            url('./iconfont/iconfont.ttf?t=1568849960214') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+            url('./iconfont/iconfont.svg?t=1568849960214#iconfont') format('svg'); /* iOS 4.1- */
+            }
+
+        .iconfont {
+            font-family: "iconfont" !important;
+            font-size: 16px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 以下部分可以直接删除，因为使用 &#xeb99; 这种方法 */
+        .iconicon_left:before { content: "\eb99"; }
+        .iconicon_search:before { content: "\eb9c"; }
+        .iconicon-test:before { content: "\e65c"; }
+        ```
+
+    - 7-2-5 在vue中引入 iconfont.css
+        - ```import '@/assets/styles/iconfont.css' // 引入iconfont```
+        ```js
+        // src/main.js
+        import Vue from 'vue'
+        import App from './App'
+        import router from './router'
+        import fastClick from 'fastclick' // 移动端 300毫秒 点击延迟问题
+        import 'minireset.css'
+        import '@/assets/styles/border.css' // 1px像素边框的问题
+        import '@/assets/styles/iconfont.css' // 引入iconfont
+
+        Vue.config.productionTip = false
+        fastClick.attach(document.body) // 配置使用
+
+        /* eslint-disable no-new */
+        new Vue({
+            el: '#app',
+            router,
+            components: { App },
+            template: '<App/>'
+        })
+        ```
+    - 7-2-6 在vue中使用 iconfont 字体图标
+        - 1.添加 ```class="iconfont"```
+        - 2.在 [iconfont 我的项目](https://www.iconfont.cn/manage/index) 中，鼠标hover图标 即可复制图标代码，如 ```&#xeb99;```
+        ```html
+        <template>
+        <div class="header">
+            <div class="header-left">
+                <span class="iconfont">&#xeb99;</span>  // 使用图标
+            </div>
+            <div class="header-input">输入城市/景点/游玩主题</div>
+            <div class="header-right">城市</div>
+        </div>
+        </template>
+
+        <script>
+        export default {
+            name: 'Home'
+        }
+        </script>
+
+        <!-- 添加“scoped”属性以仅将CSS限制到此组件 -->
+        <style lang="stylus" scoped>
+        </style>
+        ```
+    - #### 7-2-7 在vue中 定义css变量
+        - 7-2-7-1 为什么要定义css变量？
+            - 在项目中我们发现，某个css的值被经常使用，如主题色
+            - 如果现在过圣诞节、新年... 之类的，需要改变主题色。如果是按照之前的方法一个个都写死了，当你改起来时，你会发现非常想屎，**维护性极差**
+            - 这时候，如果把主题色存在一个变量里，只要我把变量改变，整个app主题色就都改变了，这是不是一个一劳永逸的方法呢
+        - 7-2-7-2 这里讲解的是 stylus 变量
+            ```
+            项目目录
+            + |- /build
+            + |- /config
+            + |- /node_modules
+            + |- /src
+                + |- /assets
+                    + |- /styles
+                        + |- /iconfont
+                        |- iconfont.css
+                        |- varibles.styl      // 创建 css变量文件
+                + |- /pages
+                    + |- /home
+                        + |- /components
+                            |- Header.vue     // 这里使用 css变量
+                        |- Home.vue
+                + |- /router
+                |- App.vue
+                |- main.js
+            + |- /static
+            |- index.html
+            |- package.json
+            |- README.md
+            ```
+
+            ```css
+            /* src/assets/styles/varibles.styl */
+            $bgColor = #00bcd4  /* 定义变量 */
+            ```
+            ```html
+            // src/pages/home/components/Header.vue
+            <template>
+            <div class="header">
+                <div class="header-left">
+                    <div class="iconfont">&#xeb99;</div>
+                </div>
+            </div>
+            </template>
+
+            <script>
+            export default {
+                name: 'Home'
+            }
+            </script>
+
+            <!-- 添加“scoped”属性以仅将CSS限制到此组件 -->
+            <style lang="stylus" scoped>
+                @import '../../../assets/styles/varibles.styl' // 引入 css变量文件
+                .header
+                    display: flex
+                    line-height: .86rem
+                    background: $bgColor // 使用css变量
+                    color: #fff
+                    font-size: 16px
+            </style>
+            ```
+
+13:46
+
+
 - ### 7-3 Vue项目首页 - 首页轮播图
 - ### 7-4 Vue项目首页 - 图标区域页面布局
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
 - ### 7-7 Vue项目首页 - 开发周末游组件
-- ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求)
+- ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求
 - ### 7-9 Vue项目首页 - 首页父子组组件间传值
