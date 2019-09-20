@@ -2955,7 +2955,8 @@ Vue 各种语法 入门讲解
             ```
         - 5.Swiper.vue
             ```html
-            // src/pages/home/components/Swiper.vue<template>
+            // src/pages/home/components/Swiper.vue
+            <template>
             <swiper :options="swiperOption">
                 <swiper-slide>
                     <img src="url.jpg">
@@ -3058,7 +3059,7 @@ Vue 各种语法 入门讲解
                 - 2.实现 固定比例的容器
                     - 这种方式 实现 **固定比例的容器**，无论 用户屏幕多大，都能完美适配
                     ```html
-                    // src/pages/home/components/Swiper.vue<template>
+                    // src/pages/home/components/Swiper.vue
                     <template>
                         <div class="wrapper">
                             <swiper :options="swiperOption">
@@ -3106,6 +3107,7 @@ Vue 各种语法 入门讲解
         - ##### 8.vue 中 css scoped 穿透问题
             - 1.轮播图底部的 小白点
                 ```html
+                // src/pages/home/components/Swiper.vue
                 <template>
                 <div class="wrapper">
                     <swiper :options="swiperOption">
@@ -3182,6 +3184,7 @@ Vue 各种语法 入门讲解
                     ```
         - 9.把图片数据写在 组件的 data 数据中, 用 v-for 去循环
             ```html
+            // src/pages/home/components/Swiper.vue
             <template>
                 <div class="wrapper">
                     <swiper :options="swiperOption">
@@ -3266,6 +3269,7 @@ Vue 各种语法 入门讲解
         - 先看效果图
             - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
         ```html
+        // src/pages/home/components/Icons.vue
         <template>
             <div class="icons">
             <div class="icon">
