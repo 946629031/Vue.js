@@ -69,8 +69,10 @@ Vue 各种语法 入门讲解
         - [7-2-2 在vue中 定义css变量](#7-2-2-在vue中-定义css变量)
         - [7-2-3-3 vue项目中 给目录取别名，例如 @ 代表 src 目录一样](#7-2-3-3-vue项目中-给目录取别名例如--代表-src-目录一样)
     - [7-3 Vue项目首页 - 首页轮播图](#7-3-Vue项目首页---首页轮播图)
-        - [7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7.CSS-利用-padding-bottom-实现固定比例的容器---(-轮播图-网速慢-加载时-占位问题-))
-        - [8.vue 中 css 穿透问题](#8.vue-中-css-穿透问题)
+        - [7-3-1 在 git 新分支上开发新功能，然后合并](#7-3-1-在-git-新分支上开发新功能然后合并)
+        - [7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 图片 网速慢 加载时 占位问题 )](#7.CSS-利用-padding-bottom-实现固定比例的容器---(-轮播图-网速慢-加载时-占位问题-))
+        - [8.vue 中 css scoped 穿透问题](#8vue-中-css-scoped-穿透问题)
+        - [7-3-3 git 新分支上开发新完后，怎么合并到 master 主分支上？](#7-3-3-git-新分支上开发新完后怎么合并到-master-主分支上)
     - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
     - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
@@ -3100,7 +3102,7 @@ Vue 各种语法 入门讲解
                             height: 26.66vw
                     </style>
                     ```
-        - ##### 8.vue 中 css 穿透问题
+        - ##### 8.vue 中 css scoped 穿透问题
             - 1.轮播图底部的 小白点
                 ```html
                 <template>
@@ -3177,8 +3179,65 @@ Vue 各种语法 入门讲解
                             padding-bottom: 26.66%
                     </style>
                     ```
+        - 9.把图片数据写在 组件的 data 数据中, 用 v-for 去循环
+            ```html
+            <template>
+                <div class="wrapper">
+                    <swiper :options="swiperOption">
+                    <!-- slides -->
+                    <swiper-slide v-for="item of swiperList" :key="item.id">
+                        <img :src="item.url">
+                    </swiper-slide>
+                    <!-- Optional controls -->
+                    <div class="swiper-pagination"  slot="pagination"></div>
+                    </swiper>
+                </div>
+            </template>
 
-- 23:20
+            <script>
+            export default {
+                name: 'HomeSwiper',
+                data () {
+                    return {
+                    swiperOption: {
+                        pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                        loop: true
+                    },
+                    swiperList: [{
+                        id: '0001',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/3ff47fa622d07edad492c2859a5ad32f.jpg_750x200_3df30168.jpg'
+                    }, {
+                        id: '0002',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/0fa39f9f5e66189e85b5c6e54278587d.jpg_750x200_86c8f2d8.jpg'
+                    }]
+                    }
+                }
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+            .wrapper >>> .swiper-pagination-bullet-active
+                background: #fff
+            .wrapper
+                overflow: hidden
+                width: 100%
+                height: 0
+                padding-bottom: 26.66%
+            </style>
+            ```
+    - #### 7-3-3 git 新分支上开发新完后，怎么合并到 master 主分支上？
+        - 1.把开发完分支的内容 **推送到远程仓库**
+            - 由于之前是在 index-swiper 分支上开发的，现在开发完成后，需要做一下收尾工作
+                - ```git add .```
+                - ```git commit```
+                - ```git push```
+        - 2.把 分支 合并到 master主分支上
+            - ```git checkout master```
+            - ```git merge origin/index-swiper```
+                - 将origin上的master分支 merge 到当前 branch 上, origin是默认远程仓库名
+            - ```git push```
+
+
 
 
 - ### 7-4 Vue项目首页 - 图标区域页面布局
