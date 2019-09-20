@@ -70,10 +70,11 @@ Vue 各种语法 入门讲解
         - [7-2-3-3 vue项目中 给目录取别名，例如 @ 代表 src 目录一样](#7-2-3-3-vue项目中-给目录取别名例如--代表-src-目录一样)
     - [7-3 Vue项目首页 - 首页轮播图](#7-3-Vue项目首页---首页轮播图)
         - [7-3-1 在 git 新分支上开发新功能，然后合并](#7-3-1-在-git-新分支上开发新功能然后合并)
-        - [7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 图片 网速慢 加载时 占位问题 )](#7.CSS-利用-padding-bottom-实现固定比例的容器---(-轮播图-网速慢-加载时-占位问题-))
+        - [7.CSS 利用 `padding-bottom` 实现固定比例的容器 - ( 图片 网速慢 加载时 占位问题 )](#7css-利用-padding-bottom-实现固定比例的容器----轮播图-网速慢-加载时-占位问题-)
         - [8.vue 中 css scoped 穿透问题](#8vue-中-css-scoped-穿透问题)
         - [7-3-3 git 新分支上开发新完后，怎么合并到 master 主分支上？](#7-3-3-git-新分支上开发新完后怎么合并到-master-主分支上)
     - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
+        - [7-4-2 纯css 固定比例伸缩 容器 - 适配任意屏幕](#7-4-2-纯css-固定比例伸缩-容器---适配任意屏幕)
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
     - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
     - [7-7 Vue项目首页 - 开发周末游组件](#7-7-Vue项目首页---开发周末游组件)
@@ -3052,7 +3053,7 @@ Vue 各种语法 入门讲解
                 - 参考文章：
                     - [《巧用margin/padding的百分比值实现高度自适应（多用于占位，避免闪烁）》](https://segmentfault.com/a/1190000004231995)
                     - [《CSS 利用 `padding-bottom` 实现固定比例的容器》](https://www.cnblogs.com/Wayou/p/css_keep_ratio_by_padding_bottom.html)
-                    - 本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 ```百分比``` 的值时，无论是left/right，还是 ```top/bottom```，都是以 ```父元素的width``` 为参照物的！
+                    - ###### 本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 ```百分比``` 的值时，无论是left/right，还是 ```top/bottom```，都是以 ```父元素的width``` 为参照物的！
                 - 1.因为 轮播图 宽高比是 750:200，所以 200/750 = 26.66%
                 - 2.实现 固定比例的容器
                     - 这种方式 实现 **固定比例的容器**，无论 用户屏幕多大，都能完美适配
@@ -3238,9 +3239,98 @@ Vue 各种语法 入门讲解
             - ```git push```
 
 
-
-
 - ### 7-4 Vue项目首页 - 图标区域页面布局
+    <!-- - ![设计效果图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
+    - 明确目标
+        - 看上图。接下来，我们要做的部分，是轮播图下面这个 icon 部分
+    - 7-4-1 创建 开发新功能的 分支，再 pull 到本地
+        - [项目 github](https://github.com/946629031/Travel) 上创建分支
+        - 拉取新分支到本地
+            ```shell
+            $ git pull
+            From https://github.com/946629031/Travel
+            * [new branch]      index-icons -> origin/index-icons
+            Already up to date.
+            ```
+        - 切换到新分支
+            ```shell
+            $ git checkout index-icons
+            Switched to a new branch 'index-icons'
+            ```
+        - ```npm run dev``` 进入开发模式
+    - #### 7-4-2 纯css 固定比例伸缩 容器 - 适配任意屏幕
+        - 不管屏幕大小，元素位置都是固定的，自动适配任意屏幕
+        - 主要知识点
+            - [《css多种 水平垂直 居中方式》](https://blog.csdn.net/qq_41893551/article/details/101073529)
+            - [本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 百分比 的值时，无论是left/right，还是 top/bottom，都是以 父元素的width 为参照物的！](#本文依赖于一个基础却又容易混淆的css知识点当marginpadding取形式为-百分比-的值时无论是leftright还是-topbottom都是以-父元素的width-为参照物的)
+        - 先看效果图
+            - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
+        ```html
+        <template>
+            <div class="icons">
+            <div class="icon">
+                <div class="img-wrapper">
+                <img src="https://imgs.qunarzz.com/piao/fusion/1803/95/f3dd6c383aeb3b02.png">
+                </div>
+                <div class="keywords">景点门票</div>
+            </div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            <div class="icon"></div>
+            </div>
+        </template>
+
+        <script>
+        export default {
+        name: 'Icons'
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        .icons
+            width: 100%
+            padding-bottom: 50%
+
+            .icon
+                width: 25%
+                padding-bottom: 25%
+                height: 0
+                float: left
+                position: relative
+                border: 1px solid #ccc // 分界线
+                background: red
+
+                .img-wrapper
+                    position: relative
+                    padding-bottom: 100%
+                    height: 0
+
+                    img
+                        width: 60%
+                        position:absolute
+                        left: 0
+                        right: 0
+                        top:0
+                        bottom: .44rem
+                        margin: auto
+                
+                .keywords
+                    font-size: .22rem
+                    height: .44rem
+                    line-height: .44rem
+                    position: absolute
+                    top: 65%
+                    bottom: 0
+                    left: 0
+                    right: 0
+                    margin: auto
+        </style>
+        ```
+9:23
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
 - ### 7-7 Vue项目首页 - 开发周末游组件
