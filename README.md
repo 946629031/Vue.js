@@ -3297,6 +3297,7 @@ Vue 各种语法 入门讲解
         <style lang="stylus" scoped>
         .icons
             width: 100%
+            height: 0
             padding-bottom: 50%
 
             .icon
@@ -3336,6 +3337,9 @@ Vue 各种语法 入门讲解
         ```
 9:23
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
+16:40
+
+
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
 - ### 7-7 Vue项目首页 - 开发周末游组件
 - ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求
