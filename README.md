@@ -3265,6 +3265,7 @@ Vue 各种语法 入门讲解
         - 不管屏幕大小，元素位置都是固定的，自动适配任意屏幕
         - 主要知识点
             - [《css多种 水平垂直 居中方式》](https://blog.csdn.net/qq_41893551/article/details/101073529)
+            - [CSS 利用 padding-bottom 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7css-利用-padding-bottom-实现固定比例的容器----轮播图-网速慢-加载时-占位问题-)
             - [本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 百分比 的值时，无论是left/right，还是 top/bottom，都是以 父元素的width 为参照物的！](#本文依赖于一个基础却又容易混淆的css知识点当marginpadding取形式为-百分比-的值时无论是leftright还是-topbottom都是以-父元素的width-为参照物的)
         - 先看效果图
             - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
@@ -3335,8 +3336,140 @@ Vue 各种语法 入门讲解
                     margin: auto
         </style>
         ```
-9:23
+    - 到这里，首页图标区域布局 已完成
+
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
+    - 本节目标
+        - 通过上一节 [7-4 首页图标区域布局](#7-4-vue项目首页---图标区域页面布局) 已经完成了 css 的页面布局
+        - 接下来，我们要实现的是：
+            - 1.根据 首页图标数据 的不同，自动更新页面图标，而不是 写死在页面上的
+            - 2.如果图标个数超过8个，可以实现左右拖动，类似于轮播图的效果
+    - 主要思路
+        - 1.获得的 imgList 数据是一个数组，数组结构为 ```[{}, {}, {}, {}, {}...]```
+            - 数组内每一个对象，就是一个 icon
+            - 数组内子元素 的个数不确定，可能8个，可能十几个...
+            - 但是首页上的 icon 布局，一次最多看到8个
+            - 所以，我们需要对 获得的 imgList 数据再处理，处理成8个一组，8个一组 的形式
+            - 然后，在通过 v-for 循环展示到页面上
+        - 2.根据 上面分成的 8个一组，8个一组 的数据，再分别放在 轮播图的两个页面上 ```<swiper-slide></swiper-slide>```
+    - 代码
+        ```html
+        <template>
+            <div class="icons">
+            <swiper>
+                <swiper-slide v-for="(page, index) of pages" :key="index">
+                <div class="icon" v-for="item of page" :key="item.id">
+                    <div class="img-wrapper">
+                    <img :src="item.url">
+                    </div>
+                    <div class="keywords">{{item.name}}</div>
+                </div>
+                </swiper-slide>
+            </swiper>
+            </div>
+        </template>
+
+        <script>
+        export default {
+            name: 'Icons',
+            data () {
+                return {
+                    imgList: [{
+                        id: '0001',
+                        url: 'https://imgs.qunarzz.com/piao/fusion/1803/95/f3dd6c383aeb3b02.png',
+                        name: '景点门票'
+                    }, {
+                        id: '0002',
+                        url: 'http://img1.qunarzz.com/piao/fusion/1804/ff/fdf170ee89594b02.png',
+                        name: '广州必游'
+                    }, {
+                        id: '0003',
+                        url: 'http://img1.qunarzz.com/piao/fusion/1803/76/eb88861d78fb9902.png',
+                        name: '动植物园'
+                    }, {
+                        id: '0004',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20193/a40ee278d67000f2a29d2e20f6a029b3.png',
+                        name: '自然风光'
+                    }, {
+                        id: '0005',
+                        url: 'http://img1.qunarzz.com/piao/fusion/1804/5a/13ceb38dcf262f02.png',
+                        name: '一日游'
+                    }, {
+                        id: '0006',
+                        url: 'http://img1.qunarzz.com/piao/fusion/1803/3e/86314b2af03b7502.png',
+                        name: '水上乐园'
+                    }, {
+                        id: '0007',
+                        url: 'http://img1.qunarzz.com/piao/fusion/1803/50/26ffa31b56646402.png',
+                        name: '亲子游'
+                    }, {
+                        id: '0008',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20193/184e261814a5d07a5d3d08cd29cf590d.png',
+                        name: '长隆度假区'
+                    }, {
+                        id: '0009',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20193/c032ae43b15a3dac34b5e07bb0e46850.png',
+                        name: '广州塔'
+                    }, {
+                        id: '0010',
+                        url: 'http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20194/bda58ffc3016edad84e656e8a94b0321.png',
+                        name: '广州融创'
+                    }]
+                }
+            },
+            computed: {
+                pages () {
+                    const pages = []
+                    this.imgList.forEach((item, index) => {
+                        const page = Math.floor(index / 8)
+                        if (!pages[page]) pages[page] = [] // 如果为空
+                        pages[page].push(item)
+                    })
+                    return pages
+                }
+            },
+            mounted () {
+                console.log(this.pages)
+            }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+            @import '~styles/varibles.styl';
+            .icons >>> .swiper-container
+                height 0
+                padding-bottom: 50%
+            .icon
+                width: 25%
+                padding-bottom: 25%
+                height: 0
+                float: left
+                position: relative
+                .img-wrapper
+                    position: relative
+                    padding-bottom: 100%
+                    height: 0
+                    img
+                        width: 60%
+                        position:absolute
+                        left: 0
+                        right: 0
+                        top:0
+                        bottom: .44rem
+                        margin: auto
+                .keywords
+                    font-size: .22rem
+                    height: .44rem
+                    line-height: .44rem
+                    position: absolute
+                    top: 65%
+                    bottom: 0
+                    left: 0
+                    right: 0
+                    margin: auto
+                    color: $darkTextColor
+        </style>
+        ```
 16:40
 
 
