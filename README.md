@@ -76,6 +76,7 @@ Vue 各种语法 入门讲解
     - [7-4 Vue项目首页 - 图标区域页面布局](#7-4-Vue项目首页---图标区域页面布局)
         - [7-4-2 纯css 固定比例伸缩 容器 - 适配任意屏幕](#7-4-2-纯css-固定比例伸缩-容器---适配任意屏幕)
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
+        - [7-5-2 css函数 mixins](#7-5-2-css函数-mixins)
     - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
     - [7-7 Vue项目首页 - 开发周末游组件](#7-7-Vue项目首页---开发周末游组件)
     - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
@@ -3238,7 +3239,7 @@ Vue 各种语法 入门讲解
         - 2.把 分支 合并到 master主分支上
             - ```git checkout master```
             - ```git merge origin/index-swiper```
-                - 将origin上的master分支 merge 到当前 branch 上, origin是默认远程仓库名
+                - 将 远程仓库origin上的index-swiper分支, merge 到当前的 master branch 上, origin是默认远程仓库名
             - ```git push```
 
 
@@ -3268,7 +3269,7 @@ Vue 各种语法 入门讲解
             - [CSS 利用 padding-bottom 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7css-利用-padding-bottom-实现固定比例的容器----轮播图-网速慢-加载时-占位问题-)
             - [本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 百分比 的值时，无论是left/right，还是 top/bottom，都是以 父元素的width 为参照物的！](#本文依赖于一个基础却又容易混淆的css知识点当marginpadding取形式为-百分比-的值时无论是leftright还是-topbottom都是以-父元素的width-为参照物的)
         - 先看效果图
-            - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
+            <!-- - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg) -->
         ```html
         // src/pages/home/components/Icons.vue
         <template>
@@ -3339,7 +3340,7 @@ Vue 各种语法 入门讲解
     - 到这里，首页图标区域布局 已完成
 
 - ### 7-5 Vue项目首页 - 图标区域逻辑实现
-    - 本节目标
+    - 7-5-1 本节目标
         - 通过上一节 [7-4 首页图标区域布局](#7-4-vue项目首页---图标区域页面布局) 已经完成了 css 的页面布局
         - 接下来，我们要实现的是：
             - 1.根据 首页图标数据 的不同，自动更新页面图标，而不是 写死在页面上的
@@ -3470,8 +3471,59 @@ Vue 各种语法 入门讲解
                     color: $darkTextColor
         </style>
         ```
-17:50
+    - #### 7-5-2 css函数 mixins
+        - 有时候我们需要：一行字，如果超出规定长度，就显示省略号，如：'广州热门旅游景...'
+        - 解决方法：
+            - 我们只要给对应的选择器，加上3行css即可
+                ```css
+                overflow: hidden
+                white-space: nowarp
+                text-overflow: ellipsis
+                ```
+        - css函数 mixins
+            - 问题
+                - 我们发现，像类似这种css，可能会被复用到多个地方
+                - 所以，它能不能像 js 那样定义成函数，然后需要时，直接调用就可以了呢？
+                - 是可以的
+            - 1.定义 css函数 - mixins
+                ```stylus
+                // src/assets/styles/mixins.styl
+                ellipsis()
+                    overflow: hidden
+                    white-space: nowarp
+                    text-overflow: ellipsis
+                ```
+            - 2.调用函数 mixins
+                ```
+                // demo.vue
+                <template>
+                </template>
 
+                <script>
+                </script>
+
+                <style lang="stylus" scoped>
+                @import '~styles/varibles.styl'     // 引入css变量文件
+                @import '~styles/mixins.styl'       // 引入css函数 mixins文件
+                    .keywords
+                        font-size: .22rem
+                        height: .44rem
+                        line-height: .44rem
+                        color: $darkTextColor       // 使用 css变量
+                        ellipsis()                  // 调用 css函数 mixins
+                </style>
+                ```
+    - 7-5-3 git 新分支上开发新完后，怎么合并到 master 主分支上？
+        - 1.把开发完分支的内容 **推送到远程仓库**
+            - 由于之前是在 index-swiper 分支上开发的，现在开发完成后，需要做一下收尾工作
+                - ```git add .```
+                - ```git commit```
+                - ```git push```
+        - 2.把 分支 合并到 master主分支上
+            - ```git checkout master```
+            - ```git merge origin/index-swiper```
+                - 将 远程仓库origin上的index-swiper分支, merge 到当前的 master branch 上, origin是默认远程仓库名
+            - ```git push```
 
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
 - ### 7-7 Vue项目首页 - 开发周末游组件
