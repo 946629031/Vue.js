@@ -3526,6 +3526,10 @@ Vue 各种语法 入门讲解
             - ```git push```
 
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
+    - [在 flex 项中设置 ```min-width: 0;``` -- flex 项中子元素文本溢出截断 text-overflow:ellipsis 失效问题](https://www.html.cn/archives/10319)
+    - 17:34
+
+    
 - ### 7-7 Vue项目首页 - 开发周末游组件
 - ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求
 - ### 7-9 Vue项目首页 - 首页父子组组件间传值
