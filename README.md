@@ -3527,6 +3527,9 @@ Vue 各种语法 入门讲解
 
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
     - [在 flex 项中设置 ```min-width: 0;``` -- flex 项中子元素文本溢出截断 text-overflow:ellipsis 失效问题](https://www.html.cn/archives/10319)
+    - [Flex Basis与Width的区别](https://www.jianshu.com/p/17b1b445ecd4)
+        - Flex Items的应用准则
+        - content –> width –> flex-basis -> (flex-grow | flex-shrink) -> (limted by max|min-width) 优先级
     - 17:34
 
     
