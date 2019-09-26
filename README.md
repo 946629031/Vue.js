@@ -59,10 +59,10 @@ Vue 各种语法 入门讲解
     - [6-3 Vue项目预热 - 单文件组件与Vue中的路由](#6-3-Vue项目预热---单文件组件与Vue中的路由)
     - [6-4 Vue项目预热 - 单页应用VS多页应用](#6-4-Vue项目预热---单页应用VS多页应用)
     - [6-5 Vue项目预热 - 项目代码初始化](#6-5-Vue项目预热---项目代码初始化)
-        - [1.限制缩放](#1.限制缩放)
-        - [2.重置样式](#2.重置样式)
-        - [3.1px像素边框的问题](#3.1px像素边框的问题)
-        - [4.移动端 300毫秒 点击延迟问题](#4.移动端-300毫秒-点击延迟问题)
+        - [1.限制缩放](#1限制缩放)
+        - [2.重置样式](#2重置样式)
+        - [3.1px像素边框的问题](#31px像素边框的问题)
+        - [4.移动端 300毫秒 点击延迟问题](#4移动端-300毫秒-点击延迟问题)
 - [第7章 项目实战 - 旅游网站首页开发](#第7章-项目实战---旅游网站首页开发)
     - [7-1 Vue项目首页 - header区域开发](#7-1-Vue项目首页---header区域开发)
     - [7-2 Vue项目首页 - iconfont 的使用和代码优化和代码优化](#7-2-Vue项目首页---iconfont-的使用和代码优化和代码优化)
@@ -2460,6 +2460,14 @@ Vue 各种语法 入门讲解
                 template: '<App/>'
             })
             ```
+        - 使用方法：
+            - 在对于的 html 中，加上 对于的 class 即可
+            ```html
+            <li class="border-bottom">
+                <img src="3.jpg">
+            </li>
+            ```
+        - 参考 [《7-6-2 1px 1像素边框 的使用》](#7-6-2-1px-1像素边框-的使用)
     - #### 4.移动端 300毫秒 点击延迟问题
         - 问题：在移动端开发中，在某些机型、某些浏览器，当你使用 click事件 的时候，这个click事件 会延迟 300毫秒 才执行，这样的话用户体验就不是特别好了
         - 解决方案：fastClick
@@ -3526,10 +3534,20 @@ Vue 各种语法 入门讲解
             - ```git push```
 
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
-    - [在 flex 项中设置 ```min-width: 0;``` -- flex 项中子元素文本溢出截断 text-overflow:ellipsis 失效问题](https://www.html.cn/archives/10319)
-    - [Flex Basis与Width的区别](https://www.jianshu.com/p/17b1b445ecd4)
-        - Flex Items的应用准则
-        - content –> width –> flex-basis -> (flex-grow | flex-shrink) -> (limted by max|min-width) 优先级
+    - 7-6-1
+        - [在 flex 项中设置 ```min-width: 0;``` -- flex 项中子元素文本溢出截断 text-overflow:ellipsis 失效问题](https://www.html.cn/archives/10319)
+        - [Flex Basis与Width的区别](https://www.jianshu.com/p/17b1b445ecd4)
+            - Flex Items的应用准则
+            - content –> width –> flex-basis -> (flex-grow | flex-shrink) -> (limted by max|min-width) 优先级
+    - #### 7-6-2 1px 1像素边框 的使用
+        - 在前面 [《1px像素边框的问题》](#31px像素边框的问题) 已经介绍过了，下面讲怎么使用
+        - 使用方法：
+            - 在对于的 html 中，加上 对于的 class 即可
+            ```html
+            <li class="border-bottom">
+                <img src="3.jpg">
+            </li>
+            ```
     - 17:34
 
     
