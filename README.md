@@ -78,6 +78,7 @@ Vue 各种语法 入门讲解
     - [7-5 Vue项目首页 - 图标区域逻辑实现](#7-5-Vue项目首页---图标区域逻辑实现)
         - [7-5-2 css函数 mixins](#7-5-2-css函数-mixins)
     - [7-6 Vue项目首页 - 热销推荐组件开发](#7-6-Vue项目首页---热销推荐组件开发)
+        - [7-6-1 flex 的部分问题](#7-6-1-flex-的部分问题)
     - [7-7 Vue项目首页 - 开发周末游组件](#7-7-Vue项目首页---开发周末游组件)
     - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
     - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
@@ -3534,11 +3535,25 @@ Vue 各种语法 入门讲解
             - ```git push```
 
 - ### 7-6 Vue项目首页 - 热销推荐组件开发
-    - 7-6-1
+    - #### 7-6-1 flex 的部分问题
         - [在 flex 项中设置 ```min-width: 0;``` -- flex 项中子元素文本溢出截断 text-overflow:ellipsis 失效问题](https://www.html.cn/archives/10319)
-        - [Flex Basis与Width的区别](https://www.jianshu.com/p/17b1b445ecd4)
-            - Flex Items的应用准则
-            - content –> width –> flex-basis -> (flex-grow | flex-shrink) -> (limted by max|min-width) 优先级
+        - [[翻译] Flex Basis与Width的区别](https://www.jianshu.com/p/17b1b445ecd4)
+            - Flex Items 的 最终宽度优先级
+            - ```content –> width –> flex-basis -> ( flex-grow | flex-shrink ) -> ( limted by max | min-width ) 优先级```
+        - [flex设置成1和auto有什么区别 [思否] -- flex各个取值分别是什么意思](#https://segmentfault.com/q/1010000004080910/a-1020000004121373)
+        - 当 ```flex-basis: 0``` 跟 ```flex-basis: 0%``` 时
+            - 当 flex-basis 设为 0 后，元素的宽度，取决于 元素内 宽度最大 的子元素，如果没有子元素 则取决于单词宽度最长的词
+            - 如果 flex-basis 为 0，则 flex-grow 忽略弹性项目中内容的大小，并将行中的所有空间都视为自由空间
+            - 其中，当 flex-basis 设为 百分比 后，如 ```flex-basis: 10%```，意思是 相对于父元素的 10% 宽度
+            ```html
+            <ul> <li>I am a simple list AND I am a simple list</li> </ul>
+            <style>
+                ul { display: flex; background: #ccc} 
+                li { padding: 4px; background: #2798bd;}
+                li { flex-basis: 0; }
+            </style>
+            ```
+            - [[参考链接] 该flex-basis因素](https://stackoverflow.com/questions/43520932/make-flex-grow-expand-items-based-on-their-original-size)
     - #### 7-6-2 1px 1像素边框 的使用
         - 在前面 [《1px像素边框的问题》](#31px像素边框的问题) 已经介绍过了，下面讲怎么使用
         - 使用方法：
