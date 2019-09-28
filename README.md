@@ -3065,6 +3065,16 @@ Vue 各种语法 入门讲解
                     - [《巧用margin/padding的百分比值实现高度自适应（多用于占位，避免闪烁）》](https://segmentfault.com/a/1190000004231995)
                     - [《CSS 利用 `padding-bottom` 实现固定比例的容器》](https://www.cnblogs.com/Wayou/p/css_keep_ratio_by_padding_bottom.html)
                     - ###### 本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 ```百分比``` 的值时，无论是left/right，还是 ```top/bottom```，都是以 ```父元素的width``` 为参照物的！
+                        - 三个关键点：
+                            ```css
+                            .parent-box
+                                width: 100%                // 相对于 父元素的width
+                                height: 0                  // height 要为 0
+                                padding-bottom: 26.66%     // 相对于 父元素的width
+                                .child
+                                    background: red
+                            ```
+                            - 这样写了之后，```.parent-box``` 父容器的 宽高比 就是固定比例了的
                 - 1.因为 轮播图 宽高比是 750:200，所以 200/750 = 26.66%
                 - 2.实现 固定比例的容器
                     - 这种方式 实现 **固定比例的容器**，无论 用户屏幕多大，都能完美适配
@@ -3101,7 +3111,7 @@ Vue 各种语法 入门讲解
                         .wrapper
                             overflow: hidden
                             width: 100%                // 相对于 父元素的width
-                            height: 0
+                            height: 0                  // height 要为 0
                             padding-bottom: 26.66%     // 相对于 父元素的width
                     </style>
                     ```
@@ -3653,8 +3663,24 @@ Vue 各种语法 入门讲解
                     padding-right .1rem
         </style>
         ```
+    - 7-6-4 收尾工作
+        - ```git add .```
+        - ```git commit```
+        - ```git push```
 
-    
+
 - ### 7-7 Vue项目首页 - 开发周末游组件
+    - 7-7-1 开发前的准备工作
+        - 1.先在 github 上新建分支 index-weekend 开发新功能
+        - 2.把 分支 index-weekend 合并到 master主分支上
+            - ```git pull```
+            - ```git checkout master```
+            - ```git merge origin/index-weekend```
+                - 将 远程仓库origin上的index-weekend分支, merge 到当前的 master branch 上, origin是默认远程仓库名
+            - ```git push```
+        - 3.```npm run dev``` 进入开发模式
+    - 7-7-2 由于本节内容，与上节内容相似度很高，就不放代码了，具体参考项目源代码即可
+            
+
 - ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求
 - ### 7-9 Vue项目首页 - 首页父子组组件间传值
