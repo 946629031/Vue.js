@@ -3682,5 +3682,167 @@ Vue 各种语法 入门讲解
     - 7-7-2 由于本节内容，与上节内容相似度很高，就不放代码了，具体参考项目源代码即可
             
 
-- ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求-ajax-请求
+- ### 7-8 Vue项目首页 - 使用 axios 发送 ajax 请求
+    - 1.本节目标
+        - Ajax获取首页数据
+    - 2.存在的问题
+        - 在前面几节，我们的数据都是写死在页面上的
+        - 现在，我们要通过Ajax动态的获取首页的数据
+    - 3.开发新功能前的准备工作
+        - 在 远程仓库 github 上，新建开发新功能的分支 ```index-ajax```
+        - ```git pull```
+        - ```git checkout index-ajax```
+        - ```npm run dev```
+    - 4.在vue中，有很多Ajax工具可以供我们使用
+        - fetch
+        - vue-resource
+        - axios
+            - vue官方推荐
+            - axios 非常强大
+                - 能够实现跨平台的请求
+                - 在浏览器端，可以发送 SHR 请求
+                - 在Node服务器上，可以发送 HTTP 请求
+    - 5.安装 axios
+        - npm i axios
+    - 6.在首页中，我们有5个子组件
+        ```
+        项目目录
+        + |- /build
+        + |- /config
+        + |- /node_modules
+        + |- /src
+            + |- /assets
+            + |- /pages
+                + |- /home
+                    + |- /components
+                        |- Header.vue
+                        |- Icons.vue
+                        |- Recommend.vue
+                        |- Swiper.vue
+                        |- Weekend.vue
+                    |- Home.vue
+            + |- /router
+            |- App.vue
+            |- main.js
+        + |- /static
+        |- index.html
+        |- package.json
+        |- README.md
+        ```
+        - 如果每一个子组件，都自己发送一个请求
+            - 那么首页就要发送5个请求，那么这个网站的 **性能肯定是很低的**
+        - 所以，我们应该只 让首页发送一个Ajax请求，这样才比较合理
+    - 7.那么我们应该把这个Ajax请求，放在哪里发生才比较好呢？
+        - 很明显，应该放在 ```Home.vue``` 中
+        - 这个组件，在获取Ajax数据之后，再把数据传给每一个子组件即可
+        - 核心代码
+            - 思路：
+                - 当页面挂载完成 mounted() 时，自动执行 ```this.getHomeInfo()```
+                - getHomeInfo() 发起Ajax请求，请求到数据后，会执行 getHomeInfoSucc()
+            ```js
+            // /src/pages/home/Home.vue
+            mounted () {
+                this.getHomeInfo()
+            },
+            methods: {
+                getHomeInfo () {
+                    axios.get('/api/index.json')
+                        .then(this.getHomeInfoSucc)
+                },
+                getHomeInfoSucc (res) {
+                    console.log(res)
+                }
+            }
+            ```
+    - 8.这时候，你在控制台里会看到报错
+        - ```GET http://localhost:8080/api/index.json 404 (Not Found)```
+        - ```Uncaught (in promise) Error: Request failed with status code 404```
+        - 报错原因，找不到 Ajax请求的文件 '/api/index.json'
+    - 9.在没有后端支持的情况下，如何实现数据的模拟呢？
+        - 我们在 ```'/static'``` 目录下，新建 data_demo 文件夹，用于存放模拟的数据
+            - 为什么要放在 ```'/static'``` 目录下呢？
+                - 因为在 vue 整个工程项目里，只有 ```'/static'``` 目录可以被外部访问
+            - 新建文件 ```'/static/date_demo/index.json'```
+    - 10.使用proxy请求转发
+        - 存在问题
+            - 这时候，我们Ajax请求的就应该是 ```'/static/data_demo/index.json'```
+            - 而不是 上面写的 ```'/api/index.json'```
+        - 那么，这样又带来了新的问题
+            - 我们现在写的都是本地模拟数据的地址，```'/static/data_demo/index.json'```
+                - 而不是上线后，要求的 ```'/api/index.json'``` 地址
+            - 如果是这样的话，就要求你，在上线前 要去把所有 模拟地址 改成 上线后的数据地址
+                - 而，**上线前改动代码，是有风险的**，我们不建议这么做
+        - 解决方案
+            - 如果有那么一个东西，可以帮助我们
+                - 在开发模式下，如果我们请求 ```'/api/index.json'```
+                - 它会帮助我们，自动转发到 ```'/static/data_demo/index.json'``` 就好了
+            - 其实，这个东西是有的，在 ```webpack-dev-server``` proxy 代理转发
+                ```js
+                // /config/index.js
+                module.exports = {
+                    dev: {
+                        proxyTable: {
+                            '/api': {   // 当我们请求 /api 目录的时候
+                                target: 'http://localhost:8080',    // 就把请求转发到 localhost:8080
+                                pathRewrite: {      // 但是路径要重写
+                                    '^/api': '/static/data_demo'    // 只要是以 /api 开头的，都转到 /static/data_demo 里
+                                }
+                            }
+                        },
+                    }
+                }
+                ```
+        - index.json
+            - 为了演示方便，仅保留两条数据
+            ```js
+            // /static/data_demo/index.json
+            {
+                "ret": true,
+                "data": {
+                    "city": "北京",
+                    "swiperList": [{
+                        "id": "0001",
+                        "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/3ff47fa622d07edad492c2859a5ad32f.jpg_750x200_3df30168.jpg"
+                    }, {
+                        "id": "0002",
+                        "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/0fa39f9f5e66189e85b5c6e54278587d.jpg_750x200_86c8f2d8.jpg"
+                    }],
+                    "iconList": [{
+                        "id": "0001",
+                        "url": "https://imgs.qunarzz.com/piao/fusion/1803/95/f3dd6c383aeb3b02.png",
+                        "name": "景点门票"
+                    }, {
+                        "id": "0002",
+                        "url": "http://img1.qunarzz.com/piao/fusion/1804/ff/fdf170ee89594b02.png",
+                        "name": "广州必游"
+                    }],
+                    "recommendList": [{
+                        "id": "0001",
+                        "imgUrl": "http://img1.qunarzz.com/sight/p0/1705/35/35ae31e6e6c8032ea3.img.jpg_200x200_7f6d7753.jpg",
+                        "title": "广州国瑞欢乐世界",
+                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
+                        "price": "￥99"
+                    }, {
+                        "id": "0002",
+                        "imgUrl": "http://img1.qunarzz.com/sight/p0/1605/34/34c81bc0470c6d6f90.water.jpg_200x200_5f2fbb19.jpg",
+                        "title": "广州PORORO主题乐园",
+                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
+                        "price": "￥168"
+                    }],
+                    "weekendList": [{
+                        "id": "0001",
+                        "imgUrl": "http://img1.qunarzz.com/sight/source/1505/92/580e9ea4f37a1b.jpg_r_640x214_72112761.jpg",
+                        "title": "广州国瑞欢乐世界",
+                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
+                    }, {
+                    "id": "0002",
+                        "imgUrl": "http://img1.qunarzz.com/sight/source/1811/f8/29dfa785277839.jpg_r_640x214_7d051523.jpg",
+                        "title": "广州PORORO主题乐园",
+                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
+                    }]
+                }
+            }
+            ```
+
+
 - ### 7-9 Vue项目首页 - 首页父子组组件间传值
