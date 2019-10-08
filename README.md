@@ -3714,7 +3714,7 @@ Vue 各种语法 入门讲解
             + |- /assets
             + |- /pages
                 + |- /home
-                    + |- /components
+                    + |- /components        // 首页组件
                         |- Header.vue
                         |- Icons.vue
                         |- Recommend.vue
@@ -3732,7 +3732,7 @@ Vue 各种语法 入门讲解
         - 如果每一个子组件，都自己发送一个请求
             - 那么首页就要发送5个请求，那么这个网站的 **性能肯定是很低的**
         - 所以，我们应该只 让首页发送一个Ajax请求，这样才比较合理
-    - 7.那么我们应该把这个Ajax请求，放在哪里发生才比较好呢？
+    - 7.那么我们应该把这个Ajax请求，放在哪里发送才比较好呢？
         - 很明显，应该放在 ```Home.vue``` 中
         - 这个组件，在获取Ajax数据之后，再把数据传给每一个子组件即可
         - 核心代码
@@ -3741,6 +3741,8 @@ Vue 各种语法 入门讲解
                 - getHomeInfo() 发起Ajax请求，请求到数据后，会执行 getHomeInfoSucc()
             ```js
             // /src/pages/home/Home.vue
+            import axios from 'axios'
+
             mounted () {
                 this.getHomeInfo()
             },
@@ -3782,9 +3784,9 @@ Vue 各种语法 入门讲解
                 module.exports = {
                     dev: {
                         proxyTable: {
-                            '/api': {   // 当我们请求 /api 目录的时候
+                            '/api': {                               // 当我们请求 /api 目录的时候
                                 target: 'http://localhost:8080',    // 就把请求转发到 localhost:8080
-                                pathRewrite: {      // 但是路径要重写
+                                pathRewrite: {                      // 但是路径要重写
                                     '^/api': '/static/data_demo'    // 只要是以 /api 开头的，都转到 /static/data_demo 里
                                 }
                             }
@@ -3797,52 +3799,182 @@ Vue 各种语法 入门讲解
             ```js
             // /static/data_demo/index.json
             {
-                "ret": true,
-                "data": {
-                    "city": "北京",
-                    "swiperList": [{
-                        "id": "0001",
-                        "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/3ff47fa622d07edad492c2859a5ad32f.jpg_750x200_3df30168.jpg"
-                    }, {
-                        "id": "0002",
-                        "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/0fa39f9f5e66189e85b5c6e54278587d.jpg_750x200_86c8f2d8.jpg"
-                    }],
-                    "iconList": [{
-                        "id": "0001",
-                        "url": "https://imgs.qunarzz.com/piao/fusion/1803/95/f3dd6c383aeb3b02.png",
-                        "name": "景点门票"
-                    }, {
-                        "id": "0002",
-                        "url": "http://img1.qunarzz.com/piao/fusion/1804/ff/fdf170ee89594b02.png",
-                        "name": "广州必游"
-                    }],
-                    "recommendList": [{
-                        "id": "0001",
-                        "imgUrl": "http://img1.qunarzz.com/sight/p0/1705/35/35ae31e6e6c8032ea3.img.jpg_200x200_7f6d7753.jpg",
-                        "title": "广州国瑞欢乐世界",
-                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
-                        "price": "￥99"
-                    }, {
-                        "id": "0002",
-                        "imgUrl": "http://img1.qunarzz.com/sight/p0/1605/34/34c81bc0470c6d6f90.water.jpg_200x200_5f2fbb19.jpg",
-                        "title": "广州PORORO主题乐园",
-                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
-                        "price": "￥168"
-                    }],
-                    "weekendList": [{
-                        "id": "0001",
-                        "imgUrl": "http://img1.qunarzz.com/sight/source/1505/92/580e9ea4f37a1b.jpg_r_640x214_72112761.jpg",
-                        "title": "广州国瑞欢乐世界",
-                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
-                    }, {
-                    "id": "0002",
-                        "imgUrl": "http://img1.qunarzz.com/sight/source/1811/f8/29dfa785277839.jpg_r_640x214_7d051523.jpg",
-                        "title": "广州PORORO主题乐园",
-                        "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
-                    }]
-                }
+              "ret": true,
+              "data": {
+                "city": "北京",
+                "swiperList": [{
+                  "id": "0001",
+                  "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/3ff47fa622d07edad492c2859a5ad32f.jpg_750x200_3df30168.jpg"
+                }, {
+                  "id": "0002",
+                  "url": "http://mp-piao-admincp.qunarzz.com/mp_piao_admin_mp_piao_admin/admin/20199/0fa39f9f5e66189e85b5c6e54278587d.jpg_750x200_86c8f2d8.jpg"
+                }],
+                "iconList": [{
+                  "id": "0001",
+                  "url": "https://imgs.qunarzz.com/piao/fusion/1803/95/f3dd6c383aeb3b02.png",
+                  "name": "景点门票"
+                }, {
+                  "id": "0002",
+                  "url": "http://img1.qunarzz.com/piao/fusion/1804/ff/fdf170ee89594b02.png",
+                  "name": "广州必游"
+                }],
+                "recommendList": [{
+                  "id": "0001",
+                  "imgUrl": "http://img1.qunarzz.com/sight/p0/1705/35/35ae31e6e6c8032ea3.img.jpg_200x200_7f6d7753.jpg",
+                  "title": "广州国瑞欢乐世界",
+                  "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
+                  "price": "￥99"
+                }, {
+                  "id": "0002",
+                  "imgUrl": "http://img1.qunarzz.com/sight/p0/1605/34/34c81bc0470c6d6f90.water.jpg_200x200_5f2fbb19.jpg",
+                  "title": "广州PORORO主题乐园",
+                  "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡",
+                  "price": "￥168"
+                }],
+                "weekendList": [{
+                  "id": "0001",
+                  "imgUrl": "http://img1.qunarzz.com/sight/source/1505/92/580e9ea4f37a1b.jpg_r_640x214_72112761.jpg",
+                  "title": "广州国瑞欢乐世界",
+                  "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
+                }, {
+                  "id": "0002",
+                  "imgUrl": "http://img1.qunarzz.com/sight/source/1811/f8/29dfa785277839.jpg_r_640x214_7d051523.jpg",
+                  "title": "广州PORORO主题乐园",
+                  "desc": "这次端午六一假日的泡泡之夏主题真是如梦如幻，有泡泡圈套互动游戏，漂亮姐姐带大家花式玩泡泡"
+                }]
+              }
             }
             ```
 
 
 - ### 7-9 Vue项目首页 - 首页父子组组件间传值
+    - 7-9-1 本节目标
+        - 上一节，我们已经从Ajax接口获取了首页所有的数据，那么，我们要把这些数据分别传给 首页的各个组件
+    - 7-9-2 HomeHeader的数据传递
+        - 思路
+            - Home.vue 思路
+              - 1.在 Home.vue 上创建数据
+                  ```js
+                  data () {
+                    return {
+                      city: ''
+                    }
+                  }
+                  ```
+              - 2.将父组件的数据city 通过 属性的形式，传给子组件
+                  ```html
+                  <home-header :city='city'></home-header>
+                  ```
+              - 3.在 methods.getHomeInfoSucc() 上处理数据
+                  ```js
+                  methods: {
+                    getHomeInfo () {
+                      axios.get('/api/index.json')
+                        .then(this.getHomeInfoSucc)
+                    },
+                    getHomeInfoSucc (res) {
+                      console.log(res)
+                      res = res.data
+                      if (res.ret && res.data) {
+                        const data = res.data
+                        this.city = data.city       // 将从接口获得的数据，赋值给 Home.vue 的 data.city
+                      }
+                    }
+                  }
+                  ```
+            - Header.vue 思路
+              - 1.在 Header.vue 上接收数据
+                ```js
+                props: {
+                  city: String
+                }
+                ```
+              - 2.使用数据
+                ```html
+                <div class="header-right">
+                  {{this.city}}
+                </div>
+                ```
+        ```html
+        // /src/pages/home/Home.vue
+        <template>
+          <div>
+            <home-header :city='city'></home-header>  <!-- 将父组件的数据city 通过 属性的形式，传给子组件 -->
+            <home-swiper></home-swiper>
+            <home-icons></home-icons>
+            <home-recommend></home-recommend>
+            <home-weekend></home-weekend>
+          </div>
+        </template>
+
+        <script>
+        import HomeHeader from './components/Header'
+        import HomeSwiper from './components/Swiper'
+        import HomeIcons from './components/Icons'
+        import HomeRecommend from './components/Recommend'
+        import HomeWeekend from './components/Weekend'
+        import axios from 'axios'
+        export default {
+          name: 'Home',
+          components: {
+            HomeHeader,
+            HomeSwiper,
+            HomeIcons,
+            HomeRecommend,
+            HomeWeekend
+          },
+          data () {
+            return {
+              city: ''
+            }
+          },
+          mounted () {
+            this.getHomeInfo()
+          },
+          methods: {
+            getHomeInfo () {
+              axios.get('/api/index.json')
+                .then(this.getHomeInfoSucc)
+            },
+            getHomeInfoSucc (res) {
+              console.log(res)
+              res = res.data
+              if (res.ret && res.data) {
+                const data = res.data
+                this.city = data.city
+              }
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        </style>
+        ```
+        ```html
+        // /src/pages/home/components/Header.vue
+        <template>
+          <div class="header">
+            <div class="header-left">
+              <div class="iconfont">&#xeb99;</div>
+            </div>
+            <div class="header-input">
+              <span class="iconfont">&#xeb9c;</span>
+              输入城市/景点/游玩主题
+            </div>
+            <div class="header-right">
+              {{this.city}}
+              <span class="iconfont arrow-icon">&#xe65c;</span>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        export default {
+          name: 'HomeHeader',
+          props: {
+            city: String
+          }
+        }
+        </script>
+        ```
