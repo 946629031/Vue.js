@@ -82,6 +82,7 @@ Vue 各种语法 入门讲解
     - [7-7 Vue项目首页 - 开发周末游组件](#7-7-Vue项目首页---开发周末游组件)
     - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
     - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
+      - [7-9-4 swiper默认显示最后一张图片的问题](#7-9-4-swiper轮播图默认显示最后一张图片的问题)
 - []()
     - []()
     - []()
@@ -3861,11 +3862,7 @@ Vue 各种语法 入门讲解
                     }
                   }
                   ```
-              - 2.将父组件的数据city 通过 属性的形式，传给子组件
-                  ```html
-                  <home-header :city='city'></home-header>
-                  ```
-              - 3.在 methods.getHomeInfoSucc() 上处理数据
+              - 2.在 methods.getHomeInfoSucc() 上处理数据
                   ```js
                   methods: {
                     getHomeInfo () {
@@ -3877,10 +3874,14 @@ Vue 各种语法 入门讲解
                       res = res.data
                       if (res.ret && res.data) {
                         const data = res.data
-                        this.city = data.city       // 将从接口获得的数据，赋值给 Home.vue 的 data.city
+                        this.city = data.city       // 将从接口获得的数据 data.city，赋值给 Home.vue 的 city
                       }
                     }
                   }
+                  ```
+              - 3.将父组件 处理好的数据city 通过 属性的形式，传给子组件
+                  ```html
+                  <home-header :city='city'></home-header>
                   ```
             - Header.vue 思路
               - 1.在 Header.vue 上接收数据
@@ -3941,7 +3942,7 @@ Vue 各种语法 入门讲解
               res = res.data
               if (res.ret && res.data) {
                 const data = res.data
-                this.city = data.city
+                this.city = data.city       // 将从接口获得的数据 data.city，赋值给 Home.vue 的 city
               }
             }
           }
@@ -3977,4 +3978,239 @@ Vue 各种语法 入门讲解
           }
         }
         </script>
+
+        <style lang="stylus" scoped>
+        </style>
         ```
+    - 7-9-3 HomeSwiper的数据传递
+        - 思路
+            - Home.vue 思路
+              - 1.在 Home.vue 上创建数据
+                ```js
+                data () {
+                    return {
+                        city: '',
+                        swiperList: []      // 定义数据
+                    }
+                }
+                ```
+              - 2.在 methods.getHomeInfoSucc() 上处理数据
+                ```js
+                mounted () {
+                  this.getHomeInfo()
+                },
+                methods: {
+                  getHomeInfo () {
+                    axios.get('/api/index.json')
+                      .then(this.getHomeInfoSucc)
+                  },
+                  getHomeInfoSucc (res) {
+                    console.log(res)
+                    res = res.data
+                    if (res.ret && res.data) {
+                      const data = res.data
+                      this.city = data.city
+                      this.swiperList = data.swiperList       // 将从接口获得的数据 data.swiperList, 赋值给 Home.vue 的 swiperList
+                    }
+                  }
+                }
+                ```
+              - 3.将父组件 处理好的数据 swiperList 通过 属性的形式，传递给子组件
+                ```html
+                <home-swiper :list='swiperList'></home-swiper>
+                ```
+            - Swiper.vue 思路
+              - 1.在 Swiper.vue 上接收数据
+                ```js
+                props: {
+                  list: Array
+                }
+                ```
+              - 2.使用数据
+                ```html
+                <swiper-slide v-for="item of list" :key="item.id">
+                  <img :src="item.url">
+                </swiper-slide>
+                ```
+        ```html
+        // /src/pages/home/Home.vue
+        <template>
+          <div>
+            <home-header :city='city'></home-header>
+            <home-swiper :list='swiperList'></home-swiper>    <!-- 将父组件 处理好的数据 swiperList 通过 属性的形式，传递给子组件 -->
+            <home-icons></home-icons>
+            <home-recommend></home-recommend>
+            <home-weekend></home-weekend>
+          </div>
+        </template>
+
+        <script>
+        import HomeHeader from './components/Header'
+        import HomeSwiper from './components/Swiper'
+        import HomeIcons from './components/Icons'
+        import HomeRecommend from './components/Recommend'
+        import HomeWeekend from './components/Weekend'
+        import axios from 'axios'
+        export default {
+          name: 'Home',
+          components: {
+            HomeHeader,
+            HomeSwiper,
+            HomeIcons,
+            HomeRecommend,
+            HomeWeekend
+          },
+          data () {
+            return {
+              city: '',
+              swiperList: []      // 定义数据
+            }
+          },
+          mounted () {
+            this.getHomeInfo()
+          },
+          methods: {
+            getHomeInfo () {
+              axios.get('/api/index.json')
+                .then(this.getHomeInfoSucc)
+            },
+            getHomeInfoSucc (res) {
+              console.log(res)
+              res = res.data
+              if (res.ret && res.data) {
+                const data = res.data
+                this.city = data.city
+                this.swiperList = data.swiperList       // 将从接口获得的数据 data.swiperList, 赋值给 Home.vue 的 swiperList
+              }
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        </style>
+        ```
+        ```html
+        <template>
+          <div class="wrapper">
+            <swiper :options="swiperOption">
+              <swiper-slide v-for="item of list" :key="item.id">
+                <img :src="item.url">
+              </swiper-slide>
+              <div class="swiper-pagination"  slot="pagination"></div>
+            </swiper>
+          </div>
+        </template>
+
+        <script>
+        export default {
+          name: 'HomeSwiper',
+          props: {
+            list: Array
+          },
+          data () {
+            return {
+              swiperOption: {
+                pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                loop: true
+              }
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+          .wrapper >>> .swiper-pagination-bullet-active
+            background: #fff
+          .wrapper
+            overflow: hidden
+            width: 100%
+            height: 0
+            padding-bottom: 26.66%
+        </style>
+        ```
+    - #### 7-9-4 swiper默认显示最后一张图片的问题
+      - 1.存在的问题
+        - 当你做完上一节的操作后，你会发现swiper默认是显示最后一张图片的
+        - 原因是：在一开始 swipertList 数据没有加载到的时候，```swipertList = []``` 为空数组，而vue最开始是根据空数组 渲染页面的
+        - 等到 swiper.vue 接收到 swiperList 数据的时候，才根据 新的数据，重新渲染 swiper 页面
+        - 正是因为这样的原因，才导致了 swiper轮播图默认显示最后一张图片
+      - 2.那么这个问题该如何解决呢？
+        - 思路：
+          - 我们让 swiper 的初次创建，由完整的数据创建，而不是由 默认的空数组创建
+          - 通过v-if判断，在组件收到需要渲染的数据后再加载swiper
+          - 这样就能避免这个问题了
+        - 核心代码
+          ```
+          v-if="list.length"
+          ```
+          - 如果 list.length == false, 如果为 false 则不渲染 swiper
+          - 如果接收到数据后, list.length == true, 才渲染 swiper
+        - 代码
+          ```html
+          <template>
+            <div class="wrapper">
+              <swiper :options="swiperOption" v-if="list.length">
+                <swiper-slide v-for="item of list" :key="item.id">
+                  <img :src="item.url">
+                </swiper-slide>
+                <div class="swiper-pagination"  slot="pagination"></div>
+              </swiper>
+            </div>
+          </template>
+          ```
+        - 到这里，就能初步解决问题了
+      - 3.优化解决方案
+        - 存在的问题
+          - 由于上面直接在 <template> 模板中，写了 ``` v-if="list.length" ```
+          - 这种带有 逻辑性 的代码
+          - 在 Vue 中，```我们要尽量避免在 <template> 模板中 写这种逻辑性的代码```
+        - 优化思路方案
+          - 由于不该在 <template> 模板中 写逻辑性的代码
+          - 所以，我们利用 computed 计算属性，来替代
+            - swiper 轮播图的渲染与否，取决于 computed.showSwiper() 的返回值
+        - 完整代码
+          ```html
+          <template>
+            <div class="wrapper">
+              <swiper :options="swiperOption" v-if="showSwiper">
+                <swiper-slide v-for="item of list" :key="item.id">
+                  <img :src="item.url">
+                </swiper-slide>
+                <div class="swiper-pagination"  slot="pagination"></div>
+              </swiper>
+            </div>
+          </template>
+
+          <script>
+          export default {
+            name: 'HomeSwiper',
+            props: {
+              list: Array
+            },
+            data () {
+              return {
+                swiperOption: {
+                  pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                  loop: true
+                }
+              }
+            },
+            computed: {
+              showSwiper () {
+                return this.list.length
+              }
+            }
+          }
+          </script>
+
+          <style lang="stylus" scoped>
+            .wrapper >>> .swiper-pagination-bullet-active
+              background: #fff
+            .wrapper
+              overflow: hidden
+              width: 100%
+              height: 0
+              padding-bottom: 26.66%
+          </style>
+          ```
