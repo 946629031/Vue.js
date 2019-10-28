@@ -4330,7 +4330,7 @@ Vue 各种语法 入门讲解
   - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg)
       
 
-- ### 8-1 Vue项目城市选择页 - 路由配置
+- ### 8-1 Vue项目 <城市选择页面> - 路由配置
     - 8-1-1 本节目标
         - 在开发这个页面之前，第一步，我们先要解决 <页面的路由配置>
     - 8-1-2 前期准备工作
@@ -4422,3 +4422,49 @@ Vue 各种语法 入门讲解
         </template>
         ```
     - 8-1-6 到这里 路由配置完成
+    - 8-1-7 创建 <城市选择页面> 的 Header
+      - 返回按钮
+      - 组件布局 和 样式
+      ```html
+      // src/pages/city/components/Header.vue
+      <template>
+        <div class="header">
+          <router-link to='/'>    <!-- 返回按钮 -->
+            <div class="header-back iconfont">&#xeb99;</div>
+          </router-link>
+          城市选择
+        </div>
+      </template>
+
+      <script>
+      export default{
+        name: 'CityHeader'
+      }
+      </script>
+
+      <style lang='stylus' scoped>
+        @import '~styles/varibles.styl';
+        .header
+          position relative
+          height $headerHeight
+          line-height $headerHeight
+          overflow hidden
+          text-align center
+          font-size .32rem
+          background $bgColor
+          color #fff
+          .header-back
+            width .64rem
+            text-align center
+            font-size .4rem
+            position absolute
+            top 0
+            left 0
+            color #fff
+      </style>
+      ```
+    - 8-1-7 收尾工作 push 到github
+      - 开发完本小节的功能点后
+      - git add .
+      - git commit -m ''
+      - git push
