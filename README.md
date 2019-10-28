@@ -5,6 +5,8 @@ Vue 各种语法 入门讲解
 
 [【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
 
+本笔记对应项目的[源码 《去哪儿app》](https://github.com/946629031/Travel)
+
 课程出品时间：2017.x ~ 2018.4
 
 看视频整理要点笔记：
@@ -83,10 +85,32 @@ Vue 各种语法 入门讲解
     - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
     - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
       - [7-9-4 swiper默认显示最后一张图片的问题](#7-9-4-swiper轮播图默认显示最后一张图片的问题)
-- []()
-    - []()
-    - []()
-    - []()
+- [第8章 项目实战 - 旅游网站城市列表页面开发](#第8章-项目实战---旅游网站城市列表页面开发)
+    - [8-1 Vue项目城市选择页 - 路由配置](#8-1-Vue项目城市选择页---路由配置)
+    - [8-2 Vue项目城市选择页 - 搜索框布局](#8-2-Vue项目城市选择页---搜索框布局)
+    - [8-3 Vue项目城市选择页 - 列表布局](#8-3-Vue项目城市选择页---列表布局)
+    - [8-4 Vue项目城市选择页 - BetterScroll 的使用和字母表布局](#8-4-Vue项目城市选择页---BetterScroll-的使用和字母表布局)
+    - [8-5 Vue项目城市选择页 - 页面的动态数据渲染](#8-5-Vue项目城市选择页---页面的动态数据渲染)
+    - [8-6 Vue项目城市选择页 - 兄弟组件数据传递](#8-6-Vue项目城市选择页---兄弟组件数据传递)
+    - [8-7 Vue项目城市选择页 - 列表性能优化](#8-7-Vue项目城市选择页---列表性能优化)
+    - [8-8 Vue项目城市选择页 - 搜索逻辑实现](#8-8-Vue项目城市选择页---搜索逻辑实现)
+    - [8-9 Vue项目城市选择页 - Vuex实现数据共享](#8-9-Vue项目城市选择页---Vuex实现数据共享)
+    - [8-10 Vue项目城市选择页 - Vuex的高级使用及localStorage](#8-10-Vue项目城市选择页---Vuex的高级使用及localStorage)
+    - [8-11 Vue项目城市选择页 - 使用keep-alive优化网页性能](#8-11-Vue项目城市选择页---使用keep-alive优化网页性能)
+- [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
+    - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
+    - [9-2 Vue项目详情页 - 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
+    - [9-3 Vue项目详情页 - 实现Header渐隐渐显效果](#9-3-Vue项目详情页---实现Header渐隐渐显效果)
+    - [9-4 Vue项目详情页 - 对全局事件的解绑](#9-4-Vue项目详情页---对全局事件的解绑)
+    - [9-5 Vue项目详情页 - 使用递归组件实现详情页列表](#9-5-Vue项目详情页---使用递归组件实现详情页列表)
+    - [9-6 Vue项目详情页 - 动态获取详情页面数据](#9-6-Vue项目详情页---动态获取详情页面数据)
+    - [9-7 Vue项目详情页 - 在项目中加入基础动画](#9-7-Vue项目详情页---在项目中加入基础动画)
+- [第10章 实战项目 - 项目的联调，测试与发布上线](#第10章 实战项目 - 项目的联调，测试与发布上线)
+    - [10-1 Vue项目的联调测试上线 - 项目前后端联调](#10-1-Vue项目的联调测试上线---项目前后端联调)
+    - [10-2 Vue项目的联调测试上线 - 真机测试](#10-2-Vue项目的联调测试上线---真机测试)
+    - [10-3 Vue项目的联调测试上线 - 打包上线](#10-3-Vue项目的联调测试上线---打包上线)
+    - [10-4 Vue项目的联调测试上线 - 异步组件实现按需加载](#10-4-Vue项目的联调测试上线---异步组件实现按需加载)
+    - [10-5 Vue项目的联调测试上线 - 课程总结与后续学习指南](#10-5-Vue项目的联调测试上线---课程总结与后续学习指南)
     - []()
 
 ----
@@ -3734,8 +3758,8 @@ Vue 各种语法 入门讲解
             - 那么首页就要发送5个请求，那么这个网站的 **性能肯定是很低的**
         - 所以，我们应该只 让首页发送一个Ajax请求，这样才比较合理
     - 7.那么我们应该把这个Ajax请求，放在哪里发送才比较好呢？
-        - 很明显，应该放在 ```Home.vue``` 中
-        - 这个组件，在获取Ajax数据之后，再把数据传给每一个子组件即可
+        - 很明显，应该放在 页面所有子组件的父级页面上发送，也就是 ```Home.vue``` 中
+        - 这个父级组件，在获取Ajax数据之后，再把数据传给每一个子组件即可
         - 核心代码
             - 思路：
                 - 当页面挂载完成 mounted() 时，自动执行 ```this.getHomeInfo()```
@@ -3883,8 +3907,8 @@ Vue 各种语法 入门讲解
                   ```html
                   <home-header :city='city'></home-header>
                   ```
-            - Header.vue 思路
-              - 1.在 Header.vue 上接收数据
+            - 子组件 Header.vue 思路
+              - 1.在子组件 Header.vue 上接收数据
                 ```js
                 props: {
                   city: String
@@ -4019,8 +4043,8 @@ Vue 各种语法 入门讲解
                 ```html
                 <home-swiper :list='swiperList'></home-swiper>
                 ```
-            - Swiper.vue 思路
-              - 1.在 Swiper.vue 上接收数据
+            - 在子组件 Swiper.vue 思路
+              - 1.在子组件 Swiper.vue 上接收数据
                 ```js
                 props: {
                   list: Array
@@ -4129,7 +4153,7 @@ Vue 各种语法 入门讲解
             padding-bottom: 26.66%
         </style>
         ```
-    - #### 7-9-4 swiper默认显示最后一张图片的问题
+    - #### 7-9-4 swiper轮播图默认显示最后一张图片的问题
       - 1.存在的问题
         - 当你做完上一节的操作后，你会发现swiper默认是显示最后一张图片的
         - 原因是：在一开始 swipertList 数据没有加载到的时候，```swipertList = []``` 为空数组，而vue最开始是根据空数组 渲染页面的
@@ -4197,7 +4221,7 @@ Vue 各种语法 入门讲解
               }
             },
             computed: {
-              showSwiper () {
+              showSwiper () {       // 用计算属性 优化
                 return this.list.length
               }
             }
@@ -4214,3 +4238,187 @@ Vue 各种语法 入门讲解
               padding-bottom: 26.66%
           </style>
           ```
+    - 7-9-5 其他剩下的几个组件间的传值也是同样道理
+        - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
+        - 子组件使用 props 接收后，即可使用数据
+        - Home.vue 完整代码如下
+        ```html
+        // /src/pages/home/Home.vue
+        <template>
+          <div>
+            <home-header :city='city'></home-header>
+            <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
+            <home-icons :iconList='iconList'></home-icons>
+            <home-recommend :list='recommendList'></home-recommend>
+            <home-weekend :list='weekendList'></home-weekend>
+            <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
+          </div>
+        </template>
+
+        <script>
+        import HomeHeader from './components/Header'
+        import HomeSwiper from './components/Swiper'
+        import HomeIcons from './components/Icons'
+        import HomeRecommend from './components/Recommend'
+        import HomeWeekend from './components/Weekend'
+        import axios from 'axios'
+        export default {
+          name: 'Home',
+          components: {
+            HomeHeader,
+            HomeSwiper, // 将组件HomeSwiper，注册到局部组件
+            HomeIcons,
+            HomeRecommend,
+            HomeWeekend
+          },
+          data () {
+            return {
+              city: '',
+              swiperList: [],
+              iconList: [],
+              recommendList: [],
+              weekendList: []
+            }
+          },
+          mounted () {
+            this.getHomeInfo()
+          },
+          methods: {
+            getHomeInfo () {
+              axios.get('/api/index.json')
+                .then(this.getHomeInfoSucc)
+            },
+            getHomeInfoSucc (res) {
+              res = res.data
+              if (res.ret && res.data) {
+                const data = res.data
+                this.city = data.city
+                this.swiperList = data.swiperList
+                this.iconList = data.iconList
+                this.recommendList = data.recommendList
+                this.weekendList = data.weekendList
+              }
+              console.log(res)
+            }
+          }
+        }
+        </script>
+
+        <!-- Add "scoped" attribute to limit CSS to this component only -->
+        <style lang="stylus" scoped>
+        .copyright
+          font-size .2rem
+          background #f3f3f3
+          text-align center
+          line-height 4
+        </style>
+        ```
+    - 7-9-6 收尾工作
+        - 先将 index-ajax 分支上传
+            - git add .
+            - git commit -m ''
+            - git push
+        - 再将开发好的新功能 分支，合并到 master 线上稳定版本 分支中
+            - git checkout master
+            - git merge index-ajax
+            - git push
+
+            
+## 第8章 项目实战 - 旅游网站城市列表页面开发
+    - 本章目的：完成 <城市选择页面> 的制作
+    - 效果图如下
+    - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg)
+      
+
+- ### 8-1 Vue项目城市选择页 - 路由配置
+    - 8-1-1 本节目标
+        - 在开发这个页面之前，第一步，我们先要解决 <页面的路由配置>
+    - 8-1-2 前期准备工作
+        - 在 github 上，新建分支 city-router
+        - git pull
+        - git checkout city-router
+        - npm run dev
+    - 8-1-3 创建路由
+        - 在Vue项目中，router 路由配置文件在 ```/src/router/index.js``` 中
+        - 其中，路由的默认配置如下
+            ```js
+            //  /src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import Home from '@/pages/home/Home'
+
+            Vue.use(Router)
+
+            export default new Router({
+                routes: [{
+                    path: '/',
+                    name: 'Home',
+                    component: Home
+                }]
+            })
+            ```
+        - 新增路由配置
+            - 把这个城市选择页面的路由 添加进去
+            ```js
+            //  /src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import Home from '@/pages/home/Home'
+            import City from '@/pages/city/City'    // 引入city模块
+
+            Vue.use(Router)
+
+            export default new Router({
+                routes: [{
+                    path: '/',
+                    name: 'Home',
+                    component: Home
+                }, {
+                    path: '/city',      // 配置路由
+                    name: 'City',
+                    component: City
+                }]
+            })
+        ```
+
+    - 8-1-4 创建 <城市选择页面> 文件
+        ```html
+        // /src/pages/city/City.vue
+        <template>
+          <div>city</div>
+        </template>
+
+        <script>
+        export default{
+          name: 'City'
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+
+        </style>
+        ```
+    - 8-1-5 如何跳转？ - 配置路由入口
+        - 使用 ```<router-link to='/city'></router-link>```，只要点击这个标签内的东西，都会跳转
+        - 渲染后的结果，实际上就是 a 链接
+        ```html
+        // /src/pages/home/components/Header.vue
+        <template>
+          <div class="header">
+            <div class="header-left">
+              <div class="iconfont">&#xeb99;</div>
+            </div>
+            <div class="header-input">
+              <span class="iconfont">&#xeb9c;</span>
+              输入城市/景点/游玩主题
+            </div>
+            <router-link to='/city'>          <!-- 配置路由入口 -->
+              <div class="header-right">
+                {{this.city}}
+                <span class="iconfont arrow-icon">&#xe65c;</span>
+              </div>
+            </router-link>
+          </div>
+        </template>
+        ```
+    - 8-1-6 到这里 路由配置完成
