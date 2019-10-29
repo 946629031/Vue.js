@@ -4196,35 +4196,35 @@ Vue 各种语法 入门讲解
             - 完整代码
                 ```html
                 <template>
-                <div class="wrapper">
-                    <swiper :options="swiperOption" v-if="showSwiper">
-                    <swiper-slide v-for="item of list" :key="item.id">
-                        <img :src="item.url">
-                    </swiper-slide>
-                    <div class="swiper-pagination"  slot="pagination"></div>
-                    </swiper>
-                </div>
+                    <div class="wrapper">
+                        <swiper :options="swiperOption" v-if="showSwiper">
+                        <swiper-slide v-for="item of list" :key="item.id">
+                            <img :src="item.url">
+                        </swiper-slide>
+                        <div class="swiper-pagination"  slot="pagination"></div>
+                        </swiper>
+                    </div>
                 </template>
 
                 <script>
                 export default {
-                name: 'HomeSwiper',
-                props: {
-                    list: Array
-                },
-                data () {
-                    return {
-                    swiperOption: {
-                        pagination: '.swiper-pagination', // 轮播图底部的 小白点
-                        loop: true
+                    name: 'HomeSwiper',
+                    props: {
+                        list: Array
+                    },
+                    data () {
+                        return {
+                        swiperOption: {
+                            pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                            loop: true
+                        }
+                        }
+                    },
+                    computed: {
+                        showSwiper () {       // 用计算属性 优化
+                        return this.list.length
+                        }
                     }
-                    }
-                },
-                computed: {
-                    showSwiper () {       // 用计算属性 优化
-                    return this.list.length
-                    }
-                }
                 }
                 </script>
 
@@ -4238,8 +4238,10 @@ Vue 各种语法 入门讲解
                     padding-bottom: 26.66%
                 </style>
                 ```
+
     - 7-9-6 test
         - test
+        
 - 7-9-5 其他剩下的几个组件间的传值也是同样道理
     - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
     - 子组件使用 props 接收后，即可使用数据
