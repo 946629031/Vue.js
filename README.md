@@ -4238,90 +4238,90 @@ Vue 各种语法 入门讲解
               padding-bottom: 26.66%
           </style>
           ```
-    - 7-9-5 其他剩下的几个组件间的传值也是同样道理
-        - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
-        - 子组件使用 props 接收后，即可使用数据
-        - Home.vue 完整代码如下
-        ```html
-        // /src/pages/home/Home.vue
-        <template>
-          <div>
-            <home-header :city='city'></home-header>
-            <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
-            <home-icons :iconList='iconList'></home-icons>
-            <home-recommend :list='recommendList'></home-recommend>
-            <home-weekend :list='weekendList'></home-weekend>
-            <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
-          </div>
-        </template>
+- 7-9-5 其他剩下的几个组件间的传值也是同样道理
+    - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
+    - 子组件使用 props 接收后，即可使用数据
+    - Home.vue 完整代码如下
+    ```html
+    // /src/pages/home/Home.vue
+    <template>
+        <div>
+        <home-header :city='city'></home-header>
+        <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
+        <home-icons :iconList='iconList'></home-icons>
+        <home-recommend :list='recommendList'></home-recommend>
+        <home-weekend :list='weekendList'></home-weekend>
+        <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
+        </div>
+    </template>
 
-        <script>
-        import HomeHeader from './components/Header'
-        import HomeSwiper from './components/Swiper'
-        import HomeIcons from './components/Icons'
-        import HomeRecommend from './components/Recommend'
-        import HomeWeekend from './components/Weekend'
-        import axios from 'axios'
-        export default {
-          name: 'Home',
-          components: {
-            HomeHeader,
-            HomeSwiper, // 将组件HomeSwiper，注册到局部组件
-            HomeIcons,
-            HomeRecommend,
-            HomeWeekend
-          },
-          data () {
-            return {
-              city: '',
-              swiperList: [],
-              iconList: [],
-              recommendList: [],
-              weekendList: []
-            }
-          },
-          mounted () {
-            this.getHomeInfo()
-          },
-          methods: {
-            getHomeInfo () {
-              axios.get('/api/index.json')
-                .then(this.getHomeInfoSucc)
-            },
-            getHomeInfoSucc (res) {
-              res = res.data
-              if (res.ret && res.data) {
-                const data = res.data
-                this.city = data.city
-                this.swiperList = data.swiperList
-                this.iconList = data.iconList
-                this.recommendList = data.recommendList
-                this.weekendList = data.weekendList
-              }
-              console.log(res)
-            }
-          }
+    <script>
+    import HomeHeader from './components/Header'
+    import HomeSwiper from './components/Swiper'
+    import HomeIcons from './components/Icons'
+    import HomeRecommend from './components/Recommend'
+    import HomeWeekend from './components/Weekend'
+    import axios from 'axios'
+    export default {
+        name: 'Home',
+        components: {
+        HomeHeader,
+        HomeSwiper, // 将组件HomeSwiper，注册到局部组件
+        HomeIcons,
+        HomeRecommend,
+        HomeWeekend
+        },
+        data () {
+        return {
+            city: '',
+            swiperList: [],
+            iconList: [],
+            recommendList: [],
+            weekendList: []
         }
-        </script>
+        },
+        mounted () {
+        this.getHomeInfo()
+        },
+        methods: {
+        getHomeInfo () {
+            axios.get('/api/index.json')
+            .then(this.getHomeInfoSucc)
+        },
+        getHomeInfoSucc (res) {
+            res = res.data
+            if (res.ret && res.data) {
+            const data = res.data
+            this.city = data.city
+            this.swiperList = data.swiperList
+            this.iconList = data.iconList
+            this.recommendList = data.recommendList
+            this.weekendList = data.weekendList
+            }
+            console.log(res)
+        }
+        }
+    }
+    </script>
 
-        <!-- Add "scoped" attribute to limit CSS to this component only -->
-        <style lang="stylus" scoped>
-        .copyright
-          font-size .2rem
-          background #f3f3f3
-          text-align center
-          line-height 4
-        </style>
-        ```
-    - 7-9-6 收尾工作
-        - 先将 index-ajax 分支上传
-            - git add .
-            - git commit -m ''
-            - git push
-        - 再将开发好的新功能 分支，合并到 master 线上稳定版本 分支中
-            - git checkout master
-            - git merge index-ajax
-            - git push
+    <!-- Add "scoped" attribute to limit CSS to this component only -->
+    <style lang="stylus" scoped>
+    .copyright
+        font-size .2rem
+        background #f3f3f3
+        text-align center
+        line-height 4
+    </style>
+    ```
+- 7-9-6 收尾工作
+    - 先将 index-ajax 分支上传
+        - git add .
+        - git commit -m ''
+        - git push
+    - 再将开发好的新功能 分支，合并到 master 线上稳定版本 分支中
+        - git checkout master
+        - git merge index-ajax
+        - git push
 
             
 ## 第8章 项目实战 - 旅游网站城市列表页面开发
