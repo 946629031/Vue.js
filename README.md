@@ -4161,22 +4161,22 @@ Vue 各种语法 入门讲解
             - 正是因为这样的原因，才导致了 swiper轮播图默认显示最后一张图片
         - 2.那么这个问题该如何解决呢？
             - 思路：
-            - 我们让 swiper 的初次创建，由完整的数据创建，而不是由 默认的空数组创建
-            - 通过v-if判断，在组件收到需要渲染的数据后再加载swiper
-            - 这样就能避免这个问题了
+                - 我们让 swiper 的初次创建，由完整的数据创建，而不是由 默认的空数组创建
+                - 通过v-if判断，在组件收到需要渲染的数据后再加载swiper
+                - 这样就能避免这个问题了
             - 核心代码
-            ```
-            v-if="list.length"
-            ```
-            - 如果 list.length == false, 如果为 false 则不渲染 swiper
-            - 如果接收到数据后, list.length == true, 才渲染 swiper
+                ```
+                v-if="list.length"
+                ```
+                - 如果 list.length == false, 如果为 false 则不渲染 swiper
+                - 如果接收到数据后, list.length == true, 才渲染 swiper
             - 代码
             ```html
             <template>
                 <div class="wrapper">
                 <swiper :options="swiperOption" v-if="list.length">
                     <swiper-slide v-for="item of list" :key="item.id">
-                    <img :src="item.url">
+                        <img :src="item.url">
                     </swiper-slide>
                     <div class="swiper-pagination"  slot="pagination"></div>
                 </swiper>
@@ -4238,81 +4238,82 @@ Vue 各种语法 入门讲解
                     padding-bottom: 26.66%
                 </style>
                 ```
+
     - 7-9-5 其他剩下的几个组件间的传值也是同样道理
         - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
         - 子组件使用 props 接收后，即可使用数据
         - Home.vue 完整代码如下
-        ```html
-        // /src/pages/home/Home.vue
-        <template>
-            <div>
-                <home-header :city='city'></home-header>
-                <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
-                <home-icons :iconList='iconList'></home-icons>
-                <home-recommend :list='recommendList'></home-recommend>
-                <home-weekend :list='weekendList'></home-weekend>
-                <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
-            </div>
-        </template>
+            ```html
+            // /src/pages/home/Home.vue
+            <template>
+                <div>
+                    <home-header :city='city'></home-header>
+                    <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
+                    <home-icons :iconList='iconList'></home-icons>
+                    <home-recommend :list='recommendList'></home-recommend>
+                    <home-weekend :list='weekendList'></home-weekend>
+                    <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
+                </div>
+            </template>
 
-        <script>
-        import HomeHeader from './components/Header'
-        import HomeSwiper from './components/Swiper'
-        import HomeIcons from './components/Icons'
-        import HomeRecommend from './components/Recommend'
-        import HomeWeekend from './components/Weekend'
-        import axios from 'axios'
-        export default {
-            name: 'Home',
-            components: {
-            HomeHeader,
-            HomeSwiper, // 将组件HomeSwiper，注册到局部组件
-            HomeIcons,
-            HomeRecommend,
-            HomeWeekend
-        },
-        data () {
-            return {
-                city: '',
-                swiperList: [],
-                iconList: [],
-                recommendList: [],
-                weekendList: []
-            }
-        },
-        mounted () {
-            this.getHomeInfo()
-        },
-        methods: {
-            getHomeInfo () {
-                axios.get('/api/index.json')
-                .then(this.getHomeInfoSucc)
+            <script>
+            import HomeHeader from './components/Header'
+            import HomeSwiper from './components/Swiper'
+            import HomeIcons from './components/Icons'
+            import HomeRecommend from './components/Recommend'
+            import HomeWeekend from './components/Weekend'
+            import axios from 'axios'
+            export default {
+                name: 'Home',
+                components: {
+                HomeHeader,
+                HomeSwiper, // 将组件HomeSwiper，注册到局部组件
+                HomeIcons,
+                HomeRecommend,
+                HomeWeekend
             },
-            getHomeInfoSucc (res) {
-                res = res.data
-                if (res.ret && res.data) {
-                const data = res.data
-                this.city = data.city
-                this.swiperList = data.swiperList
-                this.iconList = data.iconList
-                this.recommendList = data.recommendList
-                this.weekendList = data.weekendList
+            data () {
+                return {
+                    city: '',
+                    swiperList: [],
+                    iconList: [],
+                    recommendList: [],
+                    weekendList: []
                 }
-                console.log(res)
+            },
+            mounted () {
+                this.getHomeInfo()
+            },
+            methods: {
+                getHomeInfo () {
+                    axios.get('/api/index.json')
+                    .then(this.getHomeInfoSucc)
+                },
+                getHomeInfoSucc (res) {
+                    res = res.data
+                    if (res.ret && res.data) {
+                    const data = res.data
+                    this.city = data.city
+                    this.swiperList = data.swiperList
+                    this.iconList = data.iconList
+                    this.recommendList = data.recommendList
+                    this.weekendList = data.weekendList
+                    }
+                    console.log(res)
+                }
             }
-        }
-        }
-        </script>
+            }
+            </script>
 
-        <!-- Add "scoped" attribute to limit CSS to this component only -->
-        <style lang="stylus" scoped>
-        .copyright
-            font-size .2rem
-            background #f3f3f3
-            text-align center
-            line-height 4
-        </style>
-        ```
+            <!-- Add "scoped" attribute to limit CSS to this component only -->
+            <style lang="stylus" scoped>
+            .copyright
+                font-size .2rem
+                background #f3f3f3
+                text-align center
+                line-height 4
+            </style>
+            ```
     - 7-9-6 收尾工作
         - 先将 index-ajax 分支上传
             - git add .
