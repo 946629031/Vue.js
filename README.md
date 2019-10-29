@@ -86,17 +86,17 @@ Vue 各种语法 入门讲解
     - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
       - [7-9-4 swiper默认显示最后一张图片的问题](#7-9-4-swiper轮播图默认显示最后一张图片的问题)
 - [第8章 项目实战 - 旅游网站城市列表页面开发](#第8章-项目实战---旅游网站城市列表页面开发)
-    - [8-1 Vue项目城市选择页 - 路由配置](#8-1-Vue项目城市选择页---路由配置)
-    - [8-2 Vue项目城市选择页 - 搜索框布局](#8-2-Vue项目城市选择页---搜索框布局)
-    - [8-3 Vue项目城市选择页 - 列表布局](#8-3-Vue项目城市选择页---列表布局)
-    - [8-4 Vue项目城市选择页 - BetterScroll 的使用和字母表布局](#8-4-Vue项目城市选择页---BetterScroll-的使用和字母表布局)
-    - [8-5 Vue项目城市选择页 - 页面的动态数据渲染](#8-5-Vue项目城市选择页---页面的动态数据渲染)
-    - [8-6 Vue项目城市选择页 - 兄弟组件数据传递](#8-6-Vue项目城市选择页---兄弟组件数据传递)
-    - [8-7 Vue项目城市选择页 - 列表性能优化](#8-7-Vue项目城市选择页---列表性能优化)
-    - [8-8 Vue项目城市选择页 - 搜索逻辑实现](#8-8-Vue项目城市选择页---搜索逻辑实现)
-    - [8-9 Vue项目城市选择页 - Vuex实现数据共享](#8-9-Vue项目城市选择页---Vuex实现数据共享)
-    - [8-10 Vue项目城市选择页 - Vuex的高级使用及localStorage](#8-10-Vue项目城市选择页---Vuex的高级使用及localStorage)
-    - [8-11 Vue项目城市选择页 - 使用keep-alive优化网页性能](#8-11-Vue项目城市选择页---使用keep-alive优化网页性能)
+    - [8-1 Vue项目 <城市选择页> - 路由配置](#8-1-Vue项目-<城市选择页>---路由配置)
+    - [8-2 Vue项目 <城市选择页> - 搜索框布局](#8-2-Vue项目-<城市选择页>---搜索框布局)
+    - [8-3 Vue项目 <城市选择页> - 列表布局](#8-3-Vue项目-<城市选择页>---列表布局)
+    - [8-4 Vue项目 <城市选择页> - BetterScroll 的使用和字母表布局](#8-4-Vue项目-<城市选择页>---BetterScroll-的使用和字母表布局)
+    - [8-5 Vue项目 <城市选择页> - 页面的动态数据渲染](#8-5-Vue项目-<城市选择页>---页面的动态数据渲染)
+    - [8-6 Vue项目 <城市选择页> - 兄弟组件数据传递](#8-6-Vue项目-<城市选择页>---兄弟组件数据传递)
+    - [8-7 Vue项目 <城市选择页> - 列表性能优化](#8-7-Vue项目-<城市选择页>---列表性能优化)
+    - [8-8 Vue项目 <城市选择页> - 搜索逻辑实现](#8-8-Vue项目-<城市选择页>---搜索逻辑实现)
+    - [8-9 Vue项目 <城市选择页> - Vuex实现数据共享](#8-9-Vue项目-<城市选择页>---Vuex实现数据共享)
+    - [8-10 Vue项目 <城市选择页> - Vuex的高级使用及localStorage](#8-10-Vue项目-<城市选择页>---Vuex的高级使用及localStorage)
+    - [8-11 Vue项目 <城市选择页> - 使用keep-alive优化网页性能](#8-11-Vue项目-<城市选择页>---使用keep-alive优化网页性能)
 - [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
     - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
     - [9-2 Vue项目详情页 - 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
@@ -149,7 +149,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
+    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -4330,7 +4330,7 @@ Vue 各种语法 入门讲解
   - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg)
       
 
-- ### 8-1 Vue项目 <城市选择页面> - 路由配置
+- ### 8-1 Vue项目 <城市选择页> - 路由配置
     - 8-1-1 本节目标
         - 在开发这个页面之前，第一步，我们先要解决 <页面的路由配置>
     - 8-1-2 前期准备工作
@@ -4463,8 +4463,401 @@ Vue 各种语法 入门讲解
             color #fff
       </style>
       ```
-    - 8-1-7 收尾工作 push 到github
-      - 开发完本小节的功能点后
-      - git add .
-      - git commit -m ''
-      - git push
+    - 8-1-7 收尾工作
+      - city-router push 到github
+        - git add .
+        - git commit -m ''
+        - git push
+      - 将 city-router 开发完的分支 合并到 master 分支上
+        - git status
+        - git checkout master
+        - git merge city-router
+        - git push
+
+- ### 8-2 Vue项目 <城市选择页> - 搜索框布局
+    - 8-2-1 前期准备工作
+        - 在 github 上，新建分支 city-search
+        - git pull
+        - git checkout city-search
+        - npm run dev
+    - 8-2-2 代码
+        ```html
+        // /src/pages/city/components/Search.vue
+        <template>
+          <div class="search">
+            <input class="search-input" type="text" placeholder="输入城市名或拼音" />
+          </div>
+        </template>
+
+        <script>
+        export default{
+          name: 'CitySearch'
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .search
+            height .92rem
+            padding .1rem
+            background $bgColor
+            box-sizing border-box
+            position relative
+            .search-input
+              color #666
+              box-sizing border-box
+              padding 0 .1rem
+              height .62rem
+              line-height .62rem
+              width 96%
+              border none
+              border-radius .1rem
+              text-align center
+              position absolute
+              top 0
+              left 0
+              right 0
+              bottom 0
+              margin auto
+        </style>
+        ```
+    - 8-2-3 收尾工作
+      - city-search push 到github
+        - git add .
+        - git commit -m ''
+        - git push
+      - 将 city-search 开发完的分支 合并到 master 分支上
+        - git status
+        - git checkout master
+        - git merge city-search
+        - git push
+
+- ### 8-3 Vue项目 <城市选择页> - 列表布局
+    - 8-3-1 前期准备工作
+        - 在 github 上，新建分支 city-list
+        - git pull
+        - git checkout city-list
+        - npm run dev
+    - 8-3-2 代码
+        ```html
+        // /src/pages/city/components/List.vue
+        <template>
+          <div class="list">
+            <div class="area">
+              <div class="title border-topbottom">当前城市</div>
+              <div class="button-list">
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+              </div>
+            </div>
+            <div class="area">
+              <div class="title border-topbottom">当前城市</div>
+              <div class="button-list">
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+                <div class="button-wrapper">
+                  <div class="button">北京</div>
+                </div>
+              </div>
+            </div>
+            <div class="area">
+              <div class="title border-topbottom">A</div>
+              <div class="item-list">
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+                <div class="item border-bottom">阿拉尔</div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        export default{
+          name: 'CityList'
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .border-topbottom
+            &:before
+              color #000
+            $:after
+              color #000
+          .title
+            background #eee
+            line-height .4rem
+            padding-left .2rem
+            color #666
+            font-size .26rem
+          .button-list
+            padding .1rem .6rem .1rem .1rem
+            overflow hidden
+            .button-wrapper
+              width 33.33%
+              float left
+              .button
+                box-sizing border-box
+                margin .1rem
+                padding .1rem
+                text-align center
+                border .02rem solid #ccc
+                border-radius .06rem
+                font-size .26rem
+          .item-list
+            padding-left .2rem
+            .item
+              font-size .26rem
+              line-height .74rem
+        </style>
+        ```
+    - 8-3-3 简单总结
+        - 到这里，这个页面的列表基本布局已经完成了
+
+        
+- ### 8-4 Vue项目 <城市选择页> - BetterScroll 的使用和字母表布局
+    - 8-4-1 前言
+        - 上一节中，列表页的 其他简单布局已经完成了
+        - 下面来介绍，如何利用 BetterScroll 制作模拟原生APP 的页面滚到
+    - 8-4-2 BetterScroll 什么是 ?
+        - [BetterScroll github](https://github.com/ustbhuangyi/better-scroll)
+        - 「官方解释」:
+            - BetterScroll 是一款重点解决移动端（已支持 PC）各种滚动场景需求的插件。它的核心是借鉴的 iscroll 的实现，它的 API 设计基本兼容 iscroll，在 iscroll 的基础上又扩展了一些 feature 以及做了一些性能优化。
+        - 「优点」:
+            - 拥有类似于 原生APP 的滚动效果
+            - 优雅的滚动超出回弹动画
+    - 8-4-3 BetterScroll 怎么用 ?
+        - 安装 ```npm i better-scroll```
+        - 关键css代码
+            ```css
+            .list
+              position absolute
+              overflow hidden
+              top 1.78rem
+              left 0
+              right 0
+              bottom 0
+            ```
+        - BetterScroll 最常见的应用场景是列表滚动，我们来看一下它的 html 结构。[详情 请查看文档](https://github.com/ustbhuangyi/better-scroll/blob/master/README_zh-CN.md#%E8%B5%B7%E6%AD%A5)
+            - 要使得你的html解构符合下面这种模式
+            - 所以我们要在循环列表的子项 外层 包裹一个 div
+            ```html
+            <div class="wrapper">
+              <ul class="content">
+                <li>...</li>
+                <li>...</li>
+                ...
+              </ul>
+              <!-- 这里可以放一些其它的 DOM，但不会影响滚动 -->
+            </div>
+            ```
+        - 关键js代码
+            - 通过 ref 获取 Vue 中的 DOM元素
+            ```js
+            import Bscroll from 'better-scroll'       // 引入 better-scroll
+            export default{
+              mounted () {
+                this.scroll = new Bscroll(this.$refs.wrapper)   // 将 better-scroll 挂载到 获取到的 DOM节点上
+              }
+            }
+            ```
+    - 8-4-4 完整代码
+        ```html
+        // /src/pages/city/components/List.vue
+        <template>
+          <div class="list" ref='wrapper'>
+            <div>
+              <div class="area">
+                <div class="title border-topbottom">当前城市</div>
+                <div class="button-list">
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                </div>
+              </div>
+              <div class="area">
+                <div class="title border-topbottom">热门城市</div>
+                <div class="button-list">
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                </div>
+              </div>
+              <div class="area">
+                <div class="title border-topbottom">A</div>
+                <div class="item-list">
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                </div>
+              </div>
+              <div class="area">
+                <div class="title border-topbottom">A</div>
+                <div class="item-list">
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                </div>
+              </div>
+              <div class="area">
+                <div class="title border-topbottom">A</div>
+                <div class="item-list">
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                  <div class="item border-bottom">阿拉尔</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        import Bscroll from 'better-scroll'
+        export default{
+          name: 'CityList',
+          mounted () {
+            this.scroll = new Bscroll(this.$refs.wrapper)
+          }
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .border-topbottom
+            &:before
+              color #000
+            $:after
+              color #000
+          .list
+            position absolute
+            overflow hidden
+            top 1.78rem
+            left 0
+            right 0
+            bottom 0
+            .title
+              background #eee
+              line-height .54rem
+              padding-left .2rem
+              color #666
+              font-size .26rem
+            .button-list
+              padding .1rem .6rem .1rem .1rem
+              overflow hidden
+              .button-wrapper
+                width 33.33%
+                float left
+                .button
+                  box-sizing border-box
+                  margin .1rem
+                  padding .1rem
+                  text-align center
+                  border .02rem solid #ccc
+                  border-radius .06rem
+                  font-size .26rem
+            .item-list
+              padding-left .2rem
+              .item
+                font-size .26rem
+                line-height .74rem
+        </style>
+        ```
+    - 8-4-5 字母表布局
+        ```html
+        // /src/pages/city/components/Alphabet.vue
+        <template>
+          <div class="list">
+            <div class="item">A</div>
+            <div class="item">A</div>
+            <div class="item">A</div>
+            <div class="item">A</div>
+            <div class="item">A</div>
+            <div class="item">A</div>
+            <div class="item">A</div>
+          </div>
+        </template>
+
+        <script>
+        export default{
+          name: 'CityAlphabet'
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .list
+            position absolute
+            right 0
+            top 1.78rem
+            bottom 0
+            display flex
+            flex-direction column
+            justify-content center
+            width .4rem
+            text-align center
+            .item
+              color $bgColor
+              line-height .4rem
+              font-size .26rem
+        </style>
+        ```
+        - 到这里，本页面的 css布局 基本完成了，下一节 就进入 逻辑 和 数据 的操作
+
+    - 8-4-6 收尾工作
+        - city-list push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 city-list 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge city-list
+          - git push
+
+- ### 8-5 Vue项目 <城市选择页> - 页面的动态数据渲染
+    - 8-4-1 前言
