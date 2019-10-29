@@ -4171,26 +4171,26 @@ Vue 各种语法 入门讲解
                 - 如果 list.length == false, 如果为 false 则不渲染 swiper
                 - 如果接收到数据后, list.length == true, 才渲染 swiper
             - 代码
-            ```html
-            <template>
-                <div class="wrapper">
-                <swiper :options="swiperOption" v-if="list.length">
-                    <swiper-slide v-for="item of list" :key="item.id">
-                        <img :src="item.url">
-                    </swiper-slide>
-                    <div class="swiper-pagination"  slot="pagination"></div>
-                </swiper>
-                </div>
-            </template>
-            ```
+                ```html
+                <template>
+                    <div class="wrapper">
+                    <swiper :options="swiperOption" v-if="list.length">
+                        <swiper-slide v-for="item of list" :key="item.id">
+                            <img :src="item.url">
+                        </swiper-slide>
+                        <div class="swiper-pagination"  slot="pagination"></div>
+                    </swiper>
+                    </div>
+                </template>
+                ```
             - 到这里，就能初步解决问题了
         - 3.优化解决方案
             - 存在的问题
-                - 由于上面直接在 <template> 模板中，写了 ``` v-if="list.length" ```
+                - 由于上面直接在 ```<template>``` 模板中，写了 ``` v-if="list.length" ```
                 - 这种带有 逻辑性 的代码
                 - 在 Vue 中，```我们要尽量避免在 <template> 模板中 写这种逻辑性的代码```
             - 优化思路方案
-                - 由于不该在 <template> 模板中 写逻辑性的代码
+                - 由于不该在 ```<template>``` 模板中 写逻辑性的代码
                 - 所以，我们利用 computed 计算属性，来替代
                     - swiper 轮播图的渲染与否，取决于 computed.showSwiper() 的返回值
             - 完整代码
