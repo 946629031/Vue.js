@@ -4154,174 +4154,174 @@ Vue 各种语法 入门讲解
         </style>
         ```
     - #### 7-9-4 swiper轮播图默认显示最后一张图片的问题
-      - 1.存在的问题
-        - 当你做完上一节的操作后，你会发现swiper默认是显示最后一张图片的
-        - 原因是：在一开始 swipertList 数据没有加载到的时候，```swipertList = []``` 为空数组，而vue最开始是根据空数组 渲染页面的
-        - 等到 swiper.vue 接收到 swiperList 数据的时候，才根据 新的数据，重新渲染 swiper 页面
-        - 正是因为这样的原因，才导致了 swiper轮播图默认显示最后一张图片
-      - 2.那么这个问题该如何解决呢？
-        - 思路：
-          - 我们让 swiper 的初次创建，由完整的数据创建，而不是由 默认的空数组创建
-          - 通过v-if判断，在组件收到需要渲染的数据后再加载swiper
-          - 这样就能避免这个问题了
-        - 核心代码
-          ```
-          v-if="list.length"
-          ```
-          - 如果 list.length == false, 如果为 false 则不渲染 swiper
-          - 如果接收到数据后, list.length == true, 才渲染 swiper
-        - 代码
-          ```html
-          <template>
-            <div class="wrapper">
-              <swiper :options="swiperOption" v-if="list.length">
-                <swiper-slide v-for="item of list" :key="item.id">
-                  <img :src="item.url">
-                </swiper-slide>
-                <div class="swiper-pagination"  slot="pagination"></div>
-              </swiper>
-            </div>
-          </template>
-          ```
-        - 到这里，就能初步解决问题了
-      - 3.优化解决方案
-        - 存在的问题
-          - 由于上面直接在 <template> 模板中，写了 ``` v-if="list.length" ```
-          - 这种带有 逻辑性 的代码
-          - 在 Vue 中，```我们要尽量避免在 <template> 模板中 写这种逻辑性的代码```
-        - 优化思路方案
-          - 由于不该在 <template> 模板中 写逻辑性的代码
-          - 所以，我们利用 computed 计算属性，来替代
-            - swiper 轮播图的渲染与否，取决于 computed.showSwiper() 的返回值
-        - 完整代码
-          ```html
-          <template>
-            <div class="wrapper">
-              <swiper :options="swiperOption" v-if="showSwiper">
-                <swiper-slide v-for="item of list" :key="item.id">
-                  <img :src="item.url">
-                </swiper-slide>
-                <div class="swiper-pagination"  slot="pagination"></div>
-              </swiper>
-            </div>
-          </template>
+        - 1.存在的问题
+            - 当你做完上一节的操作后，你会发现swiper默认是显示最后一张图片的
+            - 原因是：在一开始 swipertList 数据没有加载到的时候，```swipertList = []``` 为空数组，而vue最开始是根据空数组 渲染页面的
+            - 等到 swiper.vue 接收到 swiperList 数据的时候，才根据 新的数据，重新渲染 swiper 页面
+            - 正是因为这样的原因，才导致了 swiper轮播图默认显示最后一张图片
+        - 2.那么这个问题该如何解决呢？
+            - 思路：
+            - 我们让 swiper 的初次创建，由完整的数据创建，而不是由 默认的空数组创建
+            - 通过v-if判断，在组件收到需要渲染的数据后再加载swiper
+            - 这样就能避免这个问题了
+            - 核心代码
+            ```
+            v-if="list.length"
+            ```
+            - 如果 list.length == false, 如果为 false 则不渲染 swiper
+            - 如果接收到数据后, list.length == true, 才渲染 swiper
+            - 代码
+            ```html
+            <template>
+                <div class="wrapper">
+                <swiper :options="swiperOption" v-if="list.length">
+                    <swiper-slide v-for="item of list" :key="item.id">
+                    <img :src="item.url">
+                    </swiper-slide>
+                    <div class="swiper-pagination"  slot="pagination"></div>
+                </swiper>
+                </div>
+            </template>
+            ```
+            - 到这里，就能初步解决问题了
+        - 3.优化解决方案
+            - 存在的问题
+                - 由于上面直接在 <template> 模板中，写了 ``` v-if="list.length" ```
+                - 这种带有 逻辑性 的代码
+                - 在 Vue 中，```我们要尽量避免在 <template> 模板中 写这种逻辑性的代码```
+            - 优化思路方案
+                - 由于不该在 <template> 模板中 写逻辑性的代码
+                - 所以，我们利用 computed 计算属性，来替代
+                    - swiper 轮播图的渲染与否，取决于 computed.showSwiper() 的返回值
+            - 完整代码
+                ```html
+                <template>
+                <div class="wrapper">
+                    <swiper :options="swiperOption" v-if="showSwiper">
+                    <swiper-slide v-for="item of list" :key="item.id">
+                        <img :src="item.url">
+                    </swiper-slide>
+                    <div class="swiper-pagination"  slot="pagination"></div>
+                    </swiper>
+                </div>
+                </template>
 
-          <script>
-          export default {
-            name: 'HomeSwiper',
-            props: {
-              list: Array
-            },
-            data () {
-              return {
-                swiperOption: {
-                  pagination: '.swiper-pagination', // 轮播图底部的 小白点
-                  loop: true
+                <script>
+                export default {
+                name: 'HomeSwiper',
+                props: {
+                    list: Array
+                },
+                data () {
+                    return {
+                    swiperOption: {
+                        pagination: '.swiper-pagination', // 轮播图底部的 小白点
+                        loop: true
+                    }
+                    }
+                },
+                computed: {
+                    showSwiper () {       // 用计算属性 优化
+                    return this.list.length
+                    }
                 }
-              }
-            },
-            computed: {
-              showSwiper () {       // 用计算属性 优化
-                return this.list.length
-              }
-            }
-          }
-          </script>
+                }
+                </script>
 
-          <style lang="stylus" scoped>
-            .wrapper >>> .swiper-pagination-bullet-active
-              background: #fff
-            .wrapper
-              overflow: hidden
-              width: 100%
-              height: 0
-              padding-bottom: 26.66%
-          </style>
-          ```
-- 7-9-5 其他剩下的几个组件间的传值也是同样道理
-    - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
-    - 子组件使用 props 接收后，即可使用数据
-    - Home.vue 完整代码如下
-    ```html
-    // /src/pages/home/Home.vue
-    <template>
-        <div>
-        <home-header :city='city'></home-header>
-        <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
-        <home-icons :iconList='iconList'></home-icons>
-        <home-recommend :list='recommendList'></home-recommend>
-        <home-weekend :list='weekendList'></home-weekend>
-        <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
-        </div>
-    </template>
+                <style lang="stylus" scoped>
+                .wrapper >>> .swiper-pagination-bullet-active
+                    background: #fff
+                .wrapper
+                    overflow: hidden
+                    width: 100%
+                    height: 0
+                    padding-bottom: 26.66%
+                </style>
+                ```
+    - 7-9-5 其他剩下的几个组件间的传值也是同样道理
+        - 在父组件，请求 并接收到数据后，分别传递给 各个子组件
+        - 子组件使用 props 接收后，即可使用数据
+        - Home.vue 完整代码如下
+        ```html
+        // /src/pages/home/Home.vue
+        <template>
+            <div>
+                <home-header :city='city'></home-header>
+                <home-swiper :list='swiperList'></home-swiper>  <!-- 使用 HomeSwiper 组件 -->
+                <home-icons :iconList='iconList'></home-icons>
+                <home-recommend :list='recommendList'></home-recommend>
+                <home-weekend :list='weekendList'></home-weekend>
+                <div class="copyright border-top"><span>Qunar 京ICP备05021087</span><a class="qn_ml25" href="">意见反馈</a></div>
+            </div>
+        </template>
 
-    <script>
-    import HomeHeader from './components/Header'
-    import HomeSwiper from './components/Swiper'
-    import HomeIcons from './components/Icons'
-    import HomeRecommend from './components/Recommend'
-    import HomeWeekend from './components/Weekend'
-    import axios from 'axios'
-    export default {
-        name: 'Home',
-        components: {
-        HomeHeader,
-        HomeSwiper, // 将组件HomeSwiper，注册到局部组件
-        HomeIcons,
-        HomeRecommend,
-        HomeWeekend
+        <script>
+        import HomeHeader from './components/Header'
+        import HomeSwiper from './components/Swiper'
+        import HomeIcons from './components/Icons'
+        import HomeRecommend from './components/Recommend'
+        import HomeWeekend from './components/Weekend'
+        import axios from 'axios'
+        export default {
+            name: 'Home',
+            components: {
+            HomeHeader,
+            HomeSwiper, // 将组件HomeSwiper，注册到局部组件
+            HomeIcons,
+            HomeRecommend,
+            HomeWeekend
         },
         data () {
-        return {
-            city: '',
-            swiperList: [],
-            iconList: [],
-            recommendList: [],
-            weekendList: []
-        }
+            return {
+                city: '',
+                swiperList: [],
+                iconList: [],
+                recommendList: [],
+                weekendList: []
+            }
         },
         mounted () {
-        this.getHomeInfo()
+            this.getHomeInfo()
         },
         methods: {
-        getHomeInfo () {
-            axios.get('/api/index.json')
-            .then(this.getHomeInfoSucc)
-        },
-        getHomeInfoSucc (res) {
-            res = res.data
-            if (res.ret && res.data) {
-            const data = res.data
-            this.city = data.city
-            this.swiperList = data.swiperList
-            this.iconList = data.iconList
-            this.recommendList = data.recommendList
-            this.weekendList = data.weekendList
+            getHomeInfo () {
+                axios.get('/api/index.json')
+                .then(this.getHomeInfoSucc)
+            },
+            getHomeInfoSucc (res) {
+                res = res.data
+                if (res.ret && res.data) {
+                const data = res.data
+                this.city = data.city
+                this.swiperList = data.swiperList
+                this.iconList = data.iconList
+                this.recommendList = data.recommendList
+                this.weekendList = data.weekendList
+                }
+                console.log(res)
             }
-            console.log(res)
         }
         }
-    }
-    </script>
+        </script>
 
-    <!-- Add "scoped" attribute to limit CSS to this component only -->
-    <style lang="stylus" scoped>
-    .copyright
-        font-size .2rem
-        background #f3f3f3
-        text-align center
-        line-height 4
-    </style>
-    ```
-- 7-9-6 收尾工作
-    - 先将 index-ajax 分支上传
-        - git add .
-        - git commit -m ''
-        - git push
-    - 再将开发好的新功能 分支，合并到 master 线上稳定版本 分支中
-        - git checkout master
-        - git merge index-ajax
-        - git push
+        <!-- Add "scoped" attribute to limit CSS to this component only -->
+        <style lang="stylus" scoped>
+        .copyright
+            font-size .2rem
+            background #f3f3f3
+            text-align center
+            line-height 4
+        </style>
+        ```
+    - 7-9-6 收尾工作
+        - 先将 index-ajax 分支上传
+            - git add .
+            - git commit -m ''
+            - git push
+        - 再将开发好的新功能 分支，合并到 master 线上稳定版本 分支中
+            - git checkout master
+            - git merge index-ajax
+            - git push
 
             
 ## 第8章 项目实战 - 旅游网站城市列表页面开发
