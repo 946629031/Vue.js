@@ -149,7 +149,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
+    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -4861,4 +4861,452 @@ Vue 各种语法 入门讲解
           - git push
 
 - ### 8-5 Vue项目 <城市选择页> - 页面的动态数据渲染
-    - 8-4-1 前言
+    - 8-5-1 本节目标
+        - 通过 Ajax 动态获取 城市列表数据 city.json 
+        - 然后通过 组件间传值，渲染到页面上去
+    - 8-5-2 前期准备工作
+        - 在 github 上，新建分支 city-ajax
+        - git pull
+        - git checkout city-ajax
+        - npm run dev
+
+    - 8-5-3 思路
+        - 通过 axios 取得数据
+        - 然后传递给对应的子组件，渲染着对应的位置即可
+
+    - 8-5-4 代码
+        ```html
+        // /src/pages/city/City.vue
+        <template>
+          <div>
+            <city-header></city-header>
+            <city-search></city-search>
+            <city-list :cities='cities' :hot='hotCities'></city-list>   <!-- 第三步 传递数据给子组件 -->
+            <city-alphabet :cities='cities'></city-alphabet>            <!-- 第三步 传递数据给子组件 -->
+          </div>
+        </template>
+
+        <script>
+        import axios from 'axios'
+        import CityHeader from './components/Header'
+        import CitySearch from './components/Search'
+        import CityList from './components/List'
+        import CityAlphabet from './components/Alphabet'
+        export default{
+          name: 'City',
+          data () {
+            return {
+              hotCities: [],
+              cities: {}
+            }
+          },
+          components: {
+            CityHeader,
+            CitySearch,
+            CityList,
+            CityAlphabet
+          },
+          methods: {
+            getCityInfo () {
+              axios.get('/api/city.json')                 // 第一步 取得数据
+                .then(this.handleGetCityInfoSuccess)
+            },
+            handleGetCityInfoSuccess (response) {         // 第二步 处理数据
+              let res = response.data
+              if (res.ret && res.data) {
+                this.cities = res.data.cities
+                this.hotCities = res.data.hotCities
+              }
+            }
+          },
+          mounted () {
+            this.getCityInfo()
+          }
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+
+        </style>
+        ```
+        ```html
+        // /src/pages/city/components/List.vue
+        <template>
+          <div class="list" ref='wrapper'>
+            <div>
+              <div class="area">
+                <div class="title border-topbottom">当前城市</div>
+                <div class="button-list">
+                  <div class="button-wrapper">
+                    <div class="button">北京</div>
+                  </div>
+                </div>
+              </div>
+              <div class="area">
+                <div class="title border-topbottom">热门城市</div>
+                <div class="button-list">
+                  <div class="button-wrapper" v-for="city of hot" :key='city.id'>       <!-- 第二步 处理数据 使其渲染在它该在的地方 -->
+                    <div class="button">{{city.name}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="area" v-for="(item, key) of cities" :key="key">               <!-- 第二步 处理数据 使其渲染在它该在的地方 -->
+                <div class="title border-topbottom">{{key}}</div>
+                <div class="item-list">
+                  <div class="item border-bottom" v-for="city of item" :key='city.id'>{{city.name}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        import Bscroll from 'better-scroll'
+        export default{
+          name: 'CityList',
+          props: {                // 第一步 接收父组件传来的 数据
+            hot: Array,
+            cities: Object
+          },
+          mounted () {
+            this.scroll = new Bscroll(this.$refs.wrapper)
+          }
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .border-topbottom
+            &:before
+              color #000
+            $:after
+              color #000
+          .list
+            position absolute
+            overflow hidden
+            top 1.78rem
+            left 0
+            right 0
+            bottom 0
+            .title
+              background #eee
+              line-height .54rem
+              padding-left .2rem
+              color #666
+              font-size .26rem
+            .button-list
+              padding .1rem .6rem .1rem .1rem
+              overflow hidden
+              .button-wrapper
+                width 33.33%
+                float left
+                .button
+                  box-sizing border-box
+                  margin .1rem
+                  padding .1rem
+                  text-align center
+                  border .02rem solid #ccc
+                  border-radius .06rem
+                  font-size .26rem
+            .item-list
+              padding-left .2rem
+              .item
+                font-size .26rem
+                line-height .74rem
+        </style>
+        ```
+        ```html
+        // /src/pages/city/components/Alphabet.vue
+        <template>
+          <div class="list">
+            <div class="item" v-for="(item, key) of cities" :key="key">{{key}}</div>      <!-- 第二步 处理数据 使其渲染在它该在的地方 -->
+          </div>
+        </template>
+
+        <script>
+        export default{
+          name: 'CityAlphabet',
+          props: {
+            cities: Object                // 第一步 接收父组件传来的 数据
+          }
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .list
+            position absolute
+            right 0
+            top 1.78rem
+            bottom 0
+            display flex
+            flex-direction column
+            justify-content center
+            width .4rem
+            text-align center
+            .item
+              color $bgColor
+              line-height .4rem
+              font-size .26rem
+        </style>
+        ```
+
+    - 8-5-5 收尾工作
+        - city-ajax push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 city-ajax 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge city-ajax
+          - git push
+
+- ### 8-6 Vue项目 <城市选择页> - 兄弟组件数据传递
+    - 8-6-1 本节目标
+        - 我们这一节要实现的功能是
+            - 1.点击页面 右侧的字母 ABCDEFG... ，然后城市列表 自动滚动到对应的 以 ABCDEFG... 开头的城市部分
+            - 2.当我们点击拖拽 右侧的字母 ABCDEFG... 时候，左侧的 城市列表 也跟随滚动
+
+    - 8-6-2 前期准备工作
+        - 在 github 上，新建分支 city-components
+        - git pull
+        - git checkout city-components
+        - npm run dev
+
+    - 8-6-3 实现功能 - 点击右侧字母，自动滚动到对应部分
+        - 这一小节，我们先来实现 上面所说的 第一个功能
+        - 1.思路
+            - 先在 右侧字母 ```Alphabet.vue``` 中点击，获取所点击的 字母letter
+            - 这个点击，将向外触发一个事件
+            - 在组件外部监听 该事件
+            - 一但监听到该事件，城市列表组件 ```List.vue``` 做出响应，并滚动到对应的部分
+        - 2.代码
+            ```html
+            // /src/pages/city/components/Alphabet.vue
+            <template>
+              <div class="list">
+                <div
+                  class="item"
+                  v-for="(item, key) of cities"
+                  :key="key"
+                  @click='handleLetterClick'       // 第一步.监听点击事件，并触发 handleLetterClick
+                >
+                  {{key}}
+                </div>
+              </div>
+            </template>
+
+            <script>
+            export default{
+              name: 'CityAlphabet',
+              props: {
+                cities: Object
+              },
+              methods: {
+                handleLetterClick (e) {
+                  this.$emit('change', e.target.innerText)    // 第二步. 获取所点击的 字母，并向外触发一个 change 事件, 且将 所点击的字母 传递出去
+                  // console.log(e.target.innerText)
+                }
+              }
+            }
+            </script>
+
+            <style lang='stylus' scoped>
+              @import '~styles/varibles.styl';
+              .list
+                position absolute
+                right 0
+                top 1.78rem
+                bottom 0
+                display flex
+                flex-direction column
+                justify-content center
+                width .4rem
+                text-align center
+                .item
+                  color $bgColor
+                  line-height .4rem
+                  font-size .26rem
+            </style>
+            ```
+            ```html
+            // /src/pages/city/City.vue
+            <template>
+              <div>
+                <city-header></city-header>
+                <city-search></city-search>
+                <city-list
+                  :cities='cities'
+                  :hot='hotCities'
+                  :letter='letter'          // 第五步.将储存的 letter 数据，传递给 cityList 组件
+                ></city-list>
+                <city-alphabet
+                  :cities='cities'
+                  @change='handleLetterChange'      // 第三步.在这里监听 change事件，如果监听到 就执行 handleLetterChange
+                ></city-alphabet>
+              </div>
+            </template>
+
+            <script>
+            import axios from 'axios'
+            import CityHeader from './components/Header'
+            import CitySearch from './components/Search'
+            import CityList from './components/List'
+            import CityAlphabet from './components/Alphabet'
+            export default{
+              name: 'City',
+              data () {
+                return {
+                  hotCities: [],
+                  cities: {},
+                  letter: ''
+                }
+              },
+              components: {
+                CityHeader,
+                CitySearch,
+                CityList,
+                CityAlphabet
+              },
+              methods: {
+                getCityInfo () {
+                  axios.get('/api/city.json')
+                    .then(this.handleGetCityInfoSuccess)
+                },
+                handleGetCityInfoSuccess (response) {
+                  let res = response.data
+                  if (res.ret && res.data) {
+                    this.cities = res.data.cities
+                    this.hotCities = res.data.hotCities
+                  }
+                },
+                handleLetterChange (letter) {
+                  this.letter = letter    // 第四步.储存数据
+                }
+              },
+              mounted () {
+                this.getCityInfo()
+              }
+            }
+            </script>
+
+            <style lang='stylus' scoped>
+
+            </style>
+            ```
+            ```html
+            // /src/pages/city/components/List.vue
+            <template>
+              <div class="list" ref='wrapper'>
+                <div>
+                  <div class="area">
+                    <div class="title border-topbottom">当前城市</div>
+                    <div class="button-list">
+                      <div class="button-wrapper">
+                        <div class="button">北京</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="area">
+                    <div class="title border-topbottom">热门城市</div>
+                    <div class="button-list">
+                      <div class="button-wrapper" v-for="city of hot" :key='city.id'>
+                        <div class="button">{{city.name}}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="area"
+                    v-for="(item, key) of cities"
+                    :key="key"
+                    :ref='key'
+                  >
+                    <div class="title border-topbottom">{{key}}</div>
+                    <div class="item-list">
+                      <div class="item border-bottom" v-for="city of item" :key='city.id'>{{city.name}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <script>
+            import Bscroll from 'better-scroll'
+            export default{
+              name: 'CityList',
+              props: {
+                hot: Array,
+                cities: Object,
+                letter: String          // 第六步. 使用 props 接收 父组件传来的 letter 数据
+              },
+              mounted () {
+                this.scroll = new Bscroll(this.$refs.wrapper)
+              },
+              watch: {
+                letter () {             // 第七步. 使用 watch 监听属性，监听 letter 的变化
+                  console.log(this.letter)
+                  if (this.letter) {
+                    // console.log(this.$refs)
+                    let element = this.$refs[this.letter][0]
+                    this.scroll.scrollToElement(element)   // 第八步. 如果监听到变化，就滚动到对应位置，完成。
+                  }
+                }
+              }
+            }
+            </script>
+
+            <style lang='stylus' scoped>
+              @import '~styles/varibles.styl';
+              .border-topbottom
+                &:before
+                  color #000
+                $:after
+                  color #000
+              .list
+                position absolute
+                overflow hidden
+                top 1.78rem
+                left 0
+                right 0
+                bottom 0
+                .title
+                  background #eee
+                  line-height .54rem
+                  padding-left .2rem
+                  color #666
+                  font-size .26rem
+                .button-list
+                  padding .1rem .6rem .1rem .1rem
+                  overflow hidden
+                  .button-wrapper
+                    width 33.33%
+                    float left
+                    .button
+                      box-sizing border-box
+                      margin .1rem
+                      padding .1rem
+                      text-align center
+                      border .02rem solid #ccc
+                      border-radius .06rem
+                      font-size .26rem
+                .item-list
+                  padding-left .2rem
+                  .item
+                    font-size .26rem
+                    line-height .74rem
+            </style>
+            ```
+    - 8-6-4 实现功能 - 当点击拖拽 右侧的字母 ABCDEFG... 时候，左侧的 城市列表 也跟随滚动
+        - 这一小节，我们先来实现 上面所说的 第二个功能
+        - 1.思路
+            - 先在 右侧字母 ```Alphabet.vue``` 中点击，获取所点击的 字母letter
+            - 这个点击，将向外触发一个事件
+            - 在组件外部监听 该事件
+            - 一但监听到该事件，城市列表组件 ```List.vue``` 做出响应，并滚动到对应的部分
+        - 2.代码
+            ```html
+            // /src/pages/city/components/Alphabet.vue
+            ```
+
+            14:27
