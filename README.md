@@ -35,7 +35,7 @@ Vue 各种语法 入门讲解
     - [4-1 使用组件的细节点](#4-1-使用组件的细节点)
         - [is=""]()
         - [子组件的 data，必须是 **函数返回值**]()
-        - [ref Vue中如何操作DOM]()
+        - [ref Vue中如何操作DOM](#4-1-3-问题3---ref-Vue中如何操作DOM)
     - [4-2 父子组件间的数据传递](#4-2-父子组件间的数据传递)
         - [4-2-1 父组件 如何向 子组件 传递数据](#4-2-1-父组件-如何向-子组件-传递数据)
         - [单向数据流](#单向数据流)
@@ -5300,13 +5300,94 @@ Vue 各种语法 入门讲解
     - 8-6-4 实现功能 - 当点击拖拽 右侧的字母 ABCDEFG... 时候，左侧的 城市列表 也跟随滚动
         - 这一小节，我们先来实现 上面所说的 第二个功能
         - 1.思路
-            - 先在 右侧字母 ```Alphabet.vue``` 中点击，获取所点击的 字母letter
-            - 这个点击，将向外触发一个事件
-            - 在组件外部监听 该事件
-            - 一但监听到该事件，城市列表组件 ```List.vue``` 做出响应，并滚动到对应的部分
+            - 先看动作分解：
+                - 点击拖拽，实际上是三个动作
+                    - 点击，事实上就是 touchstart
+                    - 拖拽，是 touchmove
+                    - 拖拽以后松开手，事实上是 touchend
+            - 所以，我们分别根据 以上的三个行为，分别做对应的 动作监听 并响应 即可
+            - 处理完各个动作的响应后。最后，向外触发 change 事件 ```this.$emit('change', this.letters[index])```
+            - 然后在外部 监听 change事件，并使 ```List.vue``` 组件的列表滚动到对应位置即可
         - 2.代码
             ```html
             // /src/pages/city/components/Alphabet.vue
-            ```
+            <template>
+              <div class="list">
+                <div
+                  class="item"
+                  v-for="(item, key) of cities"
+                  :key="key"
+                  :ref='key'
+                  @click='handleLetterClick'
+                  @touchstart='handleTouchStart'
+                  @touchmove='handleTouchMove'
+                  @touchend='handleTouchEnd'
+                >
+                  {{key}}
+                </div>
+              </div>
+            </template>
 
-            14:27
+            <script>
+            export default{
+              name: 'CityAlphabet',
+              props: {
+                cities: Object
+              },
+              data () {
+                return {
+                  touchStatus: false
+                }
+              },
+              computed: {
+                letters () {
+                  const letters = []
+                  for (var i in this.cities) {
+                    letters.push(i)
+                  }
+                  return letters
+                }
+              },
+              methods: {
+                handleLetterClick (e) {
+                  this.$emit('change', e.target.innerText)
+                  // console.log(e.target.innerText)
+                },
+                handleTouchStart () {
+                  this.touchStatus = true
+                },
+                handleTouchMove (e) {
+                  if (this.touchStatus) {
+                    const startY = this.$refs['A'][0].offsetTop         // 获取A字母 到上级层顶部的距离
+                    let touchY = e.touches[0].clientY                   // 获取手指 距离顶部的位置
+                    let index = Math.floor((touchY - 89 - startY) / 20) // (点击的Y轴距离 - header高度 - startY ) 除以 每个字母高度
+                    if (index >= 0 && index < this.letters.length) {
+                      this.$emit('change', this.letters[index])
+                    }
+                  }
+                },
+                handleTouchEnd () {
+                  this.touchStatus = false
+                }
+              }
+            }
+            </script>
+
+            <style lang='stylus' scoped>
+              @import '~styles/varibles.styl';
+              .list
+                position absolute
+                right 0
+                top 1.78rem
+                bottom 0
+                display flex
+                flex-direction column
+                justify-content center
+                width .4rem
+                text-align center
+                .item
+                  color $bgColor
+                  line-height .4rem
+                  font-size .26rem
+            </style>
+            ```
