@@ -5391,3 +5391,97 @@ Vue 各种语法 入门讲解
                   font-size .26rem
             </style>
             ```
+
+- ### 8-7 Vue项目 <城市选择页> - 列表性能优化
+    - 8-7-1 问题1
+        - 1.存在问题
+            - 在 ```Alphabet.vue``` 中, 我们计算 startY 值的时候，是在 touchmove 时候才计算的
+            - 也就是，每次 touchmove 的时候，都要计算一次。这样导致性能极其的浪费，所以我们现在要做优化
+                ```js
+                handleTouchMove (e) {
+                    if (this.touchStatus) {
+                        const startY = this.$refs['A'][0].offsetTop
+                        let touchY = e.touches[0].clientY
+                        let index = Math.floor((touchY - 89 - startY) / 20)
+                        if (index >= 0 && index < this.letters.length) {
+                            this.$emit('change', this.letters[index])
+                        }
+                    }
+                }
+                ```
+        - 2 解决问题
+            - 思路：
+                - 由于 A 字母的位置始终是固定的，所以可以抽离出来，在页面渲染完后 就计算 并 存储起来
+                - 为什么是写在 updated 生命周期钩子 上？
+                    - 因为页面最开始渲染的时候，你是用 ```list.vue``` 里的 ```cities: {}``` 这个数据渲染的，而这个为空对象
+                    - 当页面请求到 数据以后，才会传过来新的数据 (也就是 ABCDEFG...)，然后才根据新数据 重新更新页面
+                    - 而这个 ```updated``` 生命周期钩子 就是这个时候执行的
+                - 这样的话，就可以做到，```计算一次，多次使用。``` 这种节约资源的要求了
+            ```js
+            data () {
+                return {
+                    touchStatus: false,
+                    startY: 0
+                }
+            },
+            updated () {
+                this.startY = this.$refs['A'][0].offsetTop // 获取A字母 到上级层顶部的距离
+            },
+            methods: {
+                handleTouchMove (e) {
+                    if (this.touchStatus) {
+                        let touchY = e.touches[0].clientY
+                        let index = Math.floor((touchY - 89 - this.startY) / 20)
+                        if (index >= 0 && index < this.letters.length) {
+                                this.$emit('change', this.letters[index])
+                        }
+                    }
+                }
+            }
+            ```
+    - 8-7-2 问题2 函数节流
+        - 1.存在问题
+            - 我们在之前 touchmove 触发的函数 ```handleTouchMove()``` 中，由于 touchmove 的触发频率是非常高的
+            - 这导致这个函数 在短时间内 被几十次 几百次的重复执行，导致性能的极致浪费
+        - 2.解决问题
+            - 思路：
+                - 我们规定，在一个时间单位内，touchmove 只执行一次
+                - 这样就能起到 函数节流、减少性能浪费 的问题了
+        - 3.代码
+            ```js
+            data () {
+              return {
+                touchStatus: false,
+                startY: 0,
+                timer: null
+              }
+            },
+            methods: {
+              handleTouchMove (e) {
+                if (this.touchStatus) {
+                  if (this.timer) {
+                    clearTimeout(this.timer)
+                  }
+                  this.timer = setTimeout(() => { // 利用setTimeout 做函数节流
+                    let touchY = e.touches[0].clientY
+                    let index = Math.floor((touchY - 89 - this.startY) / 20)
+                    if (index >= 0 && index < this.letters.length) {
+                      this.$emit('change', this.letters[index])
+                    }
+                  }, 16)  // 规定 每个时间单位为 16ms
+                }
+              }
+            }
+            ```
+
+- ### 8-8 Vue项目 <城市选择页> - 搜索逻辑实现
+    - 8-8-1 本节目标：
+        - 搜索功能的实现
+        - 当我们在搜索框输入 城市名字或者拼音的是时候，出现搜索结果
+    - 8-8-2 前期准备工作
+        - 在 github 上，新建分支 city-search-logic
+        - git pull
+        - git checkout city-search-logic
+        - npm run dev
+
+        11:07
