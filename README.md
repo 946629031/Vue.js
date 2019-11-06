@@ -5483,5 +5483,120 @@ Vue 各种语法 入门讲解
         - git pull
         - git checkout city-search-logic
         - npm run dev
+    - 8-8-3 思路
+        - 1.将城市数据 cities 传递进来
+        - 2.实时读取用户输入的数据，使用 v-model 数据双向绑定
+        - 3.监听用户输入的数据 keyword, 使用 watch 进行数据监听
+        - 4.根据监听的 keyword 数据变化, 进行关键词的查询匹配
+        - 5.将查询匹配的关键词，push 到搜索结果 的 数组 list 中
+        - 6.循环展示 搜索结果
+    - 8-8-4 代码
+        ```html
+        // /src/pages/city/components/Search.vue
+        <template>
+          <div class="search-wrapper">
+            <div class="search">
+              <input v-model="keyword" class="search-input" type="text" placeholder="输入城市名或拼音" />
+            </div>
+            <div class="search-content" v-show="keyword" ref='search'>
+              <ul>
+                <li class="search-item border-bottom" v-for="item of list" :key='item.id'>{{item.name}}</li>
+              </ul>
+            </div>
+          </div>
+        </template>
 
-        11:07
+        <script>
+        import Bscroll from 'better-scroll'
+        export default{
+          name: 'CitySearch',
+          data () {
+            return {
+              keyword: '',
+              list: [],
+              timer: null
+            }
+          },
+          props: {
+            cities: Object
+          },
+          watch: {
+            keyword () {
+              if (this.timer) { // 函数节流1
+                clearTimeout(this.timer)
+              }
+              if (!this.keyword) {
+                this.list = []
+                return
+              }
+              this.timer = setTimeout(() => { // 函数节流2
+                const result = []
+                for (let i in this.cities) {
+                  this.cities[i].forEach((value) => {
+                    if (value.spell.indexOf(this.keyword) > -1 || value.name.indexOf(this.keyword) > -1) {
+                      result.push(value)
+                    }
+                  })
+                }
+                this.list = result
+              }, 100)
+            }
+          },
+          mounted () {
+            this.scroll = new Bscroll(this.$refs.search)
+          }
+        }
+        </script>
+
+        <style lang='stylus' scoped>
+          @import '~styles/varibles.styl';
+          .search
+            height .92rem
+            padding .1rem
+            background $bgColor
+            box-sizing border-box
+            position relative
+            z-index 2
+            .search-input
+              box-sizing border-box
+              padding 0 .1rem
+              height .62rem
+              line-height .62rem
+              color #666
+              width 96%
+              border none
+              border-radius .1rem
+              text-align center
+              position absolute
+              top 0
+              left 0
+              right 0
+              bottom 0
+              margin auto
+          .search-content
+            position absolute
+            top 1.78rem
+            left 0
+            right 0
+            bottom 0
+            background #eee
+            z-index 1
+            // height 100vh
+            .search-item
+              background #fff
+              font-size .32rem
+              line-height .62rem
+              padding-left .2rem
+              color #666
+        </style>
+        ```
+    - 8-58-5 收尾工作
+        - city-search-logic push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 city-search-logic 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge city-search-logic
+          - git push
