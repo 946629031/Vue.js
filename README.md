@@ -85,17 +85,22 @@ Vue 各种语法 入门讲解
     - [7-8 Vue项目首页 - 使用 axios 发送 ajax 请求](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)
     - [7-9 Vue项目首页 - 首页父子组组件间传值](#7-9-Vue项目首页---首页父子组组件间传值)
       - [7-9-4 swiper默认显示最后一张图片的问题](#7-9-4-swiper轮播图默认显示最后一张图片的问题)
-- [第8章 项目实战 - 旅游网站城市列表页面开发](#第8章-项目实战---旅游网站城市列表页面开发)
-    - [8-1 Vue项目 <城市选择页> - 路由配置](#8-1-Vue项目-城市选择页---路由配置)
-    - [8-2 Vue项目 <城市选择页> - 搜索框布局](#8-2-Vue项目-城市选择页---搜索框布局)
-    - [8-3 Vue项目 <城市选择页> - 列表布局](#8-3-Vue项目-城市选择页---列表布局)
-    - [8-4 Vue项目 <城市选择页> - BetterScroll 的使用和字母表布局](#8-4-Vue项目-城市选择页---BetterScroll-的使用和字母表布局)
-    - [8-5 Vue项目 <城市选择页> - 页面的动态数据渲染](#8-5-Vue项目-城市选择页---页面的动态数据渲染)
-    - [8-6 Vue项目 <城市选择页> - 兄弟组件数据传递](#8-6-Vue项目-城市选择页---兄弟组件数据传递)
-    - [8-7 Vue项目 <城市选择页> - 列表性能优化](#8-7-Vue项目-城市选择页---列表性能优化)
-    - [8-8 Vue项目 <城市选择页> - 搜索逻辑实现](#8-8-Vue项目-城市选择页---搜索逻辑实现)
-    - [8-9 Vue项目 <城市选择页> - Vuex实现数据共享](#8-9-Vue项目-城市选择页---Vuex实现数据共享)
-    - [8-10 Vue项目 <城市选择页> - Vuex的高级使用及localStorage](#8-10-Vue项目-城市选择页---Vuex的高级使用及localStorage)
+- [第8章 项目实战 - 旅游网站 <城市列表页> 开发](#第8章-项目实战---旅游网站-城市列表页-开发)
+    - [8-1 路由配置](#8-1-Vue项目-城市选择页---路由配置)
+    - [8-2 搜索框布局](#8-2-Vue项目-城市选择页---搜索框布局)
+    - [8-3 列表布局](#8-3-Vue项目-城市选择页---列表布局)
+    - [8-4 BetterScroll 的使用和字母表布局](#8-4-Vue项目-城市选择页---BetterScroll-的使用和字母表布局)
+    - [8-5 页面的动态数据渲染](#8-5-Vue项目-城市选择页---页面的动态数据渲染)
+    - [8-6 兄弟组件数据传递](#8-6-Vue项目-城市选择页---兄弟组件数据传递)
+    - [8-7 列表性能优化](#8-7-Vue项目-城市选择页---列表性能优化)
+    - [8-8 搜索逻辑实现](#8-8-Vue项目-城市选择页---搜索逻辑实现)
+    - [8-9 Vuex实现数据共享](#8-9-Vue项目-城市选择页---Vuex实现数据共享)
+        - [8-9-4 使用 Vuex](#8-9-4-使用-Vuex)
+          - [如何读取 vuex store 中的数据？](#5.如何读取-vuex-store-中的数据？)
+          - [如何改变 vuex 中 state 的数据？](#6.如何改变-vuex-中-state-的数据？)
+          - [简化版 改变 vuex 中 state 的数据](#7.简化版-改变-vuex-中-state-的数据)
+          - [8-9-5 使用 Vue Router](#8-9-5-使用-Vue-Router)
+    - [8-10 Vuex的高级使用及localStorage](#8-10-Vue项目-城市选择页---Vuex的高级使用及localStorage)
     - [8-11 Vue项目 <城市选择页> - 使用keep-alive优化网页性能](#8-11-Vue项目-城市选择页---使用keep-alive优化网页性能)
 - [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
     - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
@@ -4325,7 +4330,7 @@ Vue 各种语法 入门讲解
             - git push
 
             
-## 第8章 项目实战 - 旅游网站城市列表页面开发
+## 第8章 项目实战 - 旅游网站 <城市列表页> 开发
 - 本章目的：完成 <城市选择页面> 的制作
 - 效果图如下
 <!-- - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg) -->
@@ -5600,3 +5605,388 @@ Vue 各种语法 入门讲解
           - git checkout master
           - git merge city-search-logic
           - git push
+
+- ### 8-9 Vue项目 <城市选择页> - Vuex实现数据共享
+    - 8-9-1 本节目标：
+        - 存在的问题
+            - 我们希望，当我们点击 <城市选择页> 的城市时候，首页也跟着更新 你所选择的数据
+            - 这就要求， <城市选择页> 和 <首页> 之间能够 进行数据共享 、 通信
+                - 有人说 我们可以使用 BUS 总线 的方法，但是使用 BUS 依然比较麻烦
+            - vue 官方给我们提供一个工具，叫做 vuex ，实际上这是vue官方推荐的一个 **数据框架**
+            - 在大型项目开发中，vue只能承担视图层的主要内容。而当我们涉及到大量的数据传递的时候，都需要一个数据框架进行辅助，在vue中 这个数据框架就是 vuex
+        - 下面，我们就来讲解一下，vuex 如何使用
+    - 8-9-2 前期准备工作
+        - 在 github 上，新建分支 city-vuex
+        - git pull
+        - git checkout city-vuex
+        - npm run dev
+    - 8-9-3 什么是 Vuex
+        - [Vuex 官网](https://vuex.vuejs.org/zh/)
+        - Vuex 是一个数据框架，能够实现各个页面之间的 **数据共享、数据通信**
+        - Vuex 就是下图中，虚线部分的内容
+            <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
+        - 大家可以把 这个虚线区域理解成一个 storage仓库
+            - 这个仓库是由三部分组成的
+                - state: 存放数据
+                  - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
+                - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
+    - #### 8-9-4 使用 Vuex
+        - 1.安装 ```npm install vuex --save```
+        - 2.新建文件夹 ```/src/store```
+        - 3.新建文件   ```/src/store/index.js```
+            ```js
+            // /src/store/index.js
+            import Vue from 'vue'
+            import Vuex from 'vuex'
+
+            Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+            export default new Vuex.Store({
+                state: {
+                    city: '北京'
+                }
+            })
+            ```
+        - 4.将 vuex store 引入vue项目中
+            ```js
+            // /src/main.js
+            import Vue from 'vue'
+            import App from './App'
+            import router from './router'
+            import fastClick from 'fastclick'
+            import VueAwesomeSwiper from 'vue-awesome-swiper'
+            import store from './store' // 引入 vuex store
+            import 'minireset.css'
+            import 'styles/border.css'
+            import 'styles/iconfont.css'
+            import 'swiper/dist/css/swiper.css'
+
+            Vue.config.productionTip = false
+            fastClick.attach(document.body)
+            Vue.use(VueAwesomeSwiper)
+
+            /* eslint-disable no-new */
+            new Vue({
+              el: '#app',
+              router,
+              store, // 使用 vuex store
+              components: { App },
+              template: '<App/>'
+            })
+            ```
+        - ##### 5.如何读取 vuex store 中的数据？
+            - 使用 vuex store 中的数据
+                ```html
+                // /src/pages/home/components/Header.vue
+                <template>
+                  <div class="header">
+                    <div class="header-left">
+                      <div class="iconfont">&#xeb99;</div>
+                    </div>
+                    <div class="header-input">
+                      <span class="iconfont">&#xeb9c;</span>
+                      输入城市/景点/游玩主题
+                    </div>
+                    <router-link to='/city'>
+                      <div class="header-right">
+                        <!-- {{this.city}} -->
+                        {{this.$store.state.city}}    <!-- 直接在html中使用 this.$store 然后读取里面对应的数据即可 -->
+                        <span class="iconfont arrow-icon">&#xe65c;</span>
+                      </div>
+                    </router-link>
+                  </div>
+                </template>
+                ```
+            - 为什么每个 子组件 都可以用这个 ```this.$store``` 呢？
+                - 是因为你在 main.js里面，创建 根实例的时候, 把 store 传递进去了
+                - 紧接着 vuex 创建 这个store，会被派发到每一个子组件里去
+                - 所以在每一个子组件，我都可以用 ```this.$store``` 来获取这个 store
+                    ```js
+                    // /src/main.js
+                    new Vue({
+                      el: '#app',
+                      router,
+                      store,
+                      components: { App },
+                      template: '<App/>'
+                    })
+                    ```
+        - ##### 6.如何改变 vuex 中 state 的数据？
+            - 思路
+                - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
+                - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
+                <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
+            - 改变数据 示例
+                - 思路
+                    - 1.在 ```<template>``` 标签中，绑定 click 事件 ```@click='handleCityClick(city.name)'```
+                        - click 事件 调用 methods 中的 handleCityClick
+                    - 2.handleCityClick 通过 dispatch 方法，调用 vuex 的 actions，并携带city参数
+                        ```js
+                        // /src/pages/city/components/List.vue
+                        methods: {
+                          handleCityClick (city) {
+                            this.$store.dispatch('changeCity', city)
+                          }
+                        }
+                        ```
+                    - 3.actions 通过 ctx.commit 调用 mutations 里的 changeCity
+                        ```js
+                        // /src/store/index.js
+                        actions: {
+                          changeCity (ctx, city) {
+                            ctx.commit('changeCity', city)
+                          }
+                        }
+                        ```
+                    - 4.mutations 调用 state, 将其重新赋值
+                        ```js
+                        // /src/store/index.js
+                        mutations: {
+                          changeCity (state, city) {
+                            state.city = city
+                          }
+                        }
+                        ```
+                ```html
+                // /src/pages/city/components/List.vue
+                <template>
+                  <div class="list" ref='wrapper'>
+                    <div>
+                      <div class="area">
+                        <div class="title border-topbottom">当前城市</div>
+                        <div class="button-list">
+                          <div class="button-wrapper">
+                            <div class="button">{{this.$store.state.city}}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="area">
+                        <div class="title border-topbottom">热门城市</div>
+                        <div class="button-list">
+                          <div
+                            class="button-wrapper"
+                            v-for="city of hot"
+                            :key='city.id'
+                            @click='handleCityClick(city.name)'
+                          >
+                            <div class="button">{{city.name}}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="area" v-for="(item, key) of cities" :key="key" :ref='key'>
+                        <div class="title border-topbottom">{{key}}</div>
+                        <div class="item-list">
+                          <div class="item border-bottom"
+                            v-for="city of item"
+                            :key='city.id'
+                            @click='handleCityClick(city.name)'
+                          >{{city.name}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <script>
+                import Bscroll from 'better-scroll'
+                export default{
+                  name: 'CityList',
+                  props: {
+                    hot: Array,
+                    cities: Object,
+                    letter: String
+                  },
+                  methods: {
+                    handleCityClick (city) {
+                      this.$store.dispatch('changeCity', city) // 通过dispatch 方法，调用 vuex 的 actions，并携带city参数
+                      console.log(city)
+                    }
+                  },
+                  mounted () {
+                    this.scroll = new Bscroll(this.$refs.wrapper)
+                  },
+                  watch: {
+                    letter () {
+                      if (this.letter) {
+                        let element = this.$refs[this.letter][0]
+                        this.scroll.scrollToElement(element)
+                      }
+                    }
+                  }
+                }
+                </script>
+
+                <style lang='stylus' scoped>
+                </style>
+                ```
+                ```js
+                // /src/store/index.js
+                import Vue from 'vue'
+                import Vuex from 'vuex'
+
+                Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+                export default new Vuex.Store({
+                  state: {
+                    city: '北京'
+                  },
+                  actions: {
+                    changeCity (ctx, city) {
+                      ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+                    }
+                  },
+                  mutations: {
+                    changeCity (state, city) {
+                      state.city = city // mutations 调用 state, 将其重新赋值
+                    }
+                  }
+                })
+                ```
+            - 到这里，vuex 中 state 中的数据改变 就完成了，并且 数据 可以在各个页面之间共享数据
+
+        - ##### 7.简化版 改变 vuex 中 state 的数据
+            - 存在的问题
+                - 在上面的例子中，我们去改变 state 中数据 的过程中，并没有任何的 **异步操作**，而且这个操作也非常简单 **不是批量的数据操作**
+                - 这种时候，我们的组件 其实没必要去调用 Actions 做一个转发。组件可以直接调用 Mutations 就可以了
+            - 所以在上面的例子中，我们可以这样修改
+                ```js
+                // /src/store/index.js
+                import Vue from 'vue'
+                import Vuex from 'vuex'
+
+                Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+                export default new Vuex.Store({
+                  state: {
+                    city: '北京'
+                  },
+                  // actions: {
+                  //   changeCity (ctx, city) {
+                  //     ctx.commit('changeCity', city)
+                  //   }
+                  // },
+                  mutations: {
+                    changeCity (state, city) {
+                      state.city = city // mutations 调用 state, 将其重新赋值
+                    }
+                  }
+                })
+                ```
+                ```html
+                // /src/pages/city/components/List.vue
+                <script>
+                  methods: {
+                    handleCityClick (city) {
+                      this.$store.commit('changeCity', city) // 直接通过 commit 方法 调用 Mutations 里的 changeCity() 方法
+                    }
+                  },
+                </script>
+                ```
+            - 运行项目验证一下，看看有没有报错
+            - 所以，在这种情况下，我们省略 Actions 这个步骤 也是可以的
+    - #### 8-9-5 使用 Vue Router
+        - 什么是 Vue Router ?
+            - [Vue Router官网文档](https://router.vuejs.org/zh/)
+            - 在文档的左侧，有一个 [编程式导航](#https://router.vuejs.org/zh/guide/essentials/navigation.html)
+                - 那么 什么是编程式导航呢？
+                    - 在过去，我们 做页面跳转 有两种方式
+                        - ```<a></a>``` a标签 的跳转方式
+                        - ```window.location.href=''``` 这种 js的跳转方式
+                    - 同样的，在 Vue 中也一样
+                        - 有 ```<router-link>``` 这种 标签形式的跳转
+                        - 也有 js 形式的跳转
+                            - 在 vue 中 js形式的跳转，不像 ```window.location.href=''``` 那么简单
+                            - 在 vue router 里 它用的是 **编程式导航** 的方式
+                            - 其中，编程式导航 提供一个方法 ```router.push()``` ，是用来做页面跳转的
+        - 如何使用 ```router.push()``` ？
+            - 直接在 js 中写 ```this.$router.push('/')``` 即可
+            - 你想跳到哪一页，就 push 那个页面进来
+            ```js
+            // /src/pages/city/components/List.vue
+            methods: {
+              handleCityClick (city) {
+                this.$store.dispatch('changeCity', city)
+                this.$router.push('/')  // 你想跳到哪一页，就 push 那个页面进来
+              }
+            }
+            ```
+
+- ### 8-10 Vue项目 城市选择页 - Vuex的高级使用及localStorage
+    - 8-10-1 存在的问题
+        - 项目进行到上一节的进度，我们发现
+            - 当选择了城市之后，如果我们刷新页面
+            - 之前选择的城市，又被设置为 默认值了
+            - 也就是说，我们 **没法存储数据**
+        - 而 html5 提供的 localStorage，就是做浏览器 本地储存的
+        - 借助 localStorage 可以帮助我们实现 数据存储
+    - 8-10-2 简单版 代码
+        ```js
+        // /src/store/index.js
+        import Vue from 'vue'
+        import Vuex from 'vuex'
+
+        Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+        export default new Vuex.Store({
+          state: {
+            city: localStorage.city || '北京'  // 优先取 localStorage.city, 如果没有 才用默认值 '北京'
+          },
+          actions: {
+            changeCity (ctx, city) {
+              ctx.commit('changeCity', city)
+            }
+          },
+          mutations: {
+            changeCity (state, city) {
+              state.city = city
+              localStorage.city = city   // 将数据 存储在 localStorage
+            }
+          }
+        })
+        ```
+    - 8-10-3 兼容版 代码
+        - 我们先来看，上面的代码中，这种写法有什么问题
+            - 如果出现如下情况
+                - 用户 **关闭了本地存储**
+                - 或者使用 **隐身模式**
+                - 或者 浏览器 **不支持 localStorage**
+            - 这个时候，如果你使用了 Localstorage 就会导致浏览器 **直接抛出异常，导致整个代码无法运行**
+        - 建议：
+            - 当我们使用 ```localStorage``` 的时候
+            - 只要我们用它，就在 外层包裹一个 ```try {} catch (){}```
+        ```js
+        // /src/store/index.js
+        import Vue from 'vue'
+        import Vuex from 'vuex'
+
+        Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+        let city = '上海'
+        try {    // 外层包裹一层 try {} catch (){}
+          if (localStorage.city) {
+            city = localStorage.city
+          }
+        } catch (e) {}
+
+        export default new Vuex.Store({
+          state: {
+            city: city
+          },
+          actions: {
+            changeCity (ctx, city) {
+              ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+            }
+          },
+          mutations: {
+            changeCity (state, city) {
+              state.city = city // mutations 调用 state, 将其重新赋值
+
+              try {    // 外层包裹一层 try {} catch (){}
+                localStorage.city = city
+              } catch (e) {}
+            }
+          }
+        })
+        ```
+
+        4:15
