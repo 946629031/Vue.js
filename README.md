@@ -101,6 +101,12 @@ Vue 各种语法 入门讲解
           - [简化版 改变 vuex 中 state 的数据](#7.简化版-改变-vuex-中-state-的数据)
           - [8-9-5 使用 Vue Router](#8-9-5-使用-Vue-Router)
     - [8-10 Vuex的高级使用及localStorage](#8-10-Vue项目-城市选择页---Vuex的高级使用及localStorage)
+        - [Vuex 中的 localStorage](#8-10-2-Vuex-中的-localStorage)
+        - [Vuex 的 代码拆分](#8-10-3-Vuex-的-代码拆分)
+        - [Vuex的高级使用 ...mapState](#8-10-4-Vuex的高级使用-...mapState)
+        - [Vuex的高级使用 ...mapMutations](#8-10-5-Vuex的高级使用-...mapMutations)
+        - [Vuex 中的 Getter](#8-10-6-Vuex-中的-Getter)
+        - [Vuex 中的 Module](#8-10-7-Vuex-中的-Module)
     - [8-11 Vue项目 <城市选择页> - 使用keep-alive优化网页性能](#8-11-Vue项目-城市选择页---使用keep-alive优化网页性能)
 - [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
     - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
@@ -5627,7 +5633,9 @@ Vue 各种语法 入门讲解
             <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
         - 大家可以把 这个虚线区域理解成一个 storage仓库
             - 这个仓库是由三部分组成的
-                - state: 存放数据
+                - State: 存放数据
+                - Action: 可以包含任意异步操作
+                - Mutations: 同步的对数据的改变
                   - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
                 - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
     - #### 8-9-4 使用 Vuex
@@ -5919,74 +5927,335 @@ Vue 各种语法 入门讲解
             - 也就是说，我们 **没法存储数据**
         - 而 html5 提供的 localStorage，就是做浏览器 本地储存的
         - 借助 localStorage 可以帮助我们实现 数据存储
-    - 8-10-2 简单版 代码
-        ```js
-        // /src/store/index.js
-        import Vue from 'vue'
-        import Vuex from 'vuex'
+    - #### 8-10-2 Vuex 中的 localStorage
+        - 1.简单版 代码
+            ```js
+            // /src/store/index.js
+            import Vue from 'vue'
+            import Vuex from 'vuex'
 
-        Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+            Vue.use(Vuex) // 通过 Vue.use() 来使用插件
 
-        export default new Vuex.Store({
-          state: {
-            city: localStorage.city || '北京'  // 优先取 localStorage.city, 如果没有 才用默认值 '北京'
-          },
-          actions: {
-            changeCity (ctx, city) {
-              ctx.commit('changeCity', city)
+            export default new Vuex.Store({
+            state: {
+                city: localStorage.city || '北京'  // 优先取 localStorage.city, 如果没有 才用默认值 '北京'
+            },
+            actions: {
+                changeCity (ctx, city) {
+                ctx.commit('changeCity', city)
+                }
+            },
+            mutations: {
+                changeCity (state, city) {
+                state.city = city
+                localStorage.city = city   // 将数据 存储在 localStorage
+                }
             }
-          },
-          mutations: {
-            changeCity (state, city) {
-              state.city = city
-              localStorage.city = city   // 将数据 存储在 localStorage
+            })
+            ```
+        - 2.兼容版 代码
+            - 我们先来看，上面的代码中，这种写法有什么问题
+                - 如果出现如下情况
+                    - 用户 **关闭了本地存储**
+                    - 或者使用 **隐身模式**
+                    - 或者 浏览器 **不支持 localStorage**
+                - 这个时候，如果你使用了 Localstorage 就会导致浏览器 **直接抛出异常，导致整个代码无法运行**
+            - 建议：
+                - 当我们使用 ```localStorage``` 的时候
+                - 只要我们用它，就在 外层包裹一个 ```try {} catch (){}```
+            ```js
+            // /src/store/index.js
+            import Vue from 'vue'
+            import Vuex from 'vuex'
+
+            Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+            let city = '上海'
+            try {    // 外层包裹一层 try {} catch (){}
+            if (localStorage.city) {
+                city = localStorage.city
             }
-          }
-        })
-        ```
-    - 8-10-3 兼容版 代码
-        - 我们先来看，上面的代码中，这种写法有什么问题
-            - 如果出现如下情况
-                - 用户 **关闭了本地存储**
-                - 或者使用 **隐身模式**
-                - 或者 浏览器 **不支持 localStorage**
-            - 这个时候，如果你使用了 Localstorage 就会导致浏览器 **直接抛出异常，导致整个代码无法运行**
-        - 建议：
-            - 当我们使用 ```localStorage``` 的时候
-            - 只要我们用它，就在 外层包裹一个 ```try {} catch (){}```
-        ```js
-        // /src/store/index.js
-        import Vue from 'vue'
-        import Vuex from 'vuex'
+            } catch (e) {}
 
-        Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+            export default new Vuex.Store({
+            state: {
+                city: city
+            },
+            actions: {
+                changeCity (ctx, city) {
+                ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+                }
+            },
+            mutations: {
+                changeCity (state, city) {
+                state.city = city // mutations 调用 state, 将其重新赋值
 
-        let city = '上海'
-        try {    // 外层包裹一层 try {} catch (){}
-          if (localStorage.city) {
-            city = localStorage.city
-          }
-        } catch (e) {}
-
-        export default new Vuex.Store({
-          state: {
-            city: city
-          },
-          actions: {
-            changeCity (ctx, city) {
-              ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+                try {    // 外层包裹一层 try {} catch (){}
+                    localStorage.city = city
+                } catch (e) {}
+                }
             }
-          },
-          mutations: {
-            changeCity (state, city) {
-              state.city = city // mutations 调用 state, 将其重新赋值
+            })
+            ```
 
-              try {    // 外层包裹一层 try {} catch (){}
-                localStorage.city = city
-              } catch (e) {}
+    - #### 8-10-3 Vuex 的 代码拆分
+        - 1.存在的问题
+            - 在实际项目开发过程中，vuex 的 ```store/index.js``` 会变得越来越复杂
+            - 所以为了 **提高可维护性、可阅读性**，我们可以将 store 进行拆分
+        - 2.代码
+            - 拆分思路
+                - 由于 ```store/index.js``` 主要是由3个部分组成的
+                - 分别是 state, actions, mutations
+                - 所以，我们可以将这三个部分，分别每个分离出来，作为一个单独的模块
+                - 最后引入主文件 ```store/index.js``` ，并使用即可
+            ```js
+            // /src/store/index.js
+            import Vue from 'vue'
+            import Vuex from 'vuex'
+            import state from './state'
+            import mutations from './mutations'
+            import actions from './actions'
+
+            Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+            export default new Vuex.Store({
+              state,
+              actions,
+              mutations
+            })
+            ```
+            ```js
+            // /src/store/state.js
+            let city = '上海'
+            try {
+              if (localStorage.city) {
+                city = localStorage.city
+              }
+            } catch (e) {}
+
+            export default {
+              city
             }
-          }
-        })
-        ```
+            ```
+            ```js
+            // /src/store/actions.js
+            export default {
+              changeCity (ctx, city) {
+                ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+              }
+            }
+            ```
+            ```js
+            // /src/store/mutations.js
+            export default {
+              changeCity (state, city) {
+                state.city = city // mutations 调用 state, 将其重新赋值
 
-        4:15
+                try {
+                  localStorage.city = city
+                } catch (e) {}
+              }
+            }
+            ```
+    - ### 8-10-4 Vuex的高级使用 ...mapState
+        - 1.存在的问题
+            - 在之前的代码中，我们读取 vuex 公用数据的时候，需要这样写一长串 ```{{this.$store.state.city}}```
+        - 2.但是，vuex 给我们这样一个高级的 api 来简化这个问题
+            - 1.第一步 ```import { mapState } from 'vuex'```
+            - 2.第二步
+                ```js
+                computed: {
+                  ...mapState(['city'])   // ... 为展开运算符
+                }
+                ```
+                - 它是什么意思呢？
+                    - **mapState 是指，我把 vuex 里面的数据，映射到这个组件的 computed 计算属性里**
+                    - 那映射什么呢？
+                        - 映射的就是 ```[]``` 数组里的数据，这个例子中 就只映射了 ```city``` 数据
+                        - 映射的结果，就把 city 数据，最终成为了这个组件的 **计算属性**
+            - 3.第三步，使用数据 ```{{this.city}}```
+        - 3.所以，在之前的代码中，我们可以这样优化
+            ```html
+            // /src/pages/home/components/Header.vue
+            <template>
+              <div class="header-right">
+                {{this.city}}
+                <!-- {{this.$store.state.city}} -->
+                <span class="iconfont arrow-icon">&#xe65c;</span>
+              </div>
+            </template>
+
+            <script>
+            import { mapState } from 'vuex'
+            export default {
+              name: 'HomeHeader',
+              computed: {
+                ...mapState(['city'])
+              }
+            }
+            </script>
+            ```
+        - 4.vuex ...mapState 的对象用法
+            - 在上面的示例中，我们往 mapState 传的是数组 ```...mapState(['city'])```
+            - 现在，我们来看看 mapState 的对象用法
+                - mapState 的对象用法，实际上就是 把vuex里的某个变量，改个名字
+            ```html
+            // /src/pages/city/components/List.vue
+            <template>
+              <div class="area">
+                <div class="title border-topbottom">当前城市</div>
+                <div class="button-list">
+                  <div class="button-wrapper">
+                    <div class="button">{{this.currentCity}}</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <script>
+            import { mapState } from 'vuex'
+            export default{
+              name: 'CityList',
+              computed: {
+                ...mapState({
+                  currentCity: 'city'
+                })
+              }
+            }
+            </script>
+            ```
+    - ### 8-10-5 Vuex的高级使用 ...mapMutations
+        - 思路
+            - 1.```import { mapMutations } from 'vuex'``` 将 vuex 里的对象 mapMutations 引入进来
+            - 2.```...mapMutations(['changeCity'])``` 将 mapMutations 中的 changeCity() 方法 **映射** 进 methods 里面，并取名为 changeCity()
+            - 3.调用 该方法 ```this.changeCity(city)```
+                ```js
+                methods: {
+                  handleCityClick (city) {
+                    this.changeCity(city)
+                    this.$router.push('/')
+                  },
+                  ...mapMutations(['changeCity'])
+                }
+                ```
+        - 完整代码
+            ```html
+            // /src/pages/city/components/List.vue
+            <script>
+            import { mapState, mapMutations } from 'vuex'
+            export default{
+              name: 'CityList',
+              computed: {
+                ...mapState({
+                  currentCity: 'city'
+                })
+              },
+              methods: {
+                handleCityClick (city) {
+                  // this.$store.dispatch('changeCity', city)     // 通过dispatch 方法，调用 vuex 的 actions，并携带city参数
+                  this.changeCity(city)
+                  this.$router.push('/')
+                },
+                ...mapMutations(['changeCity'])
+              }
+            }
+            </script>
+            ```
+    - ### 8-10-6 Vuex 中的 Getter
+        - 到目前为止，我们已经学习了 vuex 中三个重要的 核心概念
+            - State: 存放数据
+            - Action: 可以包含任意异步操作
+            - Mutations: 同步的对数据的改变
+        - 下面，我们来介绍 另一个核心概念 Getters
+            - 通俗解释：
+                - Getters 实际上就 相当于一个 computed 计算属性
+                - 当我们需要根据 state 中的数据，算出一些新数据 的时候，我们就可以借助 Getter 这样一个工具，来提供新的数据
+                - 这样的话，我们 **可以避免数据的冗余**
+            - 1.定义 Getters
+                ```js
+                // /src/store/index.js
+                import Vue from 'vue'
+                import Vuex from 'vuex'
+                import state from './state'
+                import mutations from './mutations'
+                import actions from './actions'
+
+                Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+
+                export default new Vuex.Store({
+                  state,
+                  actions,
+                  mutations,
+                  getters: {
+                    doubleCity (state) {
+                      return state.city + ' ' + state.city
+                    }
+                  }
+                })
+                ```
+            - 2.使用 Getters
+                ```html
+                // /src/pages/home/components/Header.vue
+                <template>
+                  <div class="header-right">
+                    <!-- {{this.city}} -->
+                    {{this.doubleCity}}
+                    <!-- {{this.$store.state.city}} -->
+                    <span class="iconfont arrow-icon">&#xe65c;</span>
+                  </div>
+                </template>
+
+                <script>
+                import { mapState, mapGetters } from 'vuex'
+                export default {
+                  name: 'HomeHeader',
+                  computed: {
+                    ...mapState(['city']),
+                    ...mapGetters(['doubleCity'])
+                  }
+                }
+                </script>
+                ```
+    - ### 8-10-7 Vuex 中的 Module
+        - 这一节，我们来介绍 最后一个核心概念 Module
+        - 什么是 Module
+            - [官方解释](#https://vuex.vuejs.org/zh/guide/modules.html)
+            - 通俗解释
+                - 什么时候 我们要用 Module 呢？
+                    - 当我们遇到一个 **非常复杂的业务场景**，比如说 我们在管理后台系统的时候
+                      - 经常会有 **很多公用的数据** 在vuex里面储存
+                      - 那如果，我们把 所有的 Mutations ，都放到 Mutations.js 文件里，那么会导致 **这个文件变得非常的庞大、难以维护**
+                    - 我们这个时候，可以借助 Module 对一个 复杂的 Mutations、State、Actions 进行拆分
+            - 看[官网](#https://vuex.vuejs.org/zh/guide/modules.html)提供的一个例子
+                - 这个例子中，他定义了 几个模块
+                    - 模块A，模块B
+                    - 创建 Store 的时候，我可以通过 传入 模块来创建
+                    - 那有什么样的好处呢？
+                        - 模块A，我只需要存储 我模块A 的数据，和对数据的操作 即可
+                        - 模块B，我只需要存储 我模块B 的数据，和对数据的操作 即可
+                        - 然后在创建 Store 的时候，我对各个模块的数据进行 整合
+                        - 通过 Module 来写我们的代码，可以使 我们的代码 有更好的可维护性
+            ```js
+            const moduleA = {
+              state: { ... },
+              mutations: { ... },
+              actions: { ... },
+              getters: { ... }
+            }
+
+            const moduleB = {
+              state: { ... },
+              mutations: { ... },
+              actions: { ... }
+            }
+
+            const store = new Vuex.Store({
+              modules: {
+                a: moduleA,
+                b: moduleB
+              }
+            })
+
+            store.state.a // -> moduleA 的状态
+            store.state.b // -> moduleB 的状态
+            ```
