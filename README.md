@@ -107,7 +107,10 @@ Vue 各种语法 入门讲解
         - [Vuex的高级使用 ...mapMutations](#8-10-5-Vuex的高级使用-...mapMutations)
         - [Vuex 中的 Getter](#8-10-6-Vuex-中的-Getter)
         - [Vuex 中的 Module](#8-10-7-Vuex-中的-Module)
-    - [8-11 Vue项目 <城市选择页> - 使用keep-alive优化网页性能](#8-11-Vue项目-城市选择页---使用keep-alive优化网页性能)
+    - [8-11 使用keep-alive优化网页性能](#8-11-Vue项目-城市选择页---使用keep-alive优化网页性能)
+        - [keep-alive 如何使用](#8-11-3-使用-keep-alive-优化)
+        - [带参数发起请求 Ajax](#8-11-4-带参数发起请求-Ajax)
+        - [生命周期函数 activated](#8-11-5-生命周期函数-activated)
 - [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
     - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
     - [9-2 Vue项目详情页 - 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
@@ -5601,7 +5604,7 @@ Vue 各种语法 入门讲解
               color #666
         </style>
         ```
-    - 8-58-5 收尾工作
+    - 8-8-5 收尾工作
         - city-search-logic push 到github
           - git add .
           - git commit -m ''
@@ -6259,3 +6262,279 @@ Vue 各种语法 入门讲解
             store.state.a // -> moduleA 的状态
             store.state.b // -> moduleB 的状态
             ```
+- ### 8-11 Vue项目 <城市选择页> - 使用keep-alive优化网页性能
+    - 8-11-1 存在的问题
+        - 项目进行到上一节的进度，我们发现
+            - 当我们打开 浏览器 -> Network -> XHR
+            - 然后你在 <首页> 和 <城市选择页> 之间切换的时候发现
+            - 每次切换，都会重新请求 ```index.json``` 和 ```city.json```
+            - 这样会 **异常的浪费网络资源，和 计算机资源**
+        - 当发生切换路由的时候，每次 Ajax 都会被发送，这是什么原因呢？
+            - 原来，每次路由切换到这个组件的时候，这个组件都会被重新渲染，所以每次 mounted 这个钩子都会被重新执行
+            - 那么 这个 Ajax 数据 ```'/api/index.json'``` 就会被重新获取 
+        - 那么，我们让它每次都只获取一次不就行了吗？我们该怎么去优化这个问题呢？
+            ```js
+            // /src/pages/home/Home.vue
+            mounted () {
+                this.getHomeInfo()
+            },
+            methods: {
+                getHomeInfo () {
+                    axios.get('/api/index.json')
+                        .then(this.getHomeInfoSucc)
+                },
+                getHomeInfoSucc (res) {
+                    res = res.data
+                    if (res.ret && res.data) {
+                        const data = res.data
+                        this.swiperList = data.swiperList
+                        this.iconList = data.iconList
+                        this.recommendList = data.recommendList
+                        this.weekendList = data.weekendList
+                    }
+                }
+            }
+            ```
+    - 8-11-2 前期准备工作
+        - 在 github 上，新建分支 city-keepalive
+        - git pull
+        - git checkout city-keepalive
+        - npm run dev
+    - #### 8-11-3 使用 keep-alive 优化
+        - 1.什么是 keep-alive ?
+            - ```<keep-alive></keep-alive>```
+            - 这是 vue 自带的标签
+            - 它的意思是什么呢？
+                - 它的意思是
+                    - 我路由的内容，被加载过一次之后，我就把路由的内容 **放到内存之中**
+                    - 下一次 再进入这个路由的时候
+                        - **不需要你去重新渲染** 这个组件
+                        - 不需要去重新执行 **钩子函数**
+                    - 只需要你 从内存里，把以前的内容拿出来显示到页面上 就可以了
+        - 2.我们打开程序的入口 main.js
+            - 发现，程序的入口组件是 APP
+            ```js
+            // /src/main.js
+            import App from './App'
+
+            new Vue({
+              el: '#app',
+              router,
+              store,
+              components: { App },
+              template: '<App/>'
+            })
+            ```
+        - 3.所以我们再打开 App.vue
+            - 其中
+                - ```<router-view/>``` 显示的是 路由所对应的内容
+                - 我们在 ```<router-view/>``` 外面包裹一层 ```<keep-alive>``` 即可
+            ```html
+            // /src/App.vue
+            <template>
+              <div id="app">
+                <keep-alive>  <!--外面包裹一层 keep-alive -->
+                  <router-view/>
+                </keep-alive>
+              </div>
+            </template>
+
+            <script>
+            export default {
+              name: 'App'
+            }
+            </script>
+
+            <style>
+            </style>
+            ```
+    - #### 8-11-4 带参数发起请求 Ajax
+        - 1.存在问题
+            - 完成上面的操作后，你会发现
+              - 当你切换城市后，首页的内容 index.json 一直都是固定城市的
+              - 而不是 我们想要的那种，根据选择的城市不同，首页展示不同的城市数据
+            - 那么该怎么办呢？
+        - 2.解决思路
+            - 实际上，我们之前，一直请求的都是同一个数据 ```axios.get('/api/index.json')```
+            - 这时候，我们应该在 请求的 json 数据后，**带一个参数**
+            - 就可以请求到不同的城市数据了
+            - 下面是之前的代码
+                ```js
+                // /src/pages/home/Home.vue
+                mounted () {
+                  this.getHomeInfo()
+                },
+                methods: {
+                  getHomeInfo () {
+                    axios.get('/api/index.json')
+                      .then(this.getHomeInfoSucc)
+                  },
+                  getHomeInfoSucc (res) {
+                    res = res.data
+                    if (res.ret && res.data) {
+                      const data = res.data
+                      this.swiperList = data.swiperList
+                      this.iconList = data.iconList
+                      this.recommendList = data.recommendList
+                      this.weekendList = data.weekendList
+                    }
+                  }
+                }
+            ```
+        - 3.代码
+            - 思路
+                - 我们在请求数据的时候，携带 '城市名' 这个参数去请求，即可请求到对应的数据
+            ```html
+            // /src/pages/home/Home.vue
+            <script>
+            import HomeHeader from './components/Header'
+            import HomeSwiper from './components/Swiper'
+            import HomeIcons from './components/Icons'
+            import HomeRecommend from './components/Recommend'
+            import HomeWeekend from './components/Weekend'
+            import axios from 'axios'
+            import { mapState } from 'vuex'     // 第一步， 引入 vuex
+            export default {
+              name: 'Home',
+              components: {
+                HomeHeader,
+                HomeSwiper,
+                HomeIcons,
+                HomeRecommend,
+                HomeWeekend
+              },
+              data () {
+                return {
+                  swiperList: [],
+                  iconList: [],
+                  recommendList: [],
+                  weekendList: []
+                }
+              },
+              mounted () {
+                this.getHomeInfo()
+              },
+              computed: {                   // 第二步，将 <城市名> 这个数据引入本组件
+                ...mapState(['city'])
+              },
+              methods: {
+                getHomeInfo () {
+                  axios.get('/api/index.json?city=' + this.city)    // 第三步，在请求时，将 城市名 数据携带出去
+                    .then(this.getHomeInfoSucc)
+                },
+                getHomeInfoSucc (res) {
+                  res = res.data
+                  if (res.ret && res.data) {
+                    const data = res.data
+                    this.swiperList = data.swiperList
+                    this.iconList = data.iconList
+                    this.recommendList = data.recommendList
+                    this.weekendList = data.weekendList
+                  }
+                }
+              }
+            }
+            </script>
+            ```
+    - #### 8-11-5 生命周期函数 activated
+        - 1.keep-alive 带来的新问题
+            - 当我们在 vue 中用了 ```<keep-alive>``` 的时候，被包裹的内容 已经被缓存起来了。
+            - 每次切换 都是取缓存里的数据，导致了，即使我们切换 城市，也不会自动发送新的数据请求
+            - 那么，**是不是 我们就没有办法 去改变缓存里的数据了呢？**
+        - 2.其实不是的
+            - 当你用 ```<keep-alive>``` 的时候
+            - 我们的组件里，会多出一个 **生命周期函数 activated**
+        - 3.activated 特性
+            - 我们可以测试一下
+                ```js
+                // /src/pages/home/Home.vue
+                mounted () {
+                  console.log('mounted')
+                },
+                activated () {
+                  console.log('activated')
+                },
+                ```
+            - 我们切换到 <城市选择页> 后，再切换回 <首页>
+                - 你会发现
+                    - 第一次进入 <首页>，mounted 和 activated 都会执行
+                    - 当你 切换到 <城市选择页> 后，再切换回 <首页> 的时候，就只有 activated 会执行了
+                    - 不管你切换多少次都只有 activated 会执行
+                - ##### 那么 activated 是什么时候 执行的呢？
+                    - 当页面重新被显示的时候，activated 就会被执行
+        - 4.利用 activated 这个特性
+            - 我们上面提出的问题可以这样解决
+                - 在每次页面重新显示的时候，可以判断 **当前页面的城市** ，和 **上一次** 的页面城市，是否是相同的，如果不相同，我们就再发一次 Ajax 请求
+            ```html
+            // /src/pages/home/Home.vue
+            <script>
+            import HomeHeader from './components/Header'
+            import HomeSwiper from './components/Swiper'
+            import HomeIcons from './components/Icons'
+            import HomeRecommend from './components/Recommend'
+            import HomeWeekend from './components/Weekend'
+            import axios from 'axios'
+            import { mapState } from 'vuex'
+            export default {
+              name: 'Home',
+              components: {
+                HomeHeader,
+                HomeSwiper,
+                HomeIcons,
+                HomeRecommend,
+                HomeWeekend
+              },
+              data () {
+                return {
+                  lastCity: '',          // 保存上一次选择的城市
+                  swiperList: [],
+                  iconList: [],
+                  recommendList: [],
+                  weekendList: []
+                }
+              },
+              mounted () {
+                this.lastCity = this.city   // 页面挂载时 保存所选择的城市
+                this.getHomeInfo()
+              },
+              activated () {        // 第一步，每次 keep-alive 被激活时, 判断当前城市 是否等于 上一次选择的城市
+                if (this.lastCity !== this.city) {   // 如果不相等
+                  this.lastCity = this.city
+                  this.getHomeInfo()                 // 就重新请求数据
+                }
+              },
+              computed: {
+                ...mapState(['city'])
+              },
+              methods: {
+                getHomeInfo () {
+                  axios.get('/api/index.json?city=' + this.city) 
+                    .then(this.getHomeInfoSucc)
+                },
+                getHomeInfoSucc (res) {
+                  res = res.data
+                  if (res.ret && res.data) {
+                    const data = res.data
+                    this.swiperList = data.swiperList
+                    this.iconList = data.iconList
+                    this.recommendList = data.recommendList
+                    this.weekendList = data.weekendList
+                  }
+                }
+              }
+            }
+            </script>
+            ```
+        - 5.这样，我们就能完美解决了问题
+            - 既能最大限度的减少 没必要的 Ajax 请求
+            - 又能 **监听城市切换的行为**，然后及时请求对应数据，达到了性能最优
+        - 6. 收尾工作
+            - city-keepalive push 到github
+              - git add .
+              - git commit -m ''
+              - git push
+            - 将 city-keepalive 开发完的分支 合并到 master 分支上
+              - git status
+              - git checkout master
+              - git merge city-keepalive
+              - git push
