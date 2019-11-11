@@ -111,14 +111,14 @@ Vue 各种语法 入门讲解
         - [keep-alive 如何使用](#8-11-3-使用-keep-alive-优化)
         - [带参数发起请求 Ajax](#8-11-4-带参数发起请求-Ajax)
         - [生命周期函数 activated](#8-11-5-生命周期函数-activated)
-- [第9章 项目实战 - 旅游网站详情页面开发](#第9章-项目实战---旅游网站详情页面开发)
-    - [9-1 Vue项目详情页 - 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
-    - [9-2 Vue项目详情页 - 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
-    - [9-3 Vue项目详情页 - 实现Header渐隐渐显效果](#9-3-Vue项目详情页---实现Header渐隐渐显效果)
-    - [9-4 Vue项目详情页 - 对全局事件的解绑](#9-4-Vue项目详情页---对全局事件的解绑)
-    - [9-5 Vue项目详情页 - 使用递归组件实现详情页列表](#9-5-Vue项目详情页---使用递归组件实现详情页列表)
-    - [9-6 Vue项目详情页 - 动态获取详情页面数据](#9-6-Vue项目详情页---动态获取详情页面数据)
-    - [9-7 Vue项目详情页 - 在项目中加入基础动画](#9-7-Vue项目详情页---在项目中加入基础动画)
+- [第9章 项目实战 - 旅游网站 <详情页> 开发](#第9章-项目实战---旅游网站-详情页-开发)
+    - [9-1 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
+    - [9-2 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
+    - [9-3 实现Header渐隐渐显效果](#9-3-Vue项目详情页---实现Header渐隐渐显效果)
+    - [9-4 对全局事件的解绑](#9-4-Vue项目详情页---对全局事件的解绑)
+    - [9-5 使用递归组件实现详情页列表](#9-5-Vue项目详情页---使用递归组件实现详情页列表)
+    - [9-6 动态获取详情页面数据](#9-6-Vue项目详情页---动态获取详情页面数据)
+    - [9-7 在项目中加入基础动画](#9-7-Vue项目详情页---在项目中加入基础动画)
 - [第10章 实战项目 - 项目的联调，测试与发布上线](#第10章 实战项目 - 项目的联调，测试与发布上线)
     - [10-1 Vue项目的联调测试上线 - 项目前后端联调](#10-1-Vue项目的联调测试上线---项目前后端联调)
     - [10-2 Vue项目的联调测试上线 - 真机测试](#10-2-Vue项目的联调测试上线---真机测试)
@@ -4340,7 +4340,7 @@ Vue 各种语法 入门讲解
 
             
 ## 第8章 项目实战 - 旅游网站 <城市列表页> 开发
-- 本章目的：完成 <城市选择页面> 的制作
+- 本章目标：完成 <城市选择页面> 的制作
 - 效果图如下
 <!-- - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg) -->
       
@@ -6538,3 +6538,282 @@ Vue 各种语法 入门讲解
               - git checkout master
               - git merge city-keepalive
               - git push
+
+
+## 第9章 项目实战 - 旅游网站 <详情页> 开发
+- 本章目标：完成 <详情页> 的制作
+- 效果图如下
+<!-- - ![详情页 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/9-1 详情页.jpg) -->
+
+- ### 9-1 Vue项目详情页 - 动态路由和banner布局
+    - 9-1-1 本节目标
+        - 完成banner 页面布局
+    - 9-1-2 前期准备工作
+        - 在 github 上，新建分支 detail-banner
+        - git pull
+        - git checkout detail-banner
+        - npm run dev
+    - 9-1-3 动态路由
+        - 1.存在的问题
+            - 以前，我们 使用 ```<router-link>```做 路由跳转都是这样的
+                ```html
+                // /src/pages/home/components/Recommend.vue
+                <router-link to='/detail'>
+                  <li class="item border-bottom" v-for="item of list" :key="item.id">
+                    <img class="home-recommend-img" :src="item.imgUrl" alt="">
+                    <div>
+                      <p class="home-recommend-item-title">{{item.title}}</p>
+                      <p class="home-recommend-item-desc">{{item.desc}}</p>
+                      <p class="home-recommend-item-price"><span>{{item.price}}</span>起</p>
+                    </div>
+                  </li>
+                </router-link>
+                ```
+            - 但是，这样写 会存在两个问题
+                - 1.需要额外多包裹一层 ```<a>``` 标签, ```<router-link>``` 最后被渲染成 ```<a>``` 标签
+                - 2.这样 额外多一层标签，容易发生 CSS 样式的变化
+        - 2.解决问题
+            - 1.我们可以直接把 ```<li>``` 替换成 ```<router-link>```, 然后加一个 ```tag='li'```
+                - 这样的话, 这个 ```<router-link>``` 最终会被渲染成 ```<li>``` 标签
+            - 2.然后设定动态路由地址 ```:to="'/detail/' + item.id"```
+            ```html
+            // /src/pages/home/components/Recommend.vue
+            <router-link
+              tag='li'
+              class="item border-bottom"
+              v-for="item of list"
+              :key="item.id"
+              :to="'/detail/' + item.id"
+            >
+              <img class="home-recommend-img" :src="item.imgUrl" alt="">
+              <div>
+                <p class="home-recommend-item-title">{{item.title}}</p>
+                <p class="home-recommend-item-desc">{{item.desc}}</p>
+                <p class="home-recommend-item-price"><span>{{item.price}}</span>起</p>
+              </div>
+            </router-link>
+            ```
+            - 这样的话，当我点击 ```<router-link>``` 后，会跳转到 ```http://localhost:8080/#/detail0001``` 这种地址
+            
+    - 9-1-4 动态路由
+        - 1.存在的问题
+            - 但是跳转后的 地址 页面为空，所以我们要去配置一下 路由地址
+        - 2.配置新路由
+            - 在 vue 里，```path: '/detail/:id'```
+                - 在路由后面 加个冒号 id，通过这种形式，就是 **动态路由**
+                - 其中 冒号后面为参数，这个参数 ```id``` 为变量，
+            ```js
+            // /src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import Home from '@/pages/home/Home'
+            import City from '@/pages/city/City'
+            import Detail from '@/pages/detail/Detail'
+
+            Vue.use(Router)
+
+            export default new Router({
+              routes: [
+                {
+                  path: '/',
+                  name: 'Home',
+                  component: Home
+                }, {
+                  path: '/city',
+                  name: 'City',
+                  component: City
+                }, {
+                  path: '/detail/:id',    // 配置动态路由
+                  name: 'Detail',
+                  component: Detail
+                }
+              ]
+            })
+            ```
+        - 3.banner布局 代码
+            - 新建文件 ```/src/pages/detail/Detail.vue```
+            - 新建文件夹 ```/src/pages/detail/```
+            ```html
+            // /src/pages/detail/Detail.vue
+            <template>
+              <div>
+                <banner></banner>
+              </div>
+            </template>
+
+            <script>
+            import Banner from './components/Banner'
+            export default {
+              name: 'Detail',
+              components: {
+                Banner
+              }
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+            </style>
+            ```
+            ```html
+            // /src/pages/detail/components/Banner.vue
+            <template>
+              <div class="banner">
+                <div class="detail-banner">
+                  <img src="//img1.qunarzz.com/sight/p0/1507/69/3c6917e5686d6457e4dc6cb48982995e.water.jpg_600x330_4bee6da1.jpg" alt="">
+                </div>
+                <div class="info">
+                  <div class="title">长隆野生动物世界(AAAAA景区)</div>
+                  <div class="icon">
+                    <span class="image iconfont">&#xe635;</span>
+                    <span class="number">39</span>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <script>
+            export default {
+              name: 'DetailBanner'
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+              .banner
+                position relative
+                .detail-banner
+                  height 0
+                  padding-bottom 55%
+                .info
+                  font-size .3rem
+                  color #fff
+                  background-image linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.5));
+                  position absolute
+                  left 0
+                  right 0
+                  bottom 0
+                  .title
+                    line-height .8rem
+                    padding-left .16rem
+                  .icon
+                    padding .03rem .08rem
+                    position absolute
+                    right .16rem
+                    bottom .16rem
+                    width 1.3rem
+                    text-align center
+                    border-radius .5rem
+                    background rgba(0,0,0,.5)
+            </style>
+            ```
+        - 4.添加iconfont，更新iconfont字体图标
+            - 1.在 [iconfont 官网](https://www.iconfont.cn/) 选择需要的图标，并添加至项目
+            - 2.在 ```顶部导航 -> 图标管理 -> 我的项目 -> 下载至本地```
+            - 3.下载后, 将 新的字体文件 替换掉原来的文件
+                - 字体文件 ```woff, woff2, ttf, eot, svg```
+            - 4.最后将 iconfont.css 里的 base64 代码替换到最新的，不然字体图标不生效
+                ```css
+                /*    /src/assets/styles/iconfont.css   */
+                @font-face {font-family: "iconfont";
+                  src: url('./iconfont/iconfont.eot?t=1568849960214');
+                  src: url('./iconfont/iconfont.eot?t=1568849960214#iefix') format('embedded-opentype'),
+                  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABA........'),   /* 替换 掉base64 代码 */
+                  url('./iconfont/iconfont.woff?t=1568849960214') format('woff'),
+                  url('./iconfont/iconfont.ttf?t=1568849960214') format('truetype'),
+                  url('./iconfont/iconfont.svg?t=1568849960214#iconfont') format('svg');
+                }
+                ```
+            - 5.记得在使用字体图标的标签上添加 iconfont class
+                - ```<div class="iconfont">&#xe635;</div>```
+        - 5.到这里 <详情页中的 banner组件> 布局就完成了
+
+
+- ### 9-2 Vue项目详情页 - 公用图片画廊组件拆分
+    - 9-2-1 本节目标
+        - 当点击 <详情页 的 banner> 时候，弹出的 可左右滑动的图片 组件
+    - 9-2-2 分析
+        - 由于，这个图片查看组件 (画廊) 不仅仅只在这里被用到，在其他地方也会被用到
+        - 所以我们把它放到公用组件里，并创建 公用组件文件夹 common
+        - 创建文件
+            ```html
+            // /src/common/gallary/Gallary.vue
+            <template>
+                <div>gallary</div>
+            </template>
+
+            <script>
+            export default {
+              name: 'CommonGallary'
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+
+            </style>
+            ```
+        - 并且为 common 目录 取一个别名
+            ```js
+            // /build/webpack.base.conf.js
+            module.exports = {
+              resolve: {
+                extensions: ['.js', '.vue', '.json'],
+                alias: {
+                  'vue$': 'vue/dist/vue.esm.js',
+                  '@': resolve('src'),
+                  'styles': resolve('src/assets/styles'),
+                  'common': resolve('src/common'),     // 取一个别名
+                }
+              }
+            }
+            ```
+            - 改了 webpack 配置后，记得重启服务器 ```npm run dev```, 这样更改才会生效
+
+    - 9-2-3 使用该组件
+        ```html
+        // /src/pages/detail/components/Banner.vue
+        <template>
+          <div>
+            <div class="banner">
+              <div class="detail-banner">
+                <img src="//img1.qunarzz.com/sight/p0/1507/69/3c6917e5686d6457e4dc6cb48982995e.water.jpg_600x330_4bee6da1.jpg" alt="">
+              </div>
+              <div class="info">
+                <div class="title">长隆野生动物世界(AAAAA景区)</div>
+                <div class="icon">
+                  <span class="image iconfont">&#xe635;</span>
+                  <span class="number">39</span>
+                </div>
+              </div>
+            </div>
+            <common-gallary></common-gallary>   <!-- 第三步，使用组件 -->
+          </div>
+        </template>
+
+        <script>
+        import CommonGallary from 'common/gallary/Gallary'; // 第一步，引入组件
+        export default {
+          name: 'DetailBanner',
+          components: {
+            CommonGallary      // 第二步，在本组件 注册该组件
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        </style>
+        ```
+
+
+
+
+        - 6. 收尾工作
+            - detail-banner push 到github
+              - git add .
+              - git commit -m ''
+              - git push
+            - 将 detail-banner 开发完的分支 合并到 master 分支上
+              - git status
+              - git checkout master
+              - git merge detail-banner
+              - git push
+
+  16:00
