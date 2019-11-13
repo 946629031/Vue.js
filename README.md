@@ -114,12 +114,13 @@ Vue 各种语法 入门讲解
 - [第9章 项目实战 - 旅游网站 <详情页> 开发](#第9章-项目实战---旅游网站-详情页-开发)
     - [9-1 动态路由和banner布局](#9-1-Vue项目详情页---动态路由和banner布局)
     - [9-2 公用图片画廊组件拆分](#9-2-Vue项目详情页---公用图片画廊组件拆分)
+        - [swiper组件显示错误问题](#9-2-5-swiper组件显示错误问题)
     - [9-3 实现Header渐隐渐显效果](#9-3-Vue项目详情页---实现Header渐隐渐显效果)
     - [9-4 对全局事件的解绑](#9-4-Vue项目详情页---对全局事件的解绑)
     - [9-5 使用递归组件实现详情页列表](#9-5-Vue项目详情页---使用递归组件实现详情页列表)
     - [9-6 动态获取详情页面数据](#9-6-Vue项目详情页---动态获取详情页面数据)
     - [9-7 在项目中加入基础动画](#9-7-Vue项目详情页---在项目中加入基础动画)
-- [第10章 实战项目 - 项目的联调，测试与发布上线](#第10章 实战项目 - 项目的联调，测试与发布上线)
+- [第10章 实战项目 - 项目的联调，测试与发布上线](#第10章-实战项目---项目的联调，测试与发布上线)
     - [10-1 Vue项目的联调测试上线 - 项目前后端联调](#10-1-Vue项目的联调测试上线---项目前后端联调)
     - [10-2 Vue项目的联调测试上线 - 真机测试](#10-2-Vue项目的联调测试上线---真机测试)
     - [10-3 Vue项目的联调测试上线 - 打包上线](#10-3-Vue项目的联调测试上线---打包上线)
@@ -6772,7 +6773,7 @@ Vue 各种语法 入门讲解
         // /src/pages/detail/components/Banner.vue
         <template>
           <div>
-            <div class="banner">
+            <div class="banner" @click="handleBannerClick">
               <div class="detail-banner">
                 <img src="//img1.qunarzz.com/sight/p0/1507/69/3c6917e5686d6457e4dc6cb48982995e.water.jpg_600x330_4bee6da1.jpg" alt="">
               </div>
@@ -6784,7 +6785,7 @@ Vue 各种语法 入门讲解
                 </div>
               </div>
             </div>
-            <common-gallary></common-gallary>   <!-- 第三步，使用组件 -->
+            <common-gallary :imgs='imgs' v-show="showGallary" @GallayClose='GallayClose'></common-gallary>   <!-- 第三步，使用组件 -->
           </div>
         </template>
 
@@ -6792,28 +6793,670 @@ Vue 各种语法 入门讲解
         import CommonGallary from 'common/gallary/Gallary'; // 第一步，引入组件
         export default {
           name: 'DetailBanner',
+          data () {
+            return {
+              showGallary: false,
+              imgs: [
+                '//img1.qunarzz.com/sight/p0/1507/69/3c6917e5686d6457e4dc6cb48982995e.water.jpg_600x330_4bee6da1.jpg',
+                '//img1.qunarzz.com/sight/p0/1507/69/3c6917e5686d6457e4dc6cb48982995e.water.jpg_600x330_4bee6da1.jpg'
+              ]
+            }
+          },
           components: {
             CommonGallary      // 第二步，在本组件 注册该组件
+          },
+          methods: {
+            handleBannerClick () {
+              this.showGallary = true
+            },
+            GallayClose () {
+              this.showGallary = false
+            }
           }
         }
         </script>
 
         <style lang="stylus" scoped>
+          .banner
+            position relative
+            .detail-banner
+              height 0
+              padding-bottom 55%
+            .info
+              font-size .3rem
+              color #fff
+              background-image linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.5));
+              position absolute
+              left 0
+              right 0
+              bottom 0
+              .title
+                line-height .8rem
+                padding-left .16rem
+              .icon
+                padding .03rem .08rem
+                position absolute
+                right .16rem
+                bottom .16rem
+                width 1.3rem
+                text-align center
+                border-radius .5rem
+                background rgba(0,0,0,.5)
         </style>
         ```
 
+    - 9-2-4 画廊 Gallary组件
+        ```html
+        // /src/common/gallary/Gallary.vue
+        <template>
+          <div class="container">
+            <div class="wrapper">
+              <swiper :options='swiperOptions'>
+                <swiper-slide v-for="(item, index) of imgs" :key='index'>
+                  <img class="img" :src="item">
+                </swiper-slide>
+                <div class="swiper-pagination"  slot="pagination"></div>
+              </swiper>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        export default {
+          name: 'CommonGallary',
+          props: {
+            imgs: {
+              type: Array
+            }
+          },
+          data () {
+            return {
+              swiperOptions: {
+                pagination: '.swiper-pagination',
+                paginationType: 'fraction'
+              }
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+          .container >>> .swiper-container
+            overflow inherit
+          .container
+            display flex
+            flex-direction column
+            justify-content center
+            background #000
+            z-index 99
+            position fixed
+            top 0
+            left 0
+            right 0
+            bottom 0
+            .wrapper
+              .img
+                width 100%
+              .swiper-pagination
+                font-size .1rem
+                color #fff
+                bottom -1rem
+        </style>
+        ```
+    - #### 9-2-5 swiper组件显示错误问题
+        - 当你做完上面代码，到这一步后，你会发现
+            - 当你点开画廊 ```this.showGallary = true``` 后
+            - 你会发现 swiper 怪怪的，不能正常滑动，下面的分页器也不能正确显示分页，而且滚动起来有问题
+        - 解决方法
+            - 什么原因造成的这个问题呢？
+                - 一开始，我们让 gallary / swiper 处于隐藏状态
+                - 当你再次显示的时候，会导致 swiper 宽度计算出现问题，从而导致了  轮播图无法正确滚动
+            - 思路 
+                - 到[官网查文档](https://www.swiper.com.cn/plus/search.php?kwtype=0&q=observe)
+                - 我这个 swiper 插件，只要监听到 我这个元素，或者 父级元素，发生了 DOM 结构变化的时候
+                - 我会自动 自我刷新一次
+                - 通过这个 自我刷新 就能解决这个宽度计算的问题
+            - 在这里，我们可以添加两个 配置项
+                - ```observeParents:true```
+                    - 将observe应用于Swiper的父元素。当Swiper的父元素变化时，例如window.resize，Swiper更新。
+                - ```observer:true```
+                    - 启动动态检查器(OB/观众/观看者)，当改变swiper的样式（例如隐藏/显示）或者修改swiper的子元素时，自动初始化swiper。默认false
+            ```html
+            // /src/common/gallary/Gallary.vue
+            <template>
+              <div class="container" @click="handleGallayClick">
+                <div class="wrapper">
+                  <swiper :options='swiperOptions'>
+                    <swiper-slide v-for="(item, index) of imgs" :key='index'>
+                      <img class="img" :src="item">
+                    </swiper-slide>
+                    <div class="swiper-pagination"  slot="pagination"></div>
+                  </swiper>
+                </div>
+              </div>
+            </template>
+
+            <script>
+            export default {
+              name: 'CommonGallary',
+              props: {
+                imgs: {
+                  type: Array
+                }
+              },
+              data () {
+                return {
+                  swiperOptions: {
+                    pagination: '.swiper-pagination',
+                    paginationType: 'fraction',
+                    observeParents: true,     // 监听父级变化
+                    observer: true            // 监听自己的变化
+                  }
+                }
+              },
+              methods: {
+                handleGallayClick () {
+                  this.$emit('GallayClose')
+                }
+              }
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+            </style>
+            ```
+    - 9-2-6 收尾工作
+        - detail-banner push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 detail-banner 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge detail-banner
+          - git push
 
 
+- ### 9-3 实现Header渐隐渐显效果
+    - 9-3-1 本节目标
+        - 实现Header渐隐渐显效果
+    - 9-3-2 css布局
+        ```html
+        // /src/pages/detail/components/Header.vue
+        <template>
+          <div class="header">
+            <router-link tag='div' to='/' class="header-abs iconfont">&#xeb99;</router-link>
+            <div class="header-fixed">景点详情</div>
+          </div>
+        </template>
 
-        - 6. 收尾工作
-            - detail-banner push 到github
-              - git add .
-              - git commit -m ''
-              - git push
-            - 将 detail-banner 开发完的分支 合并到 master 分支上
-              - git status
-              - git checkout master
-              - git merge detail-banner
-              - git push
+        <script>
+        export default {
+          name: 'DetailHeader'
+        }
+        </script>
 
-  16:00
+        <style lang="stylus" scoped>
+          @import '~styles/varibles.styl'
+          .header
+            text-align center
+            color #fff
+            .header-abs
+              position absolute
+              top .2rem
+              left .2rem
+              height .8rem
+              line-height .8rem
+              width .8rem
+              border-radius .8rem
+              background rgba(0,0,0,.8)
+              z-index 11
+            .header-fixed
+              background $bgColor
+              font-size .32rem
+              height $headerHeight
+              line-height $headerHeight
+              text-align center
+              position fixed
+              top 0
+              left 0
+              right 0
+        </style>
+        ```
+        ```html
+        // /src/pages/detail/Detail.vue
+        <template>
+          <div>
+            <detail-banner></detail-banner>
+            <detail-header></detail-header>
+            <div class="height"></div>
+          </div>
+        </template>
+
+        <script>
+        import detailBanner from './components/Banner'
+        import detailHeader from './components/Header'
+        export default {
+          name: 'Detail',
+          components: {
+            detailBanner,
+            detailHeader
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        .height
+          height 20rem
+        </style>
+        ```
+    - 9-3-3 到这里，css布局基本完成，下面开始 写逻辑部分
+        - 思路
+            - 1.定义 data ```showAbs: true```，返回按钮 ```v-show="showAbs"```，header ```v-show="!showAbs"```，将他们两个的显示 设定为互斥
+            - 2.因为我们用了 ```<keep-alive></keep-alive>```
+                - 所以，只要页面一被展示，activated 生命周期函数 就会被执行
+                    ```js
+                    activated () {
+                      window.addEventListener('scroll', this.handleScroll)
+                    },
+                    methods: {
+                      handleScroll () {
+                        const top = document.documentElement.scrollTop  // 获取滚动距离
+                        if (top > 60) {
+                          this.showAbs = false
+                        } else {
+                          this.showAbs = true
+                        }
+                      }
+                    }
+                    ```
+    - 9-3-4 代码
+        ```html
+        // /src/pages/detail/components/Header.vue
+        <template>
+          <div class="header">
+            <router-link
+              tag='div'
+              to='/'
+              class="header-abs iconfont"
+              v-show="showAbs"
+            >&#xeb99;</router-link>
+            <div class="header-fixed" v-show="!showAbs" :style="opacityStyle">
+              <router-link to='/'>
+                <div class="header-back iconfont">&#xeb99;</div>
+              </router-link>
+              景点详情
+            </div>
+          </div>
+        </template>
+
+        <script>
+        export default {
+          name: 'DetailHeader',
+          data () {
+            return {
+              showAbs: true,
+              opacityStyle: { opacity: 0 }
+            }
+          },
+          activated () {
+            window.addEventListener('scroll', this.handleScroll)
+          },
+          methods: {
+            handleScroll () {
+              const top = document.documentElement.scrollTop
+              console.log(top)
+              if (top > 60) {
+                let opacity = top / 140
+                opacity = opacity > 1 ? 1 : opacity // 限制 不让 opacity 大于1
+                this.opacityStyle = { opacity }
+                this.showAbs = false
+              } else {
+                this.showAbs = true
+              }
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+          @import '~styles/varibles.styl'
+          .header
+            text-align center
+            color #fff
+            .header-abs
+              position absolute
+              top .2rem
+              left .2rem
+              height .8rem
+              line-height .8rem
+              width .8rem
+              border-radius .8rem
+              background rgba(0,0,0,.8)
+              z-index 11
+            .header-fixed
+              background $bgColor
+              font-size .32rem
+              height $headerHeight
+              line-height $headerHeight
+              text-align center
+              position fixed
+              top 0
+              left 0
+              right 0
+              .header-back
+                width .64rem
+                text-align center
+                font-size .4rem
+                position absolute
+                top 0
+                left 0
+                color #fff
+        </style>
+        ```
+    - 9-3-5 收尾工作
+        - detail-header push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 detail-header 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge detail-header
+          - git push
+
+
+- ### 9-4 Vue项目详情页 - 对全局事件的解绑
+    - 9-4-1 前言
+        - 为什么要把他单独拿出来，作为一节来讲呢？
+        - 因为这一部分内容 非常重要
+        - 很多初学者 因为没有 对全局事件 及时解绑，造成代码出现了大量的 BUG
+    - 9-4-2 存在的问题
+        - 先来看问题
+        - 1.在上一节 [9-3 实现Header渐隐渐显效果](#9-3-实现Header渐隐渐显效果) 完成后，其实遗留了一个 非常重要的BUG
+        - 2.先看上一节中的部分代码
+            - 当我们激活这个 路由 activated() 时，就会给 全局的window对象 绑定监听事件，并执行 ```this.handleScroll```
+            - 然后 ```this.handleScroll``` 会执行相关逻辑
+            ```html
+            // /src/pages/detail/components/Header.vue
+            <script>
+            export default {
+              name: 'DetailHeader',
+              data () {
+                return {
+                  showAbs: true,
+                  opacityStyle: { opacity: 0 }
+                }
+              },
+              activated () {
+                window.addEventListener('scroll', this.handleScroll)
+              },
+              methods: {
+                handleScroll () {
+                  const top = document.documentElement.scrollTop
+                  console.log('scroll')
+                  if (top > 60) {
+                    let opacity = top / 140
+                    opacity = opacity > 1 ? 1 : opacity // 限制 不让 opacity 大于1
+                    this.opacityStyle = { opacity }
+                    this.showAbs = false
+                  } else {
+                    this.showAbs = true
+                  }
+                }
+              }
+            }
+            </script>
+            ```
+        - 3.但是，如果你在 ```this.handleScroll``` 里写一个 ```console.log('scroll')```
+            - 你会发现
+                - 你在 <详情页> 中滚动，会打印 ```console.log('scroll')```
+                - **但是，如果你返回了 <首页>，继续滚动，你会发现，他还是会打印 ```console.log('scroll')```**
+                - 这和我们预期的不一样，不是我们想要的效果
+        - 4.原因分析
+            - 1.如果我们对一个页面的标签，绑定事件 ```@click='handleClick'```
+                - 那么，这个事件只会对 标签的内部产生影响，而不会对标签外面产生影响
+                ```html
+                <div @click='handleClick'>
+                  <input type='text'>
+                </div>
+                ```
+            - 2.但是，由于我们 是对 **全局对象 Window** 进行事件绑定，所以他会影响整个 window 的内部
+                - 也就是说，他在 <详情页> 进行绑定事件，在 <首页> 能继续产生影响，是正常的
+                - 但是，这个结果又不是我们想要的，该怎么办呢？
+        - 5.解决方法
+            - 1.当我们对这个组件 用了 ```<keep-alive>``` 之后
+            - 2.这个组件就会多一个 ```activated()``` 生命周期函数，他在每一次页面展示的时候会执行
+            - 3.与之对应，vue 还提供一个生命周期函数 ```deactivated()``` , 他在每一次 页面即将被隐藏的时候 会执行
+                ```js
+                activated () {
+                  window.addEventListener('scroll', this.handleScroll)
+                },
+                deactivated () {
+                  window.removeEventListener('scroll', this.handleScroll)
+                },
+                ```
+            - 4.这样写了之后，意思是
+                - 当页面被显示的时候，对全局对象window 绑定事件
+                - 当页面即将被隐藏的时候，对全局对象window 进行事件解绑
+                - 这样就能完美解决 我们这节开头 发现的问题了
+        - 6.完整代码
+            ```html
+            // /src/pages/detail/components/Header.vue
+            <script>
+            export default {
+              name: 'DetailHeader',
+              data () {
+                return {
+                  showAbs: true,
+                  opacityStyle: { opacity: 0 }
+                }
+              },
+              activated () {
+                window.addEventListener('scroll', this.handleScroll)
+              },
+              deactivated () {
+                window.removeEventListener('scroll', this.handleScroll)
+              },
+              methods: {
+                handleScroll () {
+                  const top = document.documentElement.scrollTop
+                  console.log('scroll')
+                  if (top > 60) {
+                    let opacity = top / 140
+                    opacity = opacity > 1 ? 1 : opacity1
+                    this.opacityStyle = { opacity }
+                    this.showAbs = false
+                  } else {
+                    this.showAbs = true
+                  }
+                }
+              }
+            }
+            </script>
+            ```
+
+- ### 9-5 Vue项目详情页 - 使用递归组件实现详情页列表
+    - 9-5-1 本节目标
+        - 讲解 递归组件 如何使用
+    - 9-5-2 前期准备工作
+        - 在 github 上，新建分支 detail-list
+        - git pull
+        - git checkout detail-list
+        - npm run dev
+    - 9-5-3 基础 CSS布局 代码
+        ```html
+        // /src/pages/detail/Detail.vue
+        <template>
+          <div>
+            <detail-banner></detail-banner>
+            <detail-header></detail-header>
+            <detail-list :list='list'></detail-list>
+            <div class="height"></div>
+          </div>
+        </template>
+
+        <script>
+        import detailBanner from './components/Banner'
+        import detailHeader from './components/Header'
+        import detailList from './components/List'
+        export default {
+          name: 'Detail',
+          components: {
+            detailBanner,
+            detailHeader,
+            detailList
+          },
+          data () {
+            return {
+              list: [{
+                title: '学生票'
+              }, {
+                title: '儿童票'
+              }, {
+                title: '特惠票'
+              }, {
+                title: '成人票'
+              }]
+            }
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+        .height
+          height 20rem
+        </style>
+        ```
+        ```html
+        // /src/pages/detail/components/List.vue
+        <template>
+          <div class="detail-List">
+            <div v-for="(item, index) of list" :key='index' class="item border-bottom">
+              <div class="item-title">
+                <div class="item-icon"></div>
+                {{item.title}}
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <script>
+        export default {
+          name: 'detailList',
+          props: {
+            list: Array
+          }
+        }
+        </script>
+
+        <style lang="stylus" scoped>
+          .detail-List
+            font-size .32rem
+            line-height .8rem
+            padding 0 .2rem
+            .item-title
+              display flex
+              align-items center
+              .item-icon
+                background: url(http://s.qunarzz.com/piao/image/touch/sight/detail.png) 0 -.45rem no-repeat;
+                background-size: .4rem 3rem;
+                width: .36rem;
+                height: .36rem;
+                margin-right: .1rem;
+        </style>
+        ```
+        - 基础布局代码 渲染结果
+            <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (1).jpg) -->
+    - 9-5-4 如何使用 递归组件？
+        - 1.什么是 递归组件？
+            - 所谓递归，就是自己调用自己
+            - 递归组件同理，组件自身 调用 组件自身
+        - 2.我们先定义 data数据
+            - 使得，成人票 中有 二级分类，三级分类
+            ```js
+            // /src/pages/detail/Detail.vue
+            data () {
+              return {
+                list: [{
+                  title: '学生票'
+                }, {
+                  title: '儿童票'
+                }, {
+                  title: '特惠票'
+                }, {
+                  title: '成人票',
+                  children: [{
+                    title: '成人三馆联票',
+                      children: [{
+                        title: '成人三馆联票 - 某一连锁店销售'
+                      }, {
+                        title: '成人三馆联票 - 某二连锁店销售'
+                      }]
+                  }, {
+                    title: '成人四馆联票'
+                  }]
+                }]
+              }
+            }
+            ```
+        - 3.那么 我们该如何 使用该组件展示 下面的 二级、三级分类 的数据呢？
+            - 1.这时候 就需要用到 **递归组件**了
+            - 2.以前，我们在定义组件的时候，都会在 js 里定义 name
+                ```js
+                export default {
+                  name: 'detailList'
+                }
+                ```
+                - 那么这个 name 到底有什么用呢？
+                  - 其实，这个 name 很大的一个作用 就是为了 我们调用 递归组件 时候使用的
+                  - 假设一个组件要使用自己的时候，我们就可以 通过自己的 name 来调用自己
+            - 3.代码
+                ```html
+                // /src/pages/detail/components/List.vue
+                <template>
+                  <div class="detail-List">
+                    <div v-for="(item, index) of list" :key='index' class="item border-bottom">
+                      <div class="item-title">
+                        <div class="item-icon"></div>
+                        {{item.title}}
+                      </div>
+                      <div v-if="item.children">
+                        <detail-list :list='item.children'></detail-list>  <!-- 递归调用自己 -->
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <script>
+                export default {
+                  name: 'detailList',
+                  props: {
+                    list: Array
+                  }
+                }
+                </script>
+
+                <style lang="stylus" scoped>
+                  .detail-List
+                    font-size .32rem
+                    line-height .8rem
+                    padding 0 .2rem
+                    .item-title
+                      display flex
+                      align-items center
+                      .item-icon
+                        background: url(http://s.qunarzz.com/piao/image/touch/sight/detail.png) 0 -.45rem no-repeat;
+                        background-size: .4rem 3rem;
+                        width: .36rem;
+                        height: .36rem;
+                        margin-right: .1rem;
+                </style>
+                ```
+                - 代码解析
+                    - ```<detail-list :list='item.children'></detail-list> ```
+                    - 由于定义 ```<detail-list>``` 的时候，规定 要往该组件里传入 一个 list 的数据
+                    - 所以，这里吧 循环得到的 二级数据 'item.children' 作为 list data 传入该组件
+        - 递归组件 渲染结果
+            <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (2).jpg) -->
+        - 到这里，递归组件就实现了
