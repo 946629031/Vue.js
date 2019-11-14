@@ -119,6 +119,9 @@ Vue 各种语法 入门讲解
     - [9-4 对全局事件的解绑](#9-4-Vue项目详情页---对全局事件的解绑)
     - [9-5 使用递归组件实现详情页列表](#9-5-Vue项目详情页---使用递归组件实现详情页列表)
     - [9-6 动态获取详情页面数据](#9-6-Vue项目详情页---动态获取详情页面数据)
+        - [如何实现动态路由，并获取路由参数？](#9-6-3-如何实现动态路由，并获取路由参数？)
+        - [keep-alive 的 exclude 方法](#方法二：keep-alive-的-exclude-方法)
+        - [思考组件中 name 的值有什么作用？](#9-6-5-思考组件中-name-的值有什么作用？)
     - [9-7 在项目中加入基础动画](#9-7-Vue项目详情页---在项目中加入基础动画)
 - [第10章 实战项目 - 项目的联调，测试与发布上线](#第10章-实战项目---项目的联调，测试与发布上线)
     - [10-1 Vue项目的联调测试上线 - 项目前后端联调](#10-1-Vue项目的联调测试上线---项目前后端联调)
@@ -7458,5 +7461,200 @@ Vue 各种语法 入门讲解
                     - 由于定义 ```<detail-list>``` 的时候，规定 要往该组件里传入 一个 list 的数据
                     - 所以，这里吧 循环得到的 二级数据 'item.children' 作为 list data 传入该组件
         - 递归组件 渲染结果
-            <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (2).jpg) -->
+            - ![递归组件 渲染结果](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (2).jpg)
         - 到这里，递归组件就实现了
+
+- ### 9-6　Vue项目详情页　-　动态获取详情页面数据
+    - 9-6-1 本节目标
+        - 讲解如何 动态获取页面数据
+        - 动态路由的使用
+    - 9-6-2 前期准备工作
+        - 在 github 上，新建分支 detail-ajax
+        - git pull
+        - git checkout detail-ajax
+        - npm run dev
+    - #### 9-6-3 如何实现动态路由，并获取路由参数？
+        - [【Vue Router 动态路由】 官网文档](https://router.vuejs.org/zh/guide/essentials/dynamic-matching.html)
+        - 1.我们先来看一下这个问题
+            - 当我们点击首页列表中 的景点一时，会跳转到 ```http://localhost:8080/#/detail/0001``` 这个链接
+            - 当我们点击首页列表中 的景点三时，会跳转到 ```http://localhost:8080/#/detail/0003``` 这个链接
+                - 其中
+                    - ```/detail``` 是组件地址
+                    - 而后面的 ```/0001``` 或者 ```/0003```，则是 该景点 对应的 id
+                - 那么，我们该如何才能 读取到这个 ```/0001``` 或者 ```/0003``` 的**动态路由参数**呢？
+        - 2.我们先来看一下 路由定义
+            - 在路由的定义中
+                - ```path: '/detail/:id'``` 这一项
+                - 把路由为 '/detail' 后面的参数 保存在 被命名为 id的变量里
+            ```js
+            // /src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import Home from '@/pages/home/Home'
+            import City from '@/pages/city/City'
+            import Detail from '@/pages/detail/Detail'
+
+            Vue.use(Router)
+
+            export default new Router({
+              routes: [
+                {
+                  path: '/',
+                  name: 'Home',
+                  component: Home
+                }, {
+                  path: '/city',
+                  name: 'City',
+                  component: City
+                }, {
+                  path: '/detail/:id',  // 把路由为 '/detail' 后面的参数 保存在 被命名为 id的变量里
+                  name: 'Detail',
+                  component: Detail
+                }
+              ]
+            })
+            ```
+        - 3.如何读取 动态路由的参数呢？
+            ```js
+            // /src/pages/detail/Detail.vue
+            methods: {
+              getDetailData () {
+                axios.get('/api/detail.json?id=' + this.$route.params.id)  // 读取 动态路由的参数
+                  .then(this.getDetailDataSuccess)
+              }
+            }
+            ```
+            - 同时，我们还可以这样写
+            ```js
+            // /src/pages/detail/Detail.vue
+            methods: {
+              getDetailData () {
+                axios.get('/api/detail.json', {
+                  params: {
+                    id: this.$route.params.id   // 以对象的形式，配置 动态路由的参数
+                  }
+                })
+                  .then(this.getDetailDataSuccess)
+              }
+            }
+            ```
+            - 上面这两张写法，在结果上 完全是一样的
+        - 4.做到这里，已经能根据 页面的不同，跟服务器请求对应的数据了
+            - 那么，问题就真的都解决了吗？
+            
+    - #### 9-6-4 keep-alive 的 exclude 方法
+        - 1.存在的问题
+            - 当你第一次访问这个网站，然后第一次进入 <详情页 - 0001> ，他就会请求 ```detail.json?id=0001```
+            - 然后当你返回 <首页>，再进入 <详情页 - 0002> 的时候，你会发现他并没有请求 ```detail.json?id=0002```
+        - 2.问题分析
+            - 因为这个页面，我用 ```<keep-alive>``` 做了缓存，mounted() 只会执行一次。
+            - 因为 ```<keep-alive>``` 包裹的页面，会被存中内存中，后面在进入该页面，也只是从内存中读取，而不是重新渲染页面 
+            - 即使你后面多次进入这个 页面，mounted() 也不会再执行了
+            - 所以，挂载在 mounted() 中的数据请求方法，就只会被调用一次
+        - 3.解决问题
+            - 思路
+                - 我们想办法让 每次进入详情页 都会发送对应的数据请求即可 ```detail.json?id=0002``` 
+
+            - 方法一：可以参考 [生命周期函数 activated](#8-11-5-生命周期函数-activated) 这一节讲到 activated() 方法来解决
+
+            - #### 方法二：keep-alive 的 exclude 方法
+                - 打开我们的 根组件 App.vue
+                - 我们在 ```<keep-alive>``` 中写 ```exclude="Detail"```
+                - 意思是，```<keep-alive>``` 中所有的东西都缓存到内存中，但是排除 **Detail组件**
+                    - 其中 ```exclude="Detail"``` 的 Detail 就是在定义组件时候的 组件名
+                        ```js
+                        export default {
+                          name: 'Detail'
+                        }
+                        ```
+                - 代码
+                    ```html
+                    // /src/App.vue
+                    <template>
+                      <div id="app">
+                        <keep-alive exclude="Detail">
+                          <router-view/>
+                        </keep-alive>
+                      </div>
+                    </template>
+
+                    <script>
+                    export default {
+                      name: 'App'
+                    }
+                    </script>
+
+                    <style>
+                    </style>
+                    ```
+                - 这样写完之后，你在测试一下，你会发现，每当你进入 Detail详情页 moounted() 都会被调用，从而达到了 每次都会请求新数据的结果
+    - #### 9-6-5 思考组件中 name 的值有什么作用？
+        ```js
+        export default {
+          name: 'Detail'
+        }
+        ```
+        - 1.递归组件
+        - 2.取消页面缓存
+            ```html
+            <keep-alive exclude="Detail">
+              <router-view/>
+            </keep-alive>
+            ```
+        - 3.在 chrome 浏览器中，打开调试工具 中的 Vue 调试标签，其中组件叫什么名字，就取决于 name 的值
+            ```html
+            <Root>
+              <App>
+                <home>
+                <Detail>
+                  <DetailBanner>
+                  <DetailHeader>
+                  <DetailList>
+            ```
+    - #### 9-6-6 页面跳转后不在顶部的问题
+        - 存在的问题
+            - 当你在 <首页> 滚动到这种高度的时候，然后点击 <望谷温泉度假村>
+            - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg)
+            - 跳转后，你会发现 <详情页> 的默认高度是下图这样子的。而不是我们预期的 **默认跳转后回到顶部**
+            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-.png)
+        - 解决问题
+            - [【Vue Router 滚动行为】 官网文档](https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html)
+            - 在 router 中添加一段代码即可
+                ```js
+                scrollBehavior (to, from, savedPosition) {
+                  return { x: 0, y: 0 }
+                }
+                ```
+            - 完整代码
+            ```js
+            // /src/router/index.js
+            import Vue from 'vue'
+            import Router from 'vue-router'
+            import Home from '@/pages/home/Home'
+            import City from '@/pages/city/City'
+            import Detail from '@/pages/detail/Detail'
+
+            Vue.use(Router)
+
+            export default new Router({
+              routes: [
+                {
+                  path: '/',
+                  name: 'Home',
+                  component: Home
+                }, {
+                  path: '/city',
+                  name: 'City',
+                  component: City
+                }, {
+                  path: '/detail/:id',
+                  name: 'Detail',
+                  component: Detail
+                }
+              ],
+              scrollBehavior (to, from, savedPosition) {
+                return { x: 0, y: 0 }
+              }
+            })
+            ```
+        - 这样，每次跳转后，默认都会回到顶部，达到了我们想要的效果
