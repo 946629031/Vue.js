@@ -7616,7 +7616,7 @@ Vue 各种语法 入门讲解
             - 当你在 <首页> 滚动到这种高度的时候，然后点击 <望谷温泉度假村>
             - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg)
             - 跳转后，你会发现 <详情页> 的默认高度是下图这样子的。而不是我们预期的 **默认跳转后回到顶部**
-            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-.png)
+            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png)
         - 解决问题
             - [【Vue Router 滚动行为】 官网文档](https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html)
             - 在 router 中添加一段代码即可
@@ -7658,3 +7658,134 @@ Vue 各种语法 入门讲解
             })
             ```
         - 这样，每次跳转后，默认都会回到顶部，达到了我们想要的效果
+    - 9-6-7 收尾工作
+        - detail-ajax push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 detail-ajax 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge detail-ajax
+          - git push
+
+- ### 9-7 Vue项目详情页 - 在项目中加入基础动画
+    - 9-7-1 本节目标
+        - 尝试在项目中 加入一些基础动画效果
+        - 当点击 详情页中的banner，显示 画廊组件时 的淡出淡入的效果
+    - 9-7-2 前期准备工作
+        - 在 github 上，新建分支 detail-animation
+        - git pull
+        - git checkout detail-animation
+        - npm run dev
+    - 9-7-3 思路
+        - 1.先定义 动画组件
+            ```html
+            <transition>
+              <slot></slot>
+            </transition>
+            ```
+        - 2.使用组件
+            ```
+            <fade-animation>
+              <common-gallary :imgs='gallaryImgs' v-show="showGallary" @GallayClose='GallayClose'></common-gallary>
+            </fade-animation>
+            ```
+        - 3.原理讲解
+            - 由于用 ```<transition>``` 包裹 ```<slot></slot>``` 插槽
+            - 所以，当你使用 动画组件 的时候，将需要动画的 html部分 作为插槽传递进来即可，如
+                ```
+                <fade-animation>
+                  <common-gallary></common-gallary>
+                </fade-animation>
+                ```
+            - 这样的话 ```<common-gallary>``` 就会执行 ```<fade-animation>``` 定义的动画效果了
+    - 9-7-4 完整代码
+        - 定义动画组件
+            ```html
+            // /src/common/animation/FadeAnimation.vue
+            <template>
+              <transition>
+                <slot></slot>
+              </transition>
+            </template>
+
+            <script>
+            export default {
+              name: 'fadeAnimation'
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+              .v-enter, .v-leave-to
+                opacity 0
+              .v-enter-active, .v-leave-active
+                transition opacity .5s
+            </style>
+            ```
+        - 使用动画组件
+            ```html
+            // /src/pages/detail/components/Banner.vue
+            <template>
+              <div>
+                <div class="banner" @click="handleBannerClick">
+                  <div class="detail-banner">
+                    <img :src="bannerImg" alt="">
+                  </div>
+                  <div class="info">
+                    <div class="title">{{sightName}}</div>
+                    <div class="icon">
+                      <span class="image iconfont">&#xe635;</span>
+                      <span class="number">39</span>
+                    </div>
+                  </div>
+                </div>
+                <fade-animation>
+                  <common-gallary :imgs='gallaryImgs' v-show="showGallary" @GallayClose='GallayClose'></common-gallary>
+                </fade-animation>
+              </div>
+            </template>
+
+            <script>
+            import CommonGallary from 'common/gallary/Gallary'
+            import fadeAnimation from 'common/animation/FadeAnimation'
+            export default {
+              name: 'DetailBanner',
+              props: {
+                sightName: String,
+                bannerImg: String,
+                gallaryImgs: Array
+              },
+              data () {
+                return {
+                  showGallary: false
+                }
+              },
+              components: {
+                CommonGallary,
+                fadeAnimation
+              },
+              methods: {
+                handleBannerClick () {
+                  this.showGallary = true
+                },
+                GallayClose () {
+                  this.showGallary = false
+                }
+              }
+            }
+            </script>
+
+            <style lang="stylus" scoped>
+            </style>
+            ```
+    - 9-7-5 收尾工作
+        - detail-animation push 到github
+          - git add .
+          - git commit -m ''
+          - git push
+        - 将 detail-animation 开发完的分支 合并到 master 分支上
+          - git status
+          - git checkout master
+          - git merge detail-animation
+          - git push
