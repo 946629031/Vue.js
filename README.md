@@ -93,6 +93,9 @@ Vue 各种语法 入门讲解
     - [8-5 页面的动态数据渲染](#8-5-Vue项目-城市选择页---页面的动态数据渲染)
     - [8-6 兄弟组件数据传递](#8-6-Vue项目-城市选择页---兄弟组件数据传递)
     - [8-7 列表性能优化](#8-7-Vue项目-城市选择页---列表性能优化)
+        - [8-7-1 问题1 计算性能优化](#8-7-1-问题1-计算性能优化)
+        - [8-7-2 问题2 函数节流](#8-7-2-问题2-函数节流)
+        - [8-7-3 问题3 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动](#8-7-3-问题3-手机端真机测试时-touchmove-右边字母表的时候，整个页面跟着移动)
     - [8-8 搜索逻辑实现](#8-8-Vue项目-城市选择页---搜索逻辑实现)
     - [8-9 Vuex实现数据共享](#8-9-Vue项目-城市选择页---Vuex实现数据共享)
         - [8-9-4 使用 Vuex](#8-9-4-使用-Vuex)
@@ -5411,7 +5414,7 @@ Vue 各种语法 入门讲解
             ```
 
 - ### 8-7 Vue项目 <城市选择页> - 列表性能优化
-    - 8-7-1 问题1
+    - #### 8-7-1 问题1 计算性能优化
         - 1.存在问题
             - 在 ```Alphabet.vue``` 中, 我们计算 startY 值的时候，是在 touchmove 时候才计算的
             - 也就是，每次 touchmove 的时候，都要计算一次。这样导致性能极其的浪费，所以我们现在要做优化
@@ -5457,7 +5460,7 @@ Vue 各种语法 入门讲解
                 }
             }
             ```
-    - 8-7-2 问题2 函数节流
+    - #### 8-7-2 问题2 函数节流
         - 1.存在问题
             - 我们在之前 touchmove 触发的函数 ```handleTouchMove()``` 中，由于 touchmove 的触发频率是非常高的
             - 这导致这个函数 在短时间内 被几十次 几百次的重复执行，导致性能的极致浪费
@@ -5490,6 +5493,110 @@ Vue 各种语法 入门讲解
                 }
               }
             }
+            ```
+    - #### 8-7-3 问题3 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动
+        - 1.存在问题
+            - 当你通过 ```http://192.168.1.105:8080``` 访问项目
+            - 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/8-7-3.jpg) -->
+        - 2.思路
+            - ```@touchstart.prevent='handleTouchStart'```
+                - 我们在 touchstart 后面加一个 **事件修饰符**
+                - 它可以阻止 touchstart 的默认行为
+            - 当你把它默认行为阻止掉之后
+                - 你滚动字母表的时候，就不会发生 整个页面发生 上下拖动的效果了
+
+        - 3.完整代码
+            ```html
+            // /src/pages/city/components/Alphabet.vue
+            <template>
+              <div class="list">
+                <div
+                  class="item"
+                  v-for="(item, key) of cities"
+                  :key="key"
+                  :ref='key'
+                  @click='handleLetterClick'
+                  @touchstart.prevent='handleTouchStart'
+                  @touchmove='handleTouchMove'
+                  @touchend='handleTouchEnd'
+                >
+                  {{key}}
+                </div>
+              </div>
+            </template>
+
+            <script>
+            export default{
+              name: 'CityAlphabet',
+              props: {
+                cities: Object
+              },
+              data () {
+                return {
+                  touchStatus: false,
+                  startY: 0,
+                  timer: null
+                }
+              },
+              updated () {
+                this.startY = this.$refs['A'][0].offsetTop // 获取A字母 到上级层顶部的距离
+              },
+              computed: {
+                letters () {
+                  const letters = []
+                  for (var i in this.cities) {
+                    letters.push(i)
+                  }
+                  return letters
+                }
+              },
+              methods: {
+                handleLetterClick (e) {
+                  this.$emit('change', e.target.innerText)
+                  // console.log(e.target.innerText)
+                },
+                handleTouchStart () {
+                  this.touchStatus = true
+                },
+                handleTouchMove (e) {
+                  if (this.touchStatus) {
+                    if (this.timer) {
+                      clearTimeout(this.timer)
+                    }
+                    this.timer = setTimeout(() => { // 利用setTimeout 做函数节流
+                      let touchY = e.touches[0].clientY
+                      let index = Math.floor((touchY - 89 - this.startY) / 20)
+                      if (index >= 0 && index < this.letters.length) {
+                        this.$emit('change', this.letters[index])
+                      }
+                    }, 16)
+                  }
+                },
+                handleTouchEnd () {
+                  this.touchStatus = false
+                }
+              }
+            }
+            </script>
+
+            <style lang='stylus' scoped>
+              @import '~styles/varibles.styl';
+              .list
+                position absolute
+                right 0
+                top 1.78rem
+                bottom 0
+                display flex
+                flex-direction column
+                justify-content center
+                width .4rem
+                text-align center
+                .item
+                  color $bgColor
+                  line-height .4rem
+                  font-size .26rem
+            </style>
             ```
 
 - ### 8-8 Vue项目 <城市选择页> - 搜索逻辑实现
@@ -7614,9 +7721,9 @@ Vue 各种语法 入门讲解
     - #### 9-6-6 页面跳转后不在顶部的问题
         - 存在的问题
             - 当你在 <首页> 滚动到这种高度的时候，然后点击 <望谷温泉度假村>
-            - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg)
+            <!-- - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg) -->
             - 跳转后，你会发现 <详情页> 的默认高度是下图这样子的。而不是我们预期的 **默认跳转后回到顶部**
-            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png)
+            <!-- - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png) -->
         - 解决问题
             - [【Vue Router 滚动行为】 官网文档](https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html)
             - 在 router 中添加一段代码即可
@@ -7789,3 +7896,238 @@ Vue 各种语法 入门讲解
           - git checkout master
           - git merge detail-animation
           - git push
+
+
+## 第10章 实战项目 - 项目的联调，测试与发布上线
+
+- ### 10-1 Vue项目的联调测试上线 - 项目前后端联调
+    - 10-1-1 什么是 前后端联调？
+        - Vue 项目的接口联调
+        - 之前 我们在写代码的时候
+            - 我们的所有 Ajax 拿到的都 **不是真正后端返回的真实数据**
+            - 而是我们前端 **[模拟的数据](#7-8-Vue项目首页---使用-axios-发送-ajax-请求)**
+        - 当我们前端代码已经编写完成了，后端接口也已经写好的时候。
+            - 我们就需要把 前端的模拟的数据 去掉
+            - 去使用 后端返回的 **真实数据**，进行前后端的调试
+        - 这个过程，我们就把它称之为 前后端的联调
+    - 10-1-2
+        - 本地构建服务器
+            - 我们本次案例中，在本地启动一个 PHP服务器 XAMPP，用来模拟后端服务器
+            - 我们把 json数据 放在服务器的这个地址 ```localhost/api/index.json``` 
+            - 把项目中的 模拟数据 移除，```/static/data_demo/index.json```
+            - 这个时候，当我们再去打开 <首页> 你会发现，页面为空，原因是因为 请求不到 ```index.json``` 数据了
+        - 联调的时候，我们不希望它 请求本地的 模拟数据，而是请求 服务器的数据
+            - 那么 我们该怎么做呢？
+                - 我们修改配置文件
+                - 修改前
+                    ```js
+                    // /config/index.js
+                    module.exports = {
+                      dev: {
+
+                        // Paths
+                        assetsSubDirectory: 'static',
+                        assetsPublicPath: '/',
+                        proxyTable: {   // 代理转发
+                          '/api': {
+                            target: 'http://localhost:8080',
+                            pathRewrite: {
+                              '^/api': '/static/data_demo'
+                            }
+                          }
+                        }
+                      }
+                    }
+                    ```
+                - 修改后
+                    ```js
+                    // /config/index.js
+                    module.exports = {
+                      dev: {
+
+                        // Paths
+                        assetsSubDirectory: 'static',
+                        assetsPublicPath: '/',
+                        proxyTable: {   // 代理转发
+                          '/api': {
+                            target: 'http://localhost:80'   // 意思是，只要你请求 '/api' 开头的接口，都转发到这个地址
+                          }
+                        }
+                      }
+                    }
+                    ```
+    - 10-1-3 总结
+        - 如果想实现 vue 项目的 前后端联调，不需要再使用 类似于 fiddler charles 这样的抓包代理工具了
+        - 只需要 使用 webpack 的 proxyTable 配置项即可
+
+
+- ### 10-2 Vue项目的联调测试上线 - 真机测试
+    - 10-2-1 真机测试
+        - 我们在电脑上启动我们的项目 ```npm run dev```
+            - 这样 我们在电脑上访问 ```http://localhost:8080``` 即可访问项目
+        - 获取当前机器的  ip 地址
+            - 如何获取？ 在命令行中输入下面命令
+                - Mac ```ifconfig```
+                - Windows ```ipconfig```
+            - 找到本机的ip地址，如 192.168.1.105
+        - 本地电脑测试
+            - 我们先在浏览器中输入  ```http://192.168.1.105:8080```，看看能不能访问
+            - 如果提示 "无法访问此站"
+                - 先访问  ```http://192.168.1.105``` 这个地址看看能不能访问得到
+                - 如果能访问，但是 8080 端口无法访问
+                    - 就证明，本地服务器能正常启动
+                    - 只是 8080 端口无法被外界访问而已
+                - 原因
+                    - 我们的项目 是通过 webpack-dev-server 启动的
+                    - webpack-dev-server 默认不支持通过 ip地址 的形式访问
+                    - 所以 我们需要对他的配置项 进行修改
+                        ```js
+                        // /package.json
+                        {
+                          "scripts": {
+                            "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+                            "start": "npm run dev",
+                            "lint": "eslint --ext .js,.vue src",
+                            "build": "node build/build.js"
+                          },
+                        }
+                        ```
+                        - 我们每次启动项目 ```npm run dev```
+                            - 实际上 都是在执行 ```"dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",``` 这条语句
+                        - 如果你希望 能够通过 ip地址 进行访问的话，在里面加上 ```--host 0.0.0.0``` 即可
+                        ```js
+                        // /package.json
+                        {
+                          "scripts": {
+                            "dev": "webpack-dev-server --host 0.0.0.0 --inline --progress --config build/webpack.dev.conf.js",
+                            "start": "npm run dev",
+                            "lint": "eslint --ext .js,.vue src",
+                            "build": "node build/build.js"
+                          },
+                        }
+                        ```
+                    - 修改 ```/package.json``` 后，需要重启服务器
+            - 这样修改之后，在同一局域网下，我们用手机访问 ```http://192.168.1.105:8080``` 就能看到自己的项目了
+
+    - 10-2-2 BUG修复
+        - [8-7-3 存在问题 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动](#8-7-3-问题3-手机端真机测试时-touchmove-右边字母表的时候，整个页面跟着移动)
+    - 10-2-3 
+        - 1.存在问题
+            - 由于市面上各种各样的手机都有，有的低版本的安卓机
+            - 部分手机 访问我们的项目，可能是白屏 的效果
+            - 导致这个问题 可能有两个原因
+                - 1.可能不支持 Promise
+                - 2.做完 babel-polyfill 后，部分手机 依然白屏，这种情况一般不是你代码的问题，而是 webpack-dev-server 的问题
+                    - 遇到这种情况，当项目真正的打包上线了，就不会出现这种问题了
+        - 2.解决 不支持 Promise
+            - ```npm i babel-polyfill```
+            - **babel-polyfill** 这个包，它会自动判断 如果浏览器没有 Promise，它会自动帮我们去往浏览器里 添加 ES6 的新特性
+            - 如何使用 **babel-polyfill** ?
+                - 直接在 main.js 中，```import 'babel-polyfill'``` 即可
+                - 它会自动做判断，如果是旧浏览器，会自动引入 polyfill 的代码 做填充
+                ```js
+                // /src/main.js
+                import Vue from 'vue'
+                import App from './App'
+                import router from './router'
+                import fastClick from 'fastclick' // 移动端 300毫秒 点击延迟问题
+                import VueAwesomeSwiper from 'vue-awesome-swiper'
+                import 'babel-polyfill'  // 当我们引入这个 包之后，我们整个项目 在所有浏览器上就都支持 Promise 了
+                import store from './store'
+                import 'minireset.css'
+                import 'styles/border.css' // 1px像素边框的问题
+                import 'styles/iconfont.css' // 引入iconfont
+                import 'swiper/dist/css/swiper.css'
+
+                Vue.config.productionTip = false
+                fastClick.attach(document.body) // 配置使用
+                Vue.use(VueAwesomeSwiper)
+
+                new Vue({
+                  el: '#app',
+                  router,
+                  store,
+                  components: { App },
+                  template: '<App/>'
+                })
+                ```
+            - 当我们引入这个 包之后，我们整个项目 在所有浏览器上就都支持 Promise 了
+            - 这样，部分手机 **白屏** 问题就解决了
+
+- ### 10-3 Vue项目的联调测试上线 - 打包上线
+    - 10-3-1 前言
+        - 经过 前后端联调 和 真机测试 之后，我们希望 我们的项目 打包上线
+        - 那么 如何才能 把Vue项目真正的打包上线呢？
+    - 10-3-2 问题
+        - 进入到项目目录
+            - 现在我有那么多的 文件 和 文件夹
+            - 难道我要把 /src 目录下的文件 给到后端服务器，然后我们就能访问到这一块的代码吗？ 不是这样的
+            ```
+            项目目录
+            + |- /build
+            + |- /config
+            + |- /node_modules
+            + |- /src
+            + |- /static
+            |- .babelrc
+            |- .editorconfig
+            |- .eslintignore
+            |- .eslintrc.js
+            |- .gitignore
+            |- .postcssrc.js
+            |- index.html
+            |- package-lock.json
+            |- package.json
+            |- README.md
+            ```
+    - #### 10-3-3 打包上线流程
+        - 1.在命令行里 cd 到 **项目根目录**，执行 ```npm run build```
+            - 这时候 会自动帮我们 对 /src目录 打包编译，生成一个浏览器能够 执行的代码
+            - 当命令行打包完成后，会显示 ```Build complete.```
+        - 2.打包完后，在 **项目根目录里**，会多一个 dist 文件夹，这个就是最终要给到 后端服务器的 代码
+            - 在 PHP XAMPP 中，我们把 下面这些文件放在 ```/xampp/htdocs``` 目录下即可
+                ```
+                + |- /api            数据接口
+                + |- /static         静态文件目录，如 css js
+                | - idnex.html
+                ```
+            - 这时候，我们通过 locahost 访问、ip 访问、域名访问。都没问题了
+        - 3.有时候，我们不希望 这个前端项目 在服务器的 根路径里
+            - 存在问题
+                - 而是希望他做 某一个文件夹中，例如 ```/project``` 根目录的 project 文件夹里
+                - 通过 ```http://localhost/project``` 来访问这个 网站
+                - 这个时候，就会报错
+                <!-- - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-3.jpg) -->
+                - 问题原因： 路径引用的问题
+            - 解决问题
+                - 修改路径配置
+                    - 默认是这样
+                        ```js
+                        // /config/index.js
+
+                        build: {
+                          // Paths
+                          assetsRoot: path.resolve(__dirname, '../dist'),
+                          assetsSubDirectory: 'static',
+                          assetsPublicPath: '/',
+                        }
+                        ```
+                    - 按照需求 修改路径
+                        ```js
+                        // /config/index.js
+
+                        build: {
+                          // Paths
+                          assetsRoot: path.resolve(__dirname, '../dist'),
+                          assetsSubDirectory: 'static',
+                          assetsPublicPath: '/project',  // 意思是，我打包后，要运行在后端的这个 目录下
+                        }
+                        ```
+                - 修改完后，执行 ```npm run build``` 重新打包
+                - 再把打包后的 dist目录 下的文件，放在服务器的 ```/project``` 目录即可
+                - 最后 访问测试一下 ```http://localhost/project```
+                
+- ### 10-4 Vue项目的联调测试上线 - 异步组件实现按需加载
+    - 由于视频原因，无法观看，暂无笔记
+    - 参考文章
+        - [Vue2.5学习笔记 10.4 上线联调 组件异步加载](https://blog.csdn.net/soulwyb/article/details/89208837)
