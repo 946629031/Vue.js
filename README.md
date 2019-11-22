@@ -132,7 +132,6 @@ Vue 各种语法 入门讲解
     - [10-3 Vue项目的联调测试上线 - 打包上线](#10-3-Vue项目的联调测试上线---打包上线)
     - [10-4 Vue项目的联调测试上线 - 异步组件实现按需加载](#10-4-Vue项目的联调测试上线---异步组件实现按需加载)
     - [10-5 Vue项目的联调测试上线 - 课程总结与后续学习指南](#10-5-Vue项目的联调测试上线---课程总结与后续学习指南)
-    - []()
 
 ----
 
@@ -170,7 +169,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
+    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -264,7 +263,7 @@ Vue 各种语法 入门讲解
             - View - 视图层
         - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
 
-    <!-- ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg) -->
+    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
 
     - 在 MVVM 模式下
         - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
@@ -279,12 +278,12 @@ Vue 各种语法 入门讲解
         - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
 
 - ### 2-5 前端组件化
-    <!-- ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg) -->
+    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
 
     - 看上面的例子
     - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
     - **组件化**
-        <!-- - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png) -->
+        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
         - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
         - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
@@ -490,7 +489,7 @@ Vue 各种语法 入门讲解
     - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
 
 - ### 3-2 Vue实例生命周期
-    <!-- ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg) -->
+    ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg)
     - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
     ```html
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
@@ -551,7 +550,7 @@ Vue 各种语法 入门讲解
     </script>
     ```
     - 执行结果
-    <!-- ![Vue的模版语法](https://github.com/946629031/Vue.js/blob/master/img/3-3.jpg) -->
+    ![Vue的模版语法](https://github.com/946629031/Vue.js/blob/master/img/3-3.jpg)
     - 凡是 像 ```v-text='msg'```  ```v-html='msg'``` 以 v-什么 开头的指令，后面引号内都是 跟JS表达式
 
 
@@ -765,7 +764,7 @@ Vue 各种语法 入门讲解
             })
         </script>
         ```
-    <!-- ![绑定 class](https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg) -->
+    ![绑定 class](https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg)
     - #### 绑定方式二 - 数组语法
         ```html
         <style> .activated{ color: red;} </style>
@@ -1045,7 +1044,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg) -->
+        - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg)
         - 渲染结果，每个循环项里，都被一个 div 标签包裹着
         - 但是，如果我不希望，循环项被这一个多余的标签包裹着，怎么办呢？
         ```html
@@ -1078,7 +1077,7 @@ Vue 各种语法 入门讲解
             })
         </script>
         ```
-        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg) -->
+        - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg)
         - 把包裹的 div 改成 template 即可，其中 template 只是占位符，不会被渲染到页面上
     - 5.对象循环
         ```html
@@ -1203,7 +1202,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9.Component_problems.jpg) -->
+            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9.Component_problems.jpg)
 
             - 原本我们的预期：row子组件，被包含于 tbody 中
             - 但是我们得到的：row子组件，跑到 tbody 外面去了
@@ -1232,7 +1231,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9-1.Component_problems.jpg) -->
+            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9-1.Component_problems.jpg)
             - 同理，以下标签 里面，如果要放子组件，也是同理
                 ```html
                 <ul>
@@ -1758,7 +1757,7 @@ Vue 各种语法 入门讲解
         ```
 - ### 4-5 非父子组件间的传值
     - 存在的问题
-    <!-- - ![非父子组件间的传值](https://github.com/946629031/Vue.js/blob/master/img/4-5.jpg) -->
+    - ![非父子组件间的传值](https://github.com/946629031/Vue.js/blob/master/img/4-5.jpg)
     - 如上图所示
         - 根据我们前面学习的内容，父子组件间传值，是可以实现的
             - 父传子，通过 ```props```
@@ -2548,7 +2547,7 @@ Vue 各种语法 入门讲解
             - 类似于 less 或者 Sass, 可以帮助我们在css 中，使用变量、mixin .. 这种东西
         - 安装 stylus ```npm i stylus stylus-loader```
     - 7-1-2 我们先来看一下要做的首页UI设计图
-        <!-- ![首页UI设计图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
+        ![首页UI设计图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg)
     - 7-1-3 首页 header 部分的开发
         - 下面我们来讲，怎么将首页拆分成组件
         ```
@@ -3309,7 +3308,7 @@ Vue 各种语法 入门讲解
 
 
 - ### 7-4 Vue项目首页 - 图标区域页面布局
-    <!-- - ![设计效果图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
+    - ![设计效果图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg)
     - 明确目标
         - 看上图。接下来，我们要做的部分，是轮播图下面这个 icon 部分
     - 7-4-1 创建 开发新功能的 分支，再 pull 到本地
@@ -3334,7 +3333,7 @@ Vue 各种语法 入门讲解
             - [CSS 利用 padding-bottom 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7css-利用-padding-bottom-实现固定比例的容器----轮播图-网速慢-加载时-占位问题-)
             - [本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 百分比 的值时，无论是left/right，还是 top/bottom，都是以 父元素的width 为参照物的！](#本文依赖于一个基础却又容易混淆的css知识点当marginpadding取形式为-百分比-的值时无论是leftright还是-topbottom都是以-父元素的width-为参照物的)
         - 先看效果图
-            <!-- - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg) -->
+            - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
         ```html
         // src/pages/home/components/Icons.vue
         <template>
@@ -4349,7 +4348,7 @@ Vue 各种语法 入门讲解
 ## 第8章 项目实战 - 旅游网站 <城市列表页> 开发
 - 本章目标：完成 <城市选择页面> 的制作
 - 效果图如下
-<!-- - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg) -->
+- ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg)
       
 
 - ### 8-1 Vue项目 <城市选择页> - 路由配置
@@ -5498,7 +5497,7 @@ Vue 各种语法 入门讲解
         - 1.存在问题
             - 当你通过 ```http://192.168.1.105:8080``` 访问项目
             - 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动
-            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/8-7-3.jpg) -->
+            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/8-7-3.jpg)
         - 2.思路
             - ```@touchstart.prevent='handleTouchStart'```
                 - 我们在 touchstart 后面加一个 **事件修饰符**
@@ -5744,7 +5743,7 @@ Vue 各种语法 入门讲解
         - [Vuex 官网](https://vuex.vuejs.org/zh/)
         - Vuex 是一个数据框架，能够实现各个页面之间的 **数据共享、数据通信**
         - Vuex 就是下图中，虚线部分的内容
-            <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
+            - ![vuex示意图](https://vuex.vuejs.org/vuex.png)
         - 大家可以把 这个虚线区域理解成一个 storage仓库
             - 这个仓库是由三部分组成的
                 - State: 存放数据
@@ -5837,7 +5836,7 @@ Vue 各种语法 入门讲解
             - 思路
                 - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
                 - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
-                <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
+                - ![vuex示意图](https://vuex.vuejs.org/vuex.png)
             - 改变数据 示例
                 - 思路
                     - 1.在 ```<template>``` 标签中，绑定 click 事件 ```@click='handleCityClick(city.name)'```
@@ -6654,7 +6653,7 @@ Vue 各种语法 入门讲解
 ## 第9章 项目实战 - 旅游网站 <详情页> 开发
 - 本章目标：完成 <详情页> 的制作
 - 效果图如下
-<!-- - ![详情页 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/9-1 详情页.jpg) -->
+- ![详情页 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/9-1 详情页.jpg)
 
 - ### 9-1 Vue项目详情页 - 动态路由和banner布局
     - 9-1-1 本节目标
@@ -7477,7 +7476,7 @@ Vue 各种语法 入门讲解
         </style>
         ```
         - 基础布局代码 渲染结果
-            <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (1).jpg) -->
+            - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (1).jpg)
     - 9-5-4 如何使用 递归组件？
         - 1.什么是 递归组件？
             - 所谓递归，就是自己调用自己
@@ -7721,9 +7720,9 @@ Vue 各种语法 入门讲解
     - #### 9-6-6 页面跳转后不在顶部的问题
         - 存在的问题
             - 当你在 <首页> 滚动到这种高度的时候，然后点击 <望谷温泉度假村>
-            <!-- - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg) -->
+            - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg)
             - 跳转后，你会发现 <详情页> 的默认高度是下图这样子的。而不是我们预期的 **默认跳转后回到顶部**
-            <!-- - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png) -->
+            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png)
         - 解决问题
             - [【Vue Router 滚动行为】 官网文档](https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html)
             - 在 router 中添加一段代码即可
@@ -8097,7 +8096,7 @@ Vue 各种语法 入门讲解
                 - 而是希望他做 某一个文件夹中，例如 ```/project``` 根目录的 project 文件夹里
                 - 通过 ```http://localhost/project``` 来访问这个 网站
                 - 这个时候，就会报错
-                <!-- - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-3.jpg) -->
+                - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-3.jpg)
                 - 问题原因： 路径引用的问题
             - 解决问题
                 - 修改路径配置
@@ -8131,3 +8130,120 @@ Vue 各种语法 入门讲解
     - 由于视频原因，无法观看，暂无笔记
     - 参考文章
         - [Vue2.5学习笔记 10.4 上线联调 组件异步加载](https://blog.csdn.net/soulwyb/article/details/89208837)
+    - 10-4-1 前言
+        - 打包后 的内容：
+            - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-4.png)
+        - 正常默认的情况下是 第一次打开页面的时候会把所有的文件全部下载好。这样切换到其他页面的时候就不需要再次发送请求下载数据了。
+        - 这有一个问题  项目小的时候OK，但是，项目大的时候会导致第一次加载变慢。
+        - 所以如果可以将组件加载改成异步加载的，程序在跳转到哪个页面的时候就会去加载相关的js 就好了。
+        - 而事实上 也是可以的，看下面代码
+    - 10-4-2 没修改前的代码
+        ```js
+        // /src/router/index.js
+        import Vue from 'vue'
+        import Router from 'vue-router'
+        import Home from '@/pages/home/Home'
+        import City from '@/pages/city/City'
+        import Detail from '@/pages/detail/Detail'
+
+        Vue.use(Router)
+
+        export default new Router({
+          routes: [
+            {
+              path: '/',
+              name: 'Home',
+              component: Home
+            }, {
+              path: '/city',
+              name: 'City',
+              component: City
+            }, {
+              path: '/detail/:id',
+              name: 'Detail',
+              component: Detail
+            }
+          ],
+          scrollBehavior (to, from, savedPosition) {
+            return { x: 0, y: 0 }
+          }
+        })
+        ```
+    - 10-4-3 修改后 异步组件实现按需加载
+        ```js
+        // /src/router/index.js
+        import Vue from 'vue'
+        import Router from 'vue-router'
+        // import Home from '@/pages/home/Home'
+        // import City from '@/pages/city/City'
+        // import Detail from '@/pages/detail/Detail'
+
+        Vue.use(Router)
+
+        export default new Router({
+          routes: [
+            {
+              path: '/',
+              name: 'Home',
+              component: () => import('@/pages/home/Home')
+            }, {
+              path: '/city',
+              name: 'City',
+              component: () => import('@/pages/city/City')
+            }, {
+              path: '/detail/:id',
+              name: 'Detail',
+              component: () => import('@/pages/detail/Detail')
+            }
+          ],
+          scrollBehavior (to, from, savedPosition) {
+            return { x: 0, y: 0 }
+          }
+        })
+        ```
+    - 10-4-4 不单单main.js可以这样做  其他的子组件也可以 比如 Home.vue
+        ```js
+        // /src/pages/home/Home.vue
+        import HomeSwiper from './components/Swiper'
+        import HomeIcons from './components/Icons'
+        import HomeRecommend from './components/Recommend'
+        import HomeWeekend from './components/Weekend'
+        import axios from 'axios'
+        export default {
+          name: 'Home',
+          components: {
+            HomeHeader: () => ('./components/Header'),
+            HomeSwiper,
+            HomeIcons,
+            HomeRecommend,
+            HomeWeekend
+          }
+        }
+        ```
+    - 10-4-5 结语
+        - 不过如果项目小 没必要这么费劲。
+        - 这种拆分组件，按需加载，比较适合用于 大型项目
+
+- ### 10-5 Vue项目的联调测试上线 - 课程总结与后续学习指南
+    - [Vue 核心基础教程](https://cn.vuejs.org/v2/guide/)
+    - 生态系统 核心插件
+        - [Vue Router](https://router.vuejs.org/zh/)
+            - [命名路由](https://router.vuejs.org/zh/guide/essentials/named-routes.html)
+            - [重定向和别名](https://router.vuejs.org/zh/guide/essentials/redirect-and-alias.html)
+            - [导航守卫](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html)
+        - [Vuex](https://vuex.vuejs.org/zh/)
+            - [项目结构](https://vuex.vuejs.org/zh/guide/structure.html)
+            - [插件](https://vuex.vuejs.org/zh/guide/plugins.html)
+        - [服务器端渲染](https://ssr.vuejs.org/zh/)
+    - [Vue官方 推荐插件 资源](https://github.com/vuejs/awesome-vue)
+    - 上面东西都弄懂了以后，就可以尝试阅读 **Vue 源码**了
+        - 理解作者如何构建这个项目
+        - 考虑性能的权衡，代码的简洁度
+        - 提升自己编码能力
+    - 扩展知识
+        - webpack
+        - babel
+        - ES6
+        - ...
+  
+- ### 课程至此完结，谢谢大家~
