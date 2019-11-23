@@ -47,14 +47,15 @@ Vue 各种语法 入门讲解
     - [4-7 作用域插槽](#4-7-作用域插槽)
     - [4-8 动态组件与 v-once 指令](#4-8-动态组件与-v-once-指令)
 - [第5章 Vue 中的动画特效](#第5章-Vue-中的动画特效)
-    - [5-1 Vue动画 - Vue中CSS动画原理]()
-    - [5-2 在Vue中使用 animate.css 库]()
-    - [5-3 在Vue中同时使用过渡和动画]()
-    - [5-4 Vue中的 Js 动画与 Velocity.js 的结合]()
-    - [5-5 Vue中多个元素或组件的过渡]()
-    - [5-6 Vue中的列表过渡]()
-    - [5-7 Vue中的动画封装]()
-    - [5-8 本章小节]()
+    - [5-1 Vue动画 - Vue中CSS动画原理](#5-1-Vue动画---Vue中CSS动画原理)
+        - [过渡动画原理](#过渡动画原理)
+    - [5-2 在Vue中使用 animate.css 库](#5-2-在Vue中使用-animate.css-库)
+    - [5-3 在Vue中同时使用过渡和动画](#5-3-在Vue中同时使用过渡和动画)
+    - [5-4 Vue中的 Js 动画与 Velocity.js 的结合](#5-4-Vue中的-Js-动画与-Velocity.js-的结合)
+    - [5-5 Vue中多个元素或组件的过渡](5-5-Vue中多个元素或组件的过渡)
+    - [5-6 Vue中的列表过渡](#5-6-Vue中的列表过渡)
+    - [5-7 Vue中的动画封装](5-7-Vue中的动画封装)
+    - [5-8 本章小节](5-8-本章小节)
 - [第6章 Vue 项目预热](#第6章-Vue-项目预热)
     - [6-1 Vue项目预热 - 环境配置](#6-1-Vue项目预热---环境配置)
     - [6-2 Vue项目预热 - 项目代码介绍](#6-2-Vue项目预热---项目代码介绍)
@@ -169,7 +170,7 @@ Vue 各种语法 入门讲解
     - Controller 控制 DOM
         - Controller 是核心控制器，一切用户的行为，都会通过 Controller 来进行触发、渲染视图
 - 基于 MV* 模式的 Vue 框架
-    - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg)
+    <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/1.jpg) -->
     - Model 绑定 View - (双向数据绑定)
     - 没有控制器概念
     - 数据驱动，状态管理，组件化 (核心思想)
@@ -263,7 +264,7 @@ Vue 各种语法 入门讲解
             - View - 视图层
         - 在这种模式下，Control / Presenter 层，其实有大量的代码都是在操作 DOM，而恰好这种直接操作 DOM 的模式，是非常耗费资源的
 
-    ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg)
+    <!-- ![vue-mvvm](https://github.com/946629031/Vue.js/blob/master/img/2.vue-mvvm.jpg) -->
 
     - 在 MVVM 模式下
         - 我们不需要关注 VM 层是怎么实现的，因为这个 Vue 已经帮我们实现了
@@ -278,12 +279,12 @@ Vue 各种语法 入门讲解
         - VM 层 - 当数据变化的时候，View 层自动跟着变化，这 VM 层是 Vue 帮我们实现的
 
 - ### 2-5 前端组件化
-    ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg)
+    <!-- ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/3.meituan.jpg) -->
 
     - 看上面的例子
     - 如果没有组件化，我们需要把这个页面的所有逻辑都写在 这个页面上，如果这个页面的逻辑非常的多，那之后**维护起来就会很困难**
     - **组件化**
-        - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png)
+        <!-- - ![美团外卖app](https://github.com/946629031/Vue.js/blob/master/img/4.components.png) -->
         - 合理拆分组件，我们可以把一个大型的项目，像拼积木一样拼接起来
         - 一个大型的项目可能非常的复杂，拆分成组件之后，就会变得非常的精巧
         - 每一个组件的**维护就会相对更容易些，降低维护成本**
@@ -489,7 +490,7 @@ Vue 各种语法 入门讲解
     - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
 
 - ### 3-2 Vue实例生命周期
-    ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg)
+    <!-- ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg) -->
     - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
     ```html
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
@@ -550,7 +551,7 @@ Vue 各种语法 入门讲解
     </script>
     ```
     - 执行结果
-    ![Vue的模版语法](https://github.com/946629031/Vue.js/blob/master/img/3-3.jpg)
+    <!-- ![Vue的模版语法](https://github.com/946629031/Vue.js/blob/master/img/3-3.jpg) -->
     - 凡是 像 ```v-text='msg'```  ```v-html='msg'``` 以 v-什么 开头的指令，后面引号内都是 跟JS表达式
 
 
@@ -764,7 +765,7 @@ Vue 各种语法 入门讲解
             })
         </script>
         ```
-    ![绑定 class](https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg)
+    <!-- ![绑定 class](https://github.com/946629031/Vue.js/blob/master/img/6.bind_class.jpg) -->
     - #### 绑定方式二 - 数组语法
         ```html
         <style> .activated{ color: red;} </style>
@@ -1044,7 +1045,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-        - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg)
+        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/7.v-for_template.jpg) -->
         - 渲染结果，每个循环项里，都被一个 div 标签包裹着
         - 但是，如果我不希望，循环项被这一个多余的标签包裹着，怎么办呢？
         ```html
@@ -1077,7 +1078,7 @@ Vue 各种语法 入门讲解
             })
         </script>
         ```
-        - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg)
+        <!-- - 渲染结果 ![循环中的 template 占位符](https://github.com/946629031/Vue.js/blob/master/img/8.v-for_template.jpg) -->
         - 把包裹的 div 改成 template 即可，其中 template 只是占位符，不会被渲染到页面上
     - 5.对象循环
         ```html
@@ -1202,7 +1203,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9.Component_problems.jpg)
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9.Component_problems.jpg) -->
 
             - 原本我们的预期：row子组件，被包含于 tbody 中
             - 但是我们得到的：row子组件，跑到 tbody 外面去了
@@ -1231,7 +1232,7 @@ Vue 各种语法 入门讲解
                 })
             </script>
             ```
-            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9-1.Component_problems.jpg)
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/9-1.Component_problems.jpg) -->
             - 同理，以下标签 里面，如果要放子组件，也是同理
                 ```html
                 <ul>
@@ -1757,7 +1758,7 @@ Vue 各种语法 入门讲解
         ```
 - ### 4-5 非父子组件间的传值
     - 存在的问题
-    - ![非父子组件间的传值](https://github.com/946629031/Vue.js/blob/master/img/4-5.jpg)
+    <!-- - ![非父子组件间的传值](https://github.com/946629031/Vue.js/blob/master/img/4-5.jpg) -->
     - 如上图所示
         - 根据我们前面学习的内容，父子组件间传值，是可以实现的
             - 父传子，通过 ```props```
@@ -2246,6 +2247,228 @@ Vue 各种语法 入门讲解
 
 ## 第5章 Vue 中的动画特效
 - ### 5-1 Vue动画 - Vue中CSS动画原理
+    - 1.本节目标
+        - 讲解CSS动画，及 CSS动画原理
+    - 2.我们先来写一段简单的基础代码
+        - 实现一个 点击按钮，显示隐藏 hello world 的效果
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="root">
+            <div v-if='show'>hello world</div>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - 3.我希望的 动画效果
+        - 当我点击显示隐藏的时候，会有一个 渐隐渐现 的动画过渡效果
+        - 1.包裹一个 ```<transition>``` 标签
+            - ```<transition>``` 的意思是，它包裹的内容里面 **会执行动画效果**
+            - ```<transition name='fade'>```  给这个动画 取名字，这里 取名字为 fade (名字可以随便取)
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="root">
+            <transition name='fade'>
+                <div v-if='show'>hello world</div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 过渡动画原理
+        - 当一个元素 被 ```<transition>``` 包裹了之后
+            - Vue会自动分析 元素的 css样式，然后构建一个 动画流程
+            - Vue动画 的原理，就是通过改变标签中的 class 来实现的
+                - 被 ```<transition>``` 包裹了之后，它会往内部的 div 上 增加/删除 Class 名字，从而来实现动画效果
+        - **进入动画**
+            <!-- - ![进入动画原理](https://github.com/946629031/Vue.js/blob/master/img/5-1-1.jpg) -->
+            - 1.Vue会自动帮你构建一个 **结束动画的动画流程**，如上图
+            - 2.在 **进入动画** 执行的过程中
+                - 在第一帧时，Vue会帮你增加
+                    - ```fade-enter``` class
+                    - ```fade-enter-to``` class
+                - 在第二帧时，Vue会帮你
+                    - 去掉 ~~```fade-enter```~~ class
+                    - 然后 增加 ```fade-enter-to``` class
+                - 在最后这一帧，Vue 会做两件事情
+                    - 去掉 ~~```fade-enter-active```~~ class
+                    - 去掉 ~~```fade-enter-to```~~ class
+            - 3.规律总结
+                - ```v-enter-active``` 贯穿始终，动画过程一直存在
+                - ```v-enter``` 和 ```v-enter-to``` 互斥，有他没我，有我没他
+                    - ```v-enter``` 只在第一帧
+                    - ```v-enter-to``` 除了第一帧，都存在
+        - **离开动画**
+            <!-- - ![离开动画原理](https://github.com/946629031/Vue.js/blob/master/img/5-1-2.jpg) -->
+            - 1.Vue会自动帮你构建一个 **结束动画的动画流程**，如上图
+            - 2.当开始执行**结束动画** 的时候
+                - 在第一帧时，Vue会帮你增加
+                    - ```fade-leave``` class
+                    - ```fade-leave-actvie``` class
+                - 在第二帧时，Vue会帮你
+                    - 增加 ```fade-leave-to``` class
+                    - 去掉 ~~```fade-leave```~~ class
+                - 在最后这一帧，Vue 会做两件事情
+                    - 去掉 ~~```fade-leave-active```~~ class
+                    - 去掉 ~~```fade-leave-to```~~ class
+            - 3.规律总结
+                - ```v-leave-active``` 贯穿始终
+                - ```v-leave``` 和 ```v-leave-to``` 互斥，有他没我，有我没他
+                    - ```v-leave``` 只在第一帧
+                    - ```v-leave-to``` 除了第一帧，都存在
+    - 4.如何理解 动画原理？
+        - 动画过程
+            - 1.在动画即将被执行的一瞬间，它会往内部的 div 上增加两个 Class 名字，分别是 ```fade-enter``` 和 ```fade-enter-active```
+            - 2.当第一帧动画执行结束，执行到第二帧的时候，Vue 会帮你做两件事情
+                - 去掉 ~~```fade-enter```~~ class
+                - 然后 增加 ```fade-enter-to``` class
+                - 然后一直执行下去
+            - 3.当执行到 结束的这一帧，Vue 会做两件事情
+                - 去掉 ~~```fade-enter-active```~~ class
+                - 去掉 ~~```fade-enter-to```~~ class
+        - 先看代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <style>
+            .fade-enter {
+              opacity: 0
+            }
+            .fade-enter-active {
+              transition: opacity 3s
+            }
+            </style>
+            <div id="root">
+                <transition name='fade'>
+                    <div v-if='show'>hello world</div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        }
+                    }
+                })
+            </script>
+            ```
+        - 在上面代码中，加入了 ```<style>``` 之后，再点击按钮 显示隐藏 div 时候，你会发现 就会有一个 透明度 的过渡动画了
+        - 这个 ```<style>``` 里面的代码是什么意思呢？
+            - 在第一帧的时候，默认设置 ```opacity: 0```
+            - 在第二帧开始
+                - 由于在第二帧的时候 ```.fade-enter``` class 被移除了
+                - ```opacity: 1``` 被默认设置成了 1
+                - 所以，```opacity``` 就发生了 从 ```opacity: 0``` 到 ```opacity: 1``` 的变化
+                - 但是这个效果不是立即执行完的，而是要在 ```transition: opacity 3s``` 中逐步完成，一直到最后一帧
+    - 5.离开动画，显示/隐藏 渐隐渐现 的完整代码
+        - 在第一帧的时候，默认设置 ```opacity: 1```
+        - 在第二帧的时候，就被设置为 ```opacity: 0```，但是这个变化过程 不是立即执行完的，而是在 3s内 逐步执行完
+        - 在离开动画的整个过程中，```.v-leave-active``` 始终监听 ```opacity``` ，如果 ```opacity``` 发生变化，那么就要求这个 变化过程为 3s
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <style>
+        .v-enter {
+          opacity: 0
+        }
+        .v-enter-active {
+          transition: opacity 3s
+        }
+        .v-leave-to {
+          opacity: 0
+        }
+        .v-leave-active {
+          transition: opacity 3s
+        }
+        </style>
+        <div id="root">
+            <transition>
+                <div v-if='show'>hello world</div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - 6.为什么 ```.fade-enter``` ```.fade-enter-active``` 都是以 fade 开头？
+        - 因为 我们前面 ```<transition name='fade'>``` 给这个 transition 取名为 fade
+        - 如果你没有取名
+            ```html
+            <transition>
+                <div v-if='show'>hello world</div>
+            </transition>
+            ```
+            - 那么 他的class 就应该为
+            ```html
+            <style>
+            .v-enter {
+              opacity: 0
+            }
+            .v-enter-active {
+              transition: opacity 3s
+            }
+            </style>
+            ```
+    - 7.触发 transition 的三种方式
+        ```html
+        <transition>
+            <div v-if='show'>hello world</div>
+        </transition>
+        ```
+        ```html
+        <transition>
+            <div v-show='show'>hello world</div>
+        </transition>
+        ```
+        ```html
+        <transition>
+            <动态组件></动态组件>
+        </transition>
+        ```
+
+
 - ### 5-2 在Vue中使用 animate.css 库
 - ### 5-3 在Vue中同时使用过渡和动画
 - ### 5-4 Vue中的 Js 动画与 Velocity.js 的结合
@@ -2547,7 +2770,7 @@ Vue 各种语法 入门讲解
             - 类似于 less 或者 Sass, 可以帮助我们在css 中，使用变量、mixin .. 这种东西
         - 安装 stylus ```npm i stylus stylus-loader```
     - 7-1-2 我们先来看一下要做的首页UI设计图
-        ![首页UI设计图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg)
+        <!-- ![首页UI设计图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
     - 7-1-3 首页 header 部分的开发
         - 下面我们来讲，怎么将首页拆分成组件
         ```
@@ -3308,7 +3531,7 @@ Vue 各种语法 入门讲解
 
 
 - ### 7-4 Vue项目首页 - 图标区域页面布局
-    - ![设计效果图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg)
+    <!-- - ![设计效果图](https://github.com/946629031/Vue.js/blob/master/img/7-1-1_index.jpg) -->
     - 明确目标
         - 看上图。接下来，我们要做的部分，是轮播图下面这个 icon 部分
     - 7-4-1 创建 开发新功能的 分支，再 pull 到本地
@@ -3333,7 +3556,7 @@ Vue 各种语法 入门讲解
             - [CSS 利用 padding-bottom 实现固定比例的容器 - ( 轮播图 网速慢 加载时 占位问题 )](#7css-利用-padding-bottom-实现固定比例的容器----轮播图-网速慢-加载时-占位问题-)
             - [本文依赖于一个基础却又容易混淆的css知识点：当margin/padding取形式为 百分比 的值时，无论是left/right，还是 top/bottom，都是以 父元素的width 为参照物的！](#本文依赖于一个基础却又容易混淆的css知识点当marginpadding取形式为-百分比-的值时无论是leftright还是-topbottom都是以-父元素的width-为参照物的)
         - 先看效果图
-            - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg)
+            <!-- - ![适配任意屏幕](https://github.com/946629031/Vue.js/blob/master/img/7-4-1_index_icons.jpg) -->
         ```html
         // src/pages/home/components/Icons.vue
         <template>
@@ -4348,7 +4571,7 @@ Vue 各种语法 入门讲解
 ## 第8章 项目实战 - 旅游网站 <城市列表页> 开发
 - 本章目标：完成 <城市选择页面> 的制作
 - 效果图如下
-- ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg)
+<!-- - ![城市选择页面 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/8-1-Vue项目城市选择页.jpg) -->
       
 
 - ### 8-1 Vue项目 <城市选择页> - 路由配置
@@ -5497,7 +5720,7 @@ Vue 各种语法 入门讲解
         - 1.存在问题
             - 当你通过 ```http://192.168.1.105:8080``` 访问项目
             - 手机端真机测试时 touchmove 右边字母表的时候，整个页面跟着移动
-            - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/8-7-3.jpg)
+            <!-- - ![存在问题](https://github.com/946629031/Vue.js/blob/master/img/8-7-3.jpg) -->
         - 2.思路
             - ```@touchstart.prevent='handleTouchStart'```
                 - 我们在 touchstart 后面加一个 **事件修饰符**
@@ -5743,7 +5966,7 @@ Vue 各种语法 入门讲解
         - [Vuex 官网](https://vuex.vuejs.org/zh/)
         - Vuex 是一个数据框架，能够实现各个页面之间的 **数据共享、数据通信**
         - Vuex 就是下图中，虚线部分的内容
-            - ![vuex示意图](https://vuex.vuejs.org/vuex.png)
+            <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
         - 大家可以把 这个虚线区域理解成一个 storage仓库
             - 这个仓库是由三部分组成的
                 - State: 存放数据
@@ -5836,7 +6059,7 @@ Vue 各种语法 入门讲解
             - 思路
                 - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
                 - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
-                - ![vuex示意图](https://vuex.vuejs.org/vuex.png)
+                <!-- - ![vuex示意图](https://vuex.vuejs.org/vuex.png) -->
             - 改变数据 示例
                 - 思路
                     - 1.在 ```<template>``` 标签中，绑定 click 事件 ```@click='handleCityClick(city.name)'```
@@ -6653,7 +6876,7 @@ Vue 各种语法 入门讲解
 ## 第9章 项目实战 - 旅游网站 <详情页> 开发
 - 本章目标：完成 <详情页> 的制作
 - 效果图如下
-- ![详情页 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/9-1 详情页.jpg)
+<!-- - ![详情页 - 效果图](https://github.com/946629031/Vue.js/blob/master/img/9-1 详情页.jpg) -->
 
 - ### 9-1 Vue项目详情页 - 动态路由和banner布局
     - 9-1-1 本节目标
@@ -7476,7 +7699,7 @@ Vue 各种语法 入门讲解
         </style>
         ```
         - 基础布局代码 渲染结果
-            - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (1).jpg)
+            <!-- - ![MV* 示意图](https://github.com/946629031/Vue.js/blob/master/img/9-5 递归组件 (1).jpg) -->
     - 9-5-4 如何使用 递归组件？
         - 1.什么是 递归组件？
             - 所谓递归，就是自己调用自己
@@ -7720,9 +7943,9 @@ Vue 各种语法 入门讲解
     - #### 9-6-6 页面跳转后不在顶部的问题
         - 存在的问题
             - 当你在 <首页> 滚动到这种高度的时候，然后点击 <望谷温泉度假村>
-            - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg)
+            <!-- - ![首页](https://github.com/946629031/Vue.js/blob/master/img/9-6-1.jpg) -->
             - 跳转后，你会发现 <详情页> 的默认高度是下图这样子的。而不是我们预期的 **默认跳转后回到顶部**
-            - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png)
+            <!-- - ![详情页](https://github.com/946629031/Vue.js/blob/master/img/9-6-2.png) -->
         - 解决问题
             - [【Vue Router 滚动行为】 官网文档](https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html)
             - 在 router 中添加一段代码即可
@@ -8096,7 +8319,7 @@ Vue 各种语法 入门讲解
                 - 而是希望他做 某一个文件夹中，例如 ```/project``` 根目录的 project 文件夹里
                 - 通过 ```http://localhost/project``` 来访问这个 网站
                 - 这个时候，就会报错
-                - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-3.jpg)
+                <!-- - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-3.jpg) -->
                 - 问题原因： 路径引用的问题
             - 解决问题
                 - 修改路径配置
@@ -8132,7 +8355,7 @@ Vue 各种语法 入门讲解
         - [Vue2.5学习笔记 10.4 上线联调 组件异步加载](https://blog.csdn.net/soulwyb/article/details/89208837)
     - 10-4-1 前言
         - 打包后 的内容：
-            - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-4.png)
+            <!-- - ![报错](https://github.com/946629031/Vue.js/blob/master/img/10-4.png) -->
         - 正常默认的情况下是 第一次打开页面的时候会把所有的文件全部下载好。这样切换到其他页面的时候就不需要再次发送请求下载数据了。
         - 这有一个问题  项目小的时候OK，但是，项目大的时候会导致第一次加载变慢。
         - 所以如果可以将组件加载改成异步加载的，程序在跳转到哪个页面的时候就会去加载相关的js 就好了。
@@ -8235,7 +8458,7 @@ Vue 各种语法 入门讲解
             - [项目结构](https://vuex.vuejs.org/zh/guide/structure.html)
             - [插件](https://vuex.vuejs.org/zh/guide/plugins.html)
         - [服务器端渲染](https://ssr.vuejs.org/zh/)
-    - [Vue官方 推荐插件 资源](https://github.com/vuejs/awesome-vue)
+    - [Github Awesome-Vue 官方 推荐插件 资源](https://github.com/vuejs/awesome-vue)
     - 上面东西都弄懂了以后，就可以尝试阅读 **Vue 源码**了
         - 理解作者如何构建这个项目
         - 考虑性能的权衡，代码的简洁度
