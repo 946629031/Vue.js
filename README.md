@@ -51,6 +51,8 @@ Vue 各种语法 入门讲解
         - [过渡动画原理](#过渡动画原理)
     - [5-2 在Vue中使用 animate.css 库](#5-2-在Vue中使用-animate.css-库)
     - [5-3 在Vue中同时使用过渡和动画](#5-3-在Vue中同时使用过渡和动画)
+        - [如何同时使用 transition 和 css3 keyframes 动画](#3.如何在Vue中同时使用过渡和动画？同时使用-transition-和-css3-keyframes-动画)
+        - [定义动画时长](#4.定义动画时长)
     - [5-4 Vue中的 Js 动画与 Velocity.js 的结合](#5-4-Vue中的-Js-动画与-Velocity.js-的结合)
     - [5-5 Vue中多个元素或组件的过渡](5-5-Vue中多个元素或组件的过渡)
     - [5-6 Vue中的列表过渡](#5-6-Vue中的列表过渡)
@@ -2470,7 +2472,299 @@ Vue 各种语法 入门讲解
 
 
 - ### 5-2 在Vue中使用 animate.css 库
+    - 本节目标：讲解如何使用 animate.css 这个库
+    - #### 1.先来看，如何在Vue中使用 keyframes 动画
+        - 在上一节课的代码中，加入 keyframes
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <style>
+            @keyframes bounce-in {
+                0% {
+                    transform: scale(0);
+                }
+                50%{
+                    transform: scale(1.5);
+                }
+                100% {
+                    transform: scale(1)
+                }
+            }
+            .fade-enter-active {
+                transform-origin: left center;
+                animation: bounce-in 1s;
+            }
+            .fade-leave-active {
+                transform-origin: left center;
+                animation: bounce-in 1s reverse;
+            }
+        </style>
+        <div id="root">
+            <transition name='fade'>
+                <div v-if='show'>hello world</div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - 2.动画中自定义class名
+        - 1.存在的问题
+            - 在下面这段代码中
+                - 因为 ```<transition name='fade'>``` 中 取名为 fade
+                - 所以就要用 ```.fade-enter-active``` ```.fade-leave-active``` 这两个class名
+            - 那么，我们到底能不能自定义这两个class名呢？
+            ```html
+            <style>
+                .fade-enter-active {
+                    transform-origin: left center;
+                    animation: bounce-in 1s;
+                }
+                .fade-leave-active {
+                    transform-origin: left center;
+                    animation: bounce-in 1s reverse;
+                }
+            </style>
+            <div id="root">
+                <transition name='fade'>
+                    <div v-if='show'>hello world</div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            ```
+        - 2.动画中自定义class名
+            - 通过下面这种方式自定义 class名，最终的效果跟 上面的代码是一样的
+            ```html
+            <style>
+                .active {
+                    transform-origin: left center;
+                    animation: bounce-in 1s;
+                }
+                .leave {
+                    transform-origin: left center;
+                    animation: bounce-in 1s reverse;
+                }
+            </style>
+            <div id="root">
+                <transition
+                  name='fade'
+                  enter-active-class='active'
+                  leave-active-class='leave'
+                >
+                    <div v-if='show'>hello world</div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+    - #### 3.在Vue中使用 animate.css 库
+        - 1.什么是 animate.css 库？
+            - [Animate.css 官网](https://daneden.github.io/animate.css/)
+            - animate.css 提供了非常多的动画效果
+            - animate.css 跟 @keyframes 实际上就是一个东西，animate.css 是 @keyframes 的一个封装结果
+        - 2.如何安装 animate.css
+            ```npm i animate.css```
+        - 3.如何使用 animate.css
+            - 注意，如果你要使用 animate.css 这个动画库，需要注意以下几点
+                - 1.必须使用 ```enter-active-class  leave-active-class``` 这种自定义 class 名
+                - 2.class 上一定要 写上 animated
+                - 3.然后在写上 对应 动画名的 class
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+            <link rel="stylesheet" href="./animate.min.css">
+            
+            <div id="root">
+                <transition
+                    name='fade'
+                    enter-active-class='animated swing'
+                    leave-active-class='animated shake'
+                >
+                    <div v-if='show'>
+                        hellow
+                    </div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        }
+                    }
+                })
+            </script>
+            ```
+
 - ### 5-3 在Vue中同时使用过渡和动画
+    - 1.存在的问题
+        - 打开 [上一节中的代码](#3.在Vue中使用-animate.css-库)
+        - 在浏览器中运行后，你会发现
+        - **第一次打开页面时候 动画并没有执行**
+    - 2.第一次打开页面时候 动画并不执行的问题
+        - 思路
+            - 1.添加 appear 
+                - 意思是 第一次出现的时候 也要执行动画
+            - 2.```appear-active-class='animated swing'```
+                - 要执行什么动画呢？ ```appear-active-class``` 决定的
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        <link rel="stylesheet" href="./animate.min.css">
+
+        <div id="root">
+            <transition
+                name='fade'
+                appear
+                enter-active-class='animated swing'
+                leave-active-class='animated shake'
+                appear-active-class='animated swing'
+            >
+                <div v-if='show'>
+                    hellow
+                </div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 3.如何在Vue中同时使用过渡和动画？同时使用 transition 和 css3 keyframes 动画
+        - 思路
+            - 将 过渡和动画 结合起来
+                ```
+                enter-active-class='animated swing fade-enter-active'
+                leave-active-class='animated shake fade-leave-active'
+                ```
+            - 2.然后定义 css3 动画
+                ```html
+                <style>
+                    .fade-enter, .fade-leave-to{
+                        opacity: 0;
+                    }
+                    .fade-enter-active, .fade-leave-active{
+                        transition: opacity 3s;
+                    }
+                </style>
+                ```
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        <link rel="stylesheet" href="./animate.min.css">
+
+        <style>
+            .fade-enter, .fade-leave-to{
+                opacity: 0;
+            }
+            .fade-enter-active, .fade-leave-active{
+                transition: opacity 3s;
+            }
+        </style>
+        <div id="root">
+            <transition
+                name='fade'
+                appear
+                enter-active-class='animated swing fade-enter-active'
+                leave-active-class='animated shake fade-leave-active'
+                appear-active-class='animated swing'
+            >
+                <div v-if='show'>
+                    hellow
+                </div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 4.定义动画时长
+        - 上面代码存在的问题：这个动画时长 到底是多少 秒呢？
+            - ```transition: opacity 3s``` transition 被定义为 3s
+            - 而 swing 动画 在 animate.css 中被定义为 1s
+            - 那么，它的结果 动画执行到底是多少秒？
+        - 由于 Vue 也搞不清楚，所以要 **手动定义动画时长**
+        - 1.第一种方法，```type='transiton'```
+            - 意思是 以 transiton 的时间为准
+            ```html
+            <transition
+                type='transiton'
+                name='fade'
+                appear
+                enter-active-class='animated swing fade-enter-active'
+                leave-active-class='animated shake fade-leave-active'
+                appear-active-class='animated swing'
+            >
+                <div v-if='show'>
+                    hellow
+                </div>
+            </transition>
+            ```
+        - 2.第二种方法，自定义动画时长，```:duration='10000'```
+            - 其中 10000 指的是 10000 毫秒
+            ```html
+            <transition
+                :duration='10000'
+                name='fade'
+                appear
+                enter-active-class='animated swing fade-enter-active'
+                leave-active-class='animated shake fade-leave-active'
+                appear-active-class='animated swing'
+            >
+                <div v-if='show'>
+                    hellow
+                </div>
+            </transition>
+            ```
+        - 3.第三种方法，```:duration='{enter: 5000, leave: 10000}'```
+            ```html
+            <transition
+                :duration='{enter: 5000, leave: 10000}
+                name='fade'
+                appear
+                enter-active-class='animated swing fade-enter-active'
+                leave-active-class='animated shake fade-leave-active'
+                appear-active-class='animated swing'
+            >
+                <div v-if='show'>
+                    hellow
+                </div>
+            </transition>
+            ```
+
+
 - ### 5-4 Vue中的 Js 动画与 Velocity.js 的结合
 - ### 5-5 Vue中多个元素或组件的过渡
 - ### 5-6 Vue中的列表过渡
