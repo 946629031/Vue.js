@@ -54,6 +54,7 @@ Vue 各种语法 入门讲解
         - [如何同时使用 transition 和 css3 keyframes 动画](#3.如何在Vue中同时使用过渡和动画？同时使用-transition-和-css3-keyframes-动画)
         - [定义动画时长](#4.定义动画时长)
     - [5-4 Vue中的 Js 动画与 Velocity.js 的结合](#5-4-Vue中的-Js-动画与-Velocity.js-的结合)
+        - [Transiton 动画js钩子](#3.Transiton-动画js钩子)
     - [5-5 Vue中多个元素或组件的过渡](5-5-Vue中多个元素或组件的过渡)
     - [5-6 Vue中的列表过渡](#5-6-Vue中的列表过渡)
     - [5-7 Vue中的动画封装](5-7-Vue中的动画封装)
@@ -2766,6 +2767,196 @@ Vue 各种语法 入门讲解
 
 
 - ### 5-4 Vue中的 Js 动画与 Velocity.js 的结合
+    - 1.本节目标：
+        - 讲解 JS动画
+        - [什么是 Velocity.js ？](#4.Velocity.js)
+    - 2.先来看一段代码
+        - 我们点击下面 按钮 的时候，可以实现显示/隐藏
+        - 存在的问题
+            - 过去，我们都是通过 css 来实现动画效果
+            - 那么有没有办法通过 js 来实现动画效果呢？
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="root">
+            <transition name='fade'>
+                <div v-show='show'> hello world </div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 3.Transiton 动画js钩子
+        - [《Vue Transition JavaScript 钩子》 官方文档](https://cn.vuejs.org/v2/guide/transitions.html?#JavaScript-%E9%92%A9%E5%AD%90)
+        - 在 ```<transition>``` 中
+            - 除了可以写 ```name='fade'```
+            - 还可以 绑定 动画js钩子，如 ```@before-enter='handleBeforeEnter'```
+        - ##### 动画执行流程
+            - 1.```@before-enter='handleBeforeEnter'```
+            - 2.```@enter='handleEnter'```
+                - ```done()``` 这个回调函数 **非常重要**，当动画执行结束之后  一定要手动调用一下 ```done()``` 这个回调函数，相当于告诉Vue 我的动画已经执行完了
+            - 3.当 ```done()``` 被调用之后，就又会触发下一个事件
+                - ```@after-enter='handleAfterEnter'```
+        - ##### 进入动画js钩子
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+            
+            <div id="root">
+                <transition
+                    name='fade'
+                    @before-enter='handleBeforeEnter'
+                    @enter='handleEnter'
+                    @after-enter='handleAfterEnter'
+                >
+                    <div v-show='show'> hello world </div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        },
+                        handleBeforeEnter: function(el){
+                          console.log('BeforeEnter')
+                          el.style.color = 'red'
+                        },
+                        handleEnter: function(el, done){
+                            console.log('Enter')
+                            setTimeout(() => {
+                                el.style.color='green'
+                            }, 2000)
+
+                            setTimeout(() => {
+                                done()  // done() 这个回调函数非常重要，当动画执行结束之后  一定要手动调用一下 done() 这个回调函数，相当于告诉Vue 我的动画已经执行完了
+                            }, 4000)
+                        },
+                        handleAfterEnter: function(el){
+                            console.log('AfterEnter')
+                            el.style.color='#000'
+                        }
+                    }
+                })
+            </script>
+            ```
+        - ##### 离开动画js钩子
+            - 与进入动画完全一样，只是名称变了而已
+            ```html
+            <transition
+                name='fade'
+                @before-leave='handleBeforeLeave'
+                @leave='handleLeave'
+                @after-leave='handleAfterLeave'
+            >
+                <div v-show='show'> hello world </div>
+            </transition>
+            ```
+    - #### 4.Velocity.js
+        - [Velocity.js 官网](http://velocityjs.org/)
+        - [Complete 配置项](http://velocityjs.org/#beginAndComplete)
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        <!-- <link rel="stylesheet" href="./animate.min.css"> -->
+        <script src="./velocity.min.js"></script>
+        
+        <div id="root">
+            <transition
+                name='fade'
+                @before-enter='handleBeforeEnter'
+                @enter='handleEnter'
+                @after-enter='handleAfterEnter'
+
+                @before-leave='handleBeforeLeave'
+                @leave='handleLeave'
+                @after-leave='handleAfterLeave'
+            >
+                <div v-show='show'> hello world </div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    },
+                    handleBeforeEnter: function(el){
+                        console.log('BeforeEnter')
+                      el.style.opacity = 0
+                    },
+                    handleEnter: function(el, done){
+                        Velocity(el, {opacity: 1}, {duration: 1000, complete: ()=>{ console.log('Enter'); done }})
+                        // 通过 complete 执行回调函数 done()
+                    },
+                    handleAfterEnter: function(el){
+                        console.log('动画执行结束')
+                    },
+
+
+                    handleBeforeLeave: function(el){
+                    },
+                    handleLeave: function(el, done){
+                        // el.style.opacity=0
+                        // done()
+                        Velocity(el, {opacity: 0}, {duration: 1000, complete: ()=>{ console.log('Enter'); done() }})
+                    },
+                    handleAfterLeave: function(el){
+                    },
+                }
+            })
+        </script>
+        ```
+        - 这里发现一个BUG
+            - 如果是像下面这样的代码，当你多次点击显示隐藏的时候，就显示不了了
+            - 但是 你改成上面的代码，都是通过 ```Velocity(el, {opacity: 0})``` 去控制，就不会出现这种问题
+            ```js
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    },
+                    handleBeforeEnter: function(el){
+                        console.log('BeforeEnter')
+                      el.style.opacity = 0
+                    },
+                    handleEnter: function(el, done){
+                        Velocity(el, {opacity: 1}, {duration: 1000, complete: ()=>{ console.log('Enter'); done }})
+                        // 通过 complete 执行回调函数 done()
+                    },
+                    handleAfterEnter: function(el){
+                        console.log('动画执行结束')
+                    }
+                }
+            })
+            ```
+
+
+
 - ### 5-5 Vue中多个元素或组件的过渡
 - ### 5-6 Vue中的列表过渡
 - ### 5-7 Vue中的动画封装
