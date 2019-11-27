@@ -55,7 +55,9 @@ Vue 各种语法 入门讲解
         - [定义动画时长](#4.定义动画时长)
     - [5-4 Vue中的 Js 动画与 Velocity.js 的结合](#5-4-Vue中的-Js-动画与-Velocity.js-的结合)
         - [Transiton 动画js钩子](#3.Transiton-动画js钩子)
+        - [Velocity.js 如何使用？](#4.Velocity.js)
     - [5-5 Vue中多个元素或组件的过渡](5-5-Vue中多个元素或组件的过渡)
+        - [Transition 过渡模式](#3.Transition-过渡模式)
     - [5-6 Vue中的列表过渡](#5-6-Vue中的列表过渡)
     - [5-7 Vue中的动画封装](5-7-Vue中的动画封装)
     - [5-8 本章小节](5-8-本章小节)
@@ -2247,6 +2249,7 @@ Vue 各种语法 入门讲解
             - 优点：会缓存起来，提高性能
         - 尽量少用
         - 缺点：使用 v-once 但也会出现一些问题，具体查看 [官方文档](https://cn.vuejs.org/v2/guide/components-edge-cases.html#%E9%80%9A%E8%BF%87-v-once-%E5%88%9B%E5%BB%BA%E4%BD%8E%E5%BC%80%E9%94%80%E7%9A%84%E9%9D%99%E6%80%81%E7%BB%84%E4%BB%B6)
+            - 再说一次，试着不要过度使用这个模式。当你需要渲染大量静态内容时，极少数的情况下它会给你带来便利，除非你非常留意渲染变慢了，不然它完全是没有必要的——再加上它在后期会带来很多困惑。例如，设想另一个开发者并不熟悉 v-once 或漏看了它在模板中，他们可能会花很多个小时去找出模板为什么无法正确更新。
 
 ## 第5章 Vue 中的动画特效
 - ### 5-1 Vue动画 - Vue中CSS动画原理
@@ -2871,6 +2874,8 @@ Vue 各种语法 入门讲解
     - #### 4.Velocity.js
         - [Velocity.js 官网](http://velocityjs.org/)
         - [Complete 配置项](http://velocityjs.org/#beginAndComplete)
+        - 什么是 Velocity.js ？
+            - Velocity.js 是一个 JS动画库
         ```html
         <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
         <!-- <link rel="stylesheet" href="./animate.min.css"> -->
@@ -2955,9 +2960,238 @@ Vue 各种语法 入门讲解
             })
             ```
 
-
-
 - ### 5-5 Vue中多个元素或组件的过渡
+    - 1.先来看一段 基础代码
+        - 我们点击下面 按钮 的时候，可以实现显示/隐藏
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <div id="root">
+            <transition name='fade'>
+                <div v-if='show'> hello world </div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 2.多个元素的过渡
+        - [《多个元素的过渡》 Vue 官方文档](https://cn.vuejs.org/v2/guide/transitions.html#%E5%A4%9A%E4%B8%AA%E5%85%83%E7%B4%A0%E7%9A%84%E8%BF%87%E6%B8%A1)
+        - 我们点击下面 按钮 的时候，可以实现  **两个 div标签 之间的互相切换**
+        - 存在问题
+            - 在这个切换的过程中，我希望能加入一个 渐隐渐现 的过渡效果
+            - 那么 该如何实现这个 过渡效果呢？
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+            
+            <div id="root">
+                <transition>
+                    <div v-if='show'> hello world </div>
+                    <div v-else> Bye world </div>
+                </transition>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        }
+                    }
+                })
+            </script>
+            ```
+        - 解决问题
+            - 1.按照我们过去学到的知识
+                - 应该直接加上 ```.v-enter, .v-leave-to, .v-enter-active, .v-leave-active``` 的class style 就可以了
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+                <style>
+                .v-enter, .v-leave-to{
+                  opacity: 0
+                }
+                .v-enter-active, .v-leave-active{
+                  transition: opacity 1s
+                }
+                </style>
+                
+                <div id="root">
+                    <transition>
+                        <div v-if='show'> hello world </div>
+                        <div v-else> Bye world </div>
+                    </transition>
+                    <button @click='handleClick'>按钮</button>
+                </div>
+                <script>
+                    var app = new Vue({
+                        el: '#root',
+                        data: {
+                            show: true
+                        },
+                        methods: {
+                            handleClick: function(){
+                                this.show = !this.show
+                            }
+                        }
+                    })
+                </script>
+                ```
+            - 2.但是，当你加上后，你会发现，切换时候 仍然没效果
+                - 为什么呢？
+                    - 原因是，Vue 会尽量的去复用 DOM
+                    - 在这两个 div标签 切换的时候，Vue会尽量的去复用他们
+                    - 所以导致了 没有动画效果
+                - 解决办法
+                    - 为了让 Vue 不去互相复用，就可以使用 **key值**
+                    - 这样 就可以实现了 多个元素 直接的过渡动画效果
+                ```html
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+                <style>
+                .v-enter, .v-leave-to{
+                  opacity: 0
+                }
+                .v-enter-active, .v-leave-active{
+                  transition: opacity 1s
+                }
+                </style>
+                
+                <div id="root">
+                    <transition>
+                        <div v-if='show' key='hello'> hello world </div>     <!-- 加入 key值 取消复用-->
+                        <div v-else key='bye'> Bye world </div>     <!-- 加入 key值 取消复用-->
+                    </transition>
+                    <button @click='handleClick'>按钮</button>
+                </div>
+                <script>
+                    var app = new Vue({
+                        el: '#root',
+                        data: {
+                            show: true
+                        },
+                        methods: {
+                            handleClick: function(){
+                                this.show = !this.show
+                            }
+                        }
+                    })
+                </script>
+                ```
+            - ##### 3.Transition 过渡模式
+                - [《过渡模式》 Vue官方文档](https://cn.vuejs.org/v2/guide/transitions.html#%E8%BF%87%E6%B8%A1%E6%A8%A1%E5%BC%8F)
+                - 其实，官方还定义了 动画的过渡模式
+                    - in-out：新元素先进行过渡，完成之后当前元素过渡离开。
+                    - out-in：当前元素先进行过渡，完成之后新元素过渡进入。
+                - Transition 过渡模式 用法
+                    ```html
+                    <transition mode='out-in'>
+                        <div v-if='show' key='hello'> hello world </div>
+                        <div v-else key='bye'> Bye world </div>
+                    </transition>
+                    ```
+    - #### 3.多个组件的过渡
+        - 下面的代码，展示了 如何实现 **多个组件的 Transition动画过渡**
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <style>
+        .v-enter, .v-leave-to{
+            opacity: 0
+        }
+        .v-enter-active, .v-leave-active{
+            transition: opacity 1s
+        }
+        </style>
+
+        <div id="root">
+            <transition mode='out-in'>
+                <child v-if='show'></child>
+                <child-one v-else></child-one>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            Vue.component('child', {
+                template: '<div>child</div>'
+            })
+
+            Vue.component('child-one', {
+                template: '<div>child-one</div>'
+            })
+            
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 4.用动态组件的过渡
+        - 动态组件的 切换 如何实现过渡动画？  看代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+        
+        <style>
+        .v-enter, .v-leave-to{
+            opacity: 0
+        }
+        .v-enter-active, .v-leave-active{
+            transition: opacity 1s
+        }
+        </style>
+
+        <div id="root">
+            <transition mode='out-in'>
+                <component :is='type'></component>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            Vue.component('child', {
+                template: '<div>child</div>'
+            })
+
+            Vue.component('child-one', {
+                template: '<div>child-one</div>'
+            })
+            
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    type: 'child'
+                },
+                methods: {
+                    handleClick: function(){
+                        this.type = this.type === 'child' ? 'child-one' : 'child'
+                    }
+                }
+            })
+        </script>
+        ```
+
+
+
+
 - ### 5-6 Vue中的列表过渡
 - ### 5-7 Vue中的动画封装
 - ### 5-8 本章小节
