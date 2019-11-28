@@ -58,7 +58,11 @@ Vue 各种语法 入门讲解
         - [Velocity.js 如何使用？](#4.Velocity.js)
     - [5-5 Vue中多个元素或组件的过渡](5-5-Vue中多个元素或组件的过渡)
         - [Transition 过渡模式](#3.Transition-过渡模式)
+        - [多个元素的过渡](#2.多个元素的过渡)
+        - [多个组件的过渡](#3.多个组件的过渡)
+        - [用动态组件的过渡](#4.用动态组件的过渡)
     - [5-6 Vue中的列表过渡](#5-6-Vue中的列表过渡)
+        - [列表过渡原理](#列表过渡原理)
     - [5-7 Vue中的动画封装](5-7-Vue中的动画封装)
     - [5-8 本章小节](5-8-本章小节)
 - [第6章 Vue 项目预热](#第6章-Vue-项目预热)
@@ -3189,12 +3193,257 @@ Vue 各种语法 入门讲解
         </script>
         ```
 
-
-
-
 - ### 5-6 Vue中的列表过渡
+    - 需求：现在有一个列表项，每次点击，需要增加一个数组中的内容，并循环显示到列表中
+    - 先看能实现功能的基础代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <div id="root">
+            <div v-for='item of list' :key='item.id'>{{item.text}}</div>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            let count = 0
+            
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    list: [],
+                    count: 0
+                },
+                methods: {
+                    handleClick: function(){
+                        this.list.push({
+                            id: count++,
+                            text: 'hello world'
+                        })
+                    }
+                }
+            })
+        </script>
+        ```
+    - 存在的问题
+        - 以前，我们只能对 单个元素的隐藏和显示，或者 多个元素之间 来回的切换 做动画效果
+        - 现在，我们需要对一个列表，当列表 增加/删除 内容的时候，做动画效果 (列表过渡)
+        - 那么 我们该如何实现呢？
+    - 解决方法
+        - 思路
+            - 1.使用 ```<transition-group></transition-group>``` 包裹列表
+            - 2.定义 transiton class
+                - ```.v-enter, .v-leave-to, .v-enter-active, .v-leave-active```
+        - 完整代码
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <style>
+                .v-enter, .v-leave-to{
+                    opacity: 0;
+                }
+                .v-enter-active, .v-leave-active{
+                    transition: opacity 3s;
+                }
+            </style>
+
+            <div id="root">
+                <transition-group>
+                    <div v-for='item of list' :key='item.id'>{{item.text}}</div>
+                </transition-group>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                let count = 0
+                
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        list: [],
+                        count: 0
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.list.push({
+                                id: count++,
+                                text: 'hello world'
+                            })
+                        }
+                    }
+                })
+            </script>
+            ```
+    - #### 列表过渡原理
+        ```html
+        <transition-group>
+            <div v-for='item of list' :key='item.id'>{{item.text}}</div>
+        </transition-group>
+        ```
+        - 实际上相当于
+            - 对列表每一项 的外面 都包裹一层 ```<transition></transition>```
+            - 每一个单个元素的过渡，Vue 会在对应的时间，对元素 进行增加/删除 class，来实现动画效果
+        ```html
+        <transition>
+            <div>{{item.text}}</div>
+        </transition>
+        
+        <transition>
+            <div>{{item.text}}</div>
+        </transition>
+        
+        <transition>
+            <div>{{item.text}}</div>
+        </transition>
+        
+        <transition>
+            <div>{{item.text}}</div>
+        </transition>
+        ```
+
 - ### 5-7 Vue中的动画封装
+    - 本节目标：讲解如何进行 Vue中的动画封装，让我们的动画变得 **可复用**
+    - 先来看一段基础代码
+        ```html
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+        <style>
+            .v-enter, .v-leave-to{
+                opacity: 0;
+            }
+            .v-enter-active, .v-leave-active{
+                transition: opacity 1s;
+            }
+        </style>
+
+        <div id="root">
+            <transition>
+                <div v-if='show'>hello world</div>
+            </transition>
+            <button @click='handleClick'>按钮</button>
+        </div>
+        <script>
+            
+            var app = new Vue({
+                el: '#root',
+                data: {
+                    show: true
+                },
+                methods: {
+                    handleClick: function(){
+                        this.show = !this.show
+                    }
+                }
+            })
+        </script>
+        ```
+    - #### 如何封装动画效果
+        - 现在，我希望对上面代码 的动画效果 **进行封装，实现可复用性**
+        - 那么该如何封装呢？
+        - ##### 1.封装思路
+            - 通过 Vue 组件进行封装
+            - 然后 通过 ```<slot></slot>``` 插槽，来传递外部 DOM 元素
+        - 2.初步封装
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <style>
+                .v-enter, .v-leave-to{
+                    opacity: 0;
+                }
+                .v-enter-active, .v-leave-active{
+                    transition: opacity 1s;
+                }
+            </style>
+
+            <div id="root">
+
+                <fade :show='show'>   <!-- 组件调用 -->
+                    <div>hello world xx</div>
+                </fade>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                Vue.component('fade', {
+                    props: ['show'],
+                    template: `
+                        <transition>
+                            <slot v-if='show'></slot>
+                        </transition>
+                    `
+                })
+                
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        }
+                    }
+                })
+            </script>
+            ```
+        - 3.将样式也封装进去
+            - 由于上面的 方法，只是把 ```<transition></transition>``` 的内容封装进去了而已。但是 css样式依然在外面
+            - 那么我们该如何才能把 css样式也封装进去呢？
+                - 我们不用 css动画
+                - 转而使用 js动画
+                - 所以，外面的 ```<style></style>``` 就不要了
+            ```html
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
+
+            <div id="root">
+
+                <fade :show='show'>   <!-- 组件调用 -->
+                    <div>hello world xx</div>
+                </fade>
+                <button @click='handleClick'>按钮</button>
+            </div>
+            <script>
+                Vue.component('fade', {
+                    props: ['show'],
+                    template: `
+                        <transition
+                            @before-enter='handleBeforeEnter'
+                            @enter='handleEnter'
+                        >
+                            <slot v-if='show'></slot>
+                        </transition>
+                    `,
+                    methods: {
+                        handleBeforeEnter: function(el){    // 使用 js动画
+                            el.style.color = 'red'
+                        },
+                        handleEnter: function(el, done){    // 使用 js动画
+                            setTimeout(() => {
+                                el.style.color = 'green'
+                                done()
+                            }, 2000)
+                        },
+                    }
+                })
+                
+                var app = new Vue({
+                    el: '#root',
+                    data: {
+                        show: true
+                    },
+                    methods: {
+                        handleClick: function(){
+                            this.show = !this.show
+                        }
+                    }
+                })
+            </script>
+            ```
+
 - ### 5-8 本章小节
+    - 更多更复杂的 过渡效果 扩展知识
+        - [《进入/离开 & 列表过渡》  Vue文档](https://cn.vuejs.org/v2/guide/transitions.html)
+        - [动态过渡](https://cn.vuejs.org/v2/guide/transitions.html#%E5%8A%A8%E6%80%81%E8%BF%87%E6%B8%A1)
+        - [状态过渡](https://cn.vuejs.org/v2/guide/transitioning-state.html)
+
+
 
 ## 第6章 Vue 项目预热
 - ### 6-1 Vue项目预热 - 环境配置
