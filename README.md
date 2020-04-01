@@ -3,6 +3,14 @@ Vue 各种语法 入门讲解
 
 从零开始掌握大型互联网公司NodeJS实际使用
 
+----
+## 补充
+- ### 适配移动端方案：手淘的 lib-flexible px2rem-loader
+    - [基于vue-cli配置移动端自适应](http://hjingren.cn/2017/06/16/%E5%9F%BA%E4%BA%8Evue-cli%E9%85%8D%E7%BD%AE%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%87%AA%E9%80%82%E5%BA%94/)
+    - [解决vue移动端适配问题](https://juejin.im/post/5c0fd830f265da61506450a3)
+    - [vue移动端h5适配解决方案（rem or vw）](https://juejin.im/post/5d54c80bf265da03ae786e9b)
+----
+
 [【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
 
 本笔记对应项目的[源码 《去哪儿app》](https://github.com/946629031/Travel)
