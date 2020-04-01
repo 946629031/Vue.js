@@ -5,10 +5,27 @@ Vue 各种语法 入门讲解
 
 ----
 ## 补充
-- ### 适配移动端方案：手淘的 lib-flexible px2rem-loader
+- ### 移动端适配方案：手淘的 lib-flexible px2rem-loader
     - [基于vue-cli配置移动端自适应](http://hjingren.cn/2017/06/16/%E5%9F%BA%E4%BA%8Evue-cli%E9%85%8D%E7%BD%AE%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%87%AA%E9%80%82%E5%BA%94/)
-    - [解决vue移动端适配问题](https://juejin.im/post/5c0fd830f265da61506450a3)
-    - [vue移动端h5适配解决方案（rem or vw）](https://juejin.im/post/5d54c80bf265da03ae786e9b)
+    - [解决vue移动端适配问题 - 【掘金】](https://juejin.im/post/5c0fd830f265da61506450a3)
+    - [vue移动端h5适配解决方案（rem or vw） - 【掘金】](https://juejin.im/post/5d54c80bf265da03ae786e9b)
+- [stylus @media 媒体查询适配方案 - 【stackoverrun】](https://stackoverrun.com/cn/q/3512850)
+    - This is what worked for me.
+        ```
+        medium = 'screen and (min-width: 768px)'
+        large = 'screen and (min-width: 992px)'
+        xlarge = 'screen and (min-width: 1200px)'
+
+        .box
+            background: #000
+            @media medium
+                background: #111
+            @media large
+                background: #222
+            @media xlarge
+                background: #333
+        ```
+    
 ----
 
 [【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
@@ -20,6 +37,8 @@ Vue 各种语法 入门讲解
 看视频整理要点笔记：
 
 ----
+
+# 正文开始
 
 **目录**
 - [第2章 Vue 起步](#第1章-导学)
