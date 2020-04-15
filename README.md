@@ -3,6 +3,14 @@ Vue 各种语法 入门讲解
 
 从零开始掌握大型互联网公司NodeJS实际使用
 
+[【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
+
+本笔记对应项目的[源码 《去哪儿app》](https://github.com/946629031/Travel)
+
+课程出品时间：2017.x ~ 2018.4
+
+看视频整理要点笔记：
+
 ----
 ## 补充
 - ### 移动端适配方案：手淘的 lib-flexible px2rem-loader
@@ -26,16 +34,6 @@ Vue 各种语法 入门讲解
                 background: #333
         ```
     
-----
-
-[【视频地址】Vue2.5开发去哪儿网App 从零基础入门到实战项目](https://coding.imooc.com/class/203.html)
-
-本笔记对应项目的[源码 《去哪儿app》](https://github.com/946629031/Travel)
-
-课程出品时间：2017.x ~ 2018.4
-
-看视频整理要点笔记：
-
 ----
 
 # 正文开始
@@ -3540,7 +3538,16 @@ Vue 各种语法 入门讲解
                 ],
             }
             ```
-
+    - 5.eslint忽略错误
+        - 1.忽略JS中某一行错误提示
+            在行末添加一下注释，其中 "错误类型" 为eslint提示的报错类型
+            ```
+            // eslint-disable-line [错误类型]
+            ```
+        - 2.忽略整个文件
+            ```
+            /* eslint-disable [错误类型] */
+            ```
 
 - ### 6-2 Vue项目预热 - 项目代码介绍
     - [参考链接](http://vuejs-templates.github.io/webpack/structure.html)
