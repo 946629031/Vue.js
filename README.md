@@ -3541,12 +3541,31 @@ Vue 各种语法 入门讲解
     - 5.eslint忽略错误
         - 1.忽略JS中某一行错误提示
             在行末添加一下注释，其中 "错误类型" 为eslint提示的报错类型
-            ```
+            ```js
             // eslint-disable-line [错误类型]
             ```
-        - 2.忽略整个文件
+            - 如：
+            ```js
+            // /src/main.js
+            
+            import flexible from 'amfe-flexible' // eslint-disable-line
             ```
+        - 2.忽略整个文件
+            ```js
             /* eslint-disable [错误类型] */
+            ```
+            - 如：
+            ```js
+            // /src/main.js
+
+            /* eslint-disable no-new */
+            new Vue({
+                el: '#app',
+                router,
+                store,
+                components: { App },
+                template: '<App/>'
+            })
             ```
 
 - ### 6-2 Vue项目预热 - 项目代码介绍
