@@ -9492,3 +9492,36 @@ Vue 各种语法 入门讲解
         - ...
   
 - ### 课程至此完结，谢谢大家~
+
+- ### 问题：解决vue打包后vendor.js文件过大问题
+    - 参考文章
+        - [【it work】配置webpack中externals来减少打包后vendor.js的体积](https://blog.csdn.net/qq_20097569/article/details/82492893)
+        - [解决vue打包后vendor.js文件过大问题](https://www.jb51.net/article/164542.htm)
+        - [解决vue-cli npm run build之后vendor.js文件过大的问题](https://blog.csdn.net/qq_35844177/article/details/78599064)
+        - [【webpack官方】外部扩展(externals)](https://webpack.docschina.org/configuration/externals/)
+        - [为什么打包后文件过大？](https://blog.csdn.net/qq_19666289/article/details/95330025)
+        - []()
+    
+        - [参数说明](https://blog.csdn.net/zzzyyc/article/details/89084705)
+            ```
+            externals: {
+                "v-charts": "VeIndex",
+            }
+            ```
+            - externals 配置中，左边 “v-charts” 表示 引入的模块名称，右边的 VeIndex 表示cdn中 v-charts 的全局实例变量（即可以被引入的变量名称，可以查看cdn源码发现）。
+    - 再次遇到问题：
+        - 1.用了上面这种方法后，发现
+            - 不知道 你引入的 cdn js 所暴露的全局变量名是什么。导致你不知道在externals的左右两边应该怎么写
+                ```
+                externals: {
+                    'Vue': 'vue',
+                    'vue-router': 'VueRouter',
+                    'vuex': 'Vuex',
+                    'ElementUI': 'element',
+                    'ElementUI': 'Element',
+                    'axios': 'axios'
+                },
+                ```
+            - 导致 错误：`ElementUI is not defined`
+        - 2.可能的解决方案[How to insert external .js from CDN into webpack externals? 【stackoverflow】](https://stackoverflow.com/questions/48742334/vue-js-2-webpack-3-how-to-insert-external-js-from-cdn-into-webpack-externals)
+            - using the [html-webpack-externals-plugin](https://www.npmjs.com/package/html-webpack-externals-plugin)
