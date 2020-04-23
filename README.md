@@ -9496,6 +9496,8 @@ Vue 各种语法 入门讲解
 - ### 问题：解决vue打包后vendor.js文件过大问题
     - 参考文章
         - [【it work】配置webpack中externals来减少打包后vendor.js的体积](https://blog.csdn.net/qq_20097569/article/details/82492893)
+        - [【it work】vue 打包过大处理](https://blog.csdn.net/qq_39339339/article/details/82772780)
+            - [vue 打包过大处理 解决方法一](#vue-打包过大处理-解决方法一)
         - [解决vue打包后vendor.js文件过大问题](https://www.jb51.net/article/164542.htm)
         - [解决vue-cli npm run build之后vendor.js文件过大的问题](https://blog.csdn.net/qq_35844177/article/details/78599064)
         - [【webpack官方】外部扩展(externals)](https://webpack.docschina.org/configuration/externals/)
@@ -9525,3 +9527,73 @@ Vue 各种语法 入门讲解
             - 导致 错误：`ElementUI is not defined`
         - 2.可能的解决方案[How to insert external .js from CDN into webpack externals? 【stackoverflow】](https://stackoverflow.com/questions/48742334/vue-js-2-webpack-3-how-to-insert-external-js-from-cdn-into-webpack-externals)
             - using the [html-webpack-externals-plugin](https://www.npmjs.com/package/html-webpack-externals-plugin)
+        - 3.总结：
+            - html-webpack-externals-plugin 解决方案, 是 externals 解决方案的升级版。( externals 只是临时解决方案 )
+            - html-webpack-externals-plugin 能够解决问题，但是也存在它自己的问题：
+                - 在 Vue 项目中，如果启用了 eslint , 那么他就会一直报警告，如：
+                ```
+                WARNING  Compiled with 4 warnings  
+
+                ✘  http://eslint.org/docs/rules/no-undef  'Vue' is not defined
+                src/store/index.js:4:1
+                Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+                ^
+
+                ✘  http://eslint.org/docs/rules/no-undef  'Vuex' is not defined
+                src/store/index.js:4:9
+                Vue.use(Vuex) // 通过 Vue.use() 来使用插件
+                        ^
+
+                ✘  http://eslint.org/docs/rules/no-undef  'Vuex' is not defined
+                src/store/index.js:6:20
+                export default new Vuex.Store({
+                                    ^
+                ```
+        - 所以，还是用 webpack 的分别打包比较好，每个模块单独打包成一个js文件，而不是所有用到的 js 都打包到一个 vender.js 里。这样会导致，首次打开页面时，非常慢
+    - ##### vue 打包过大处理 解决方法一
+        - 下面总结一下自己的打包优化心得：
+        - 方法一: 路由懒加载
+            - 1.像Vue 、element-ui 、vue-router 、vuex 、babel-polyfill 这些都不用打包，打包后很大的，可以引用cdn
+                ```
+                <!-- 引入样式 -->
+                <link href="https://cdn.bootcss.com/element-ui/2.0.7/theme-chalk/index.css" rel="stylesheet">
+                <!-- 引入组件库 -->
+                <script src="//cdn.bootcss.com/babel-polyfill/7.0.0-alpha.15/polyfill.min.js"></script>
+                <script src="https://cdn.bootcss.com/vue/2.5.17-beta.0/vue.min.js"></script>
+                <script src="https://cdn.bootcss.com/vue-router/3.0.1/vue-router.min.js"></script>
+                <script src="https://cdn.bootcss.com/element-ui/2.0.7/index.js"></script>
+                <script src="https://cdn.bootcss.com/vuex/2.3.1/vuex.min.js"></script>
+                ```
+            - 2.在webpack.base.config.js中加入：
+                ```js
+                entry: {
+                    app: './src/main.js'
+                },
+                //新加的
+                externals: {
+                    'element-ui': 'ELEMENT',
+                    'vue': 'Vue',
+                    'vue-router': 'VueRouter',
+                    'vuex': 'Vuex',
+                    'babel-polyfill': 'window'
+                },
+                ```
+                - 在main.js中有的人说把
+                ```
+                import Vue from 'vue'
+
+                import ElementUI from 'element-ui'
+                ```
+                - 这些去掉，我没去,项目能正常运行，加东西比改东西我觉得安全多了，去不去的根据控制台提示信息做决定，如果控制台说某个东西只能用一次，说明多用了一次，那就去掉，反之，随便哈哈！
+                - 用vue-cli框架生成的项目，webpack.prod.conf.js中的配置已经非常完善了，个人目前没有对它进行太大的改动，由于是多页面开发，也只是在其基础上copy了 new HtmlWebpackPlugin（{}），改改template和chunks
+        - 方法二: 路由懒加载
+            - 懒加载方式，当路由被访问的时候才加载对应组件
+            ```js
+            const Login = () => import('components/login/login.vue')
+            const Home = () => import('components/home/home')
+            const ClassManage = () => import('components/classManage/classManage')
+            ```
+        - 方法三: 第三方模块懒加载，用到的时候才加载
+            - 项目中用到了vue-image-crop-upload图片上传插件
+            - 如果在组件中直接 `import  MyUpload from ‘vue-image-crop-upload’` 会直接打包到vendor，增加vendor体积
+            - 如果 `const MyUpload=()=>import('vue-image-crop-upload')` 这样调用，就不会打包到vendor
