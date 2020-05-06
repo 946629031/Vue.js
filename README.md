@@ -9493,8 +9493,11 @@ Vue 各种语法 入门讲解
   
 - ### 课程至此完结，谢谢大家~
 
-- ### 问题：解决vue打包后vendor.js文件过大问题
-    - 参考文章
+----
+
+- # 问题补充
+- ### externals, 解决vue打包后vendor.js文件过大问题 - 解决方法一
+    - 解决方案 参考文章
         - [【it work】配置webpack中externals来减少打包后vendor.js的体积](https://blog.csdn.net/qq_20097569/article/details/82492893)
         - [【it work】vue 打包过大处理](https://blog.csdn.net/qq_39339339/article/details/82772780)
             - [vue 打包过大处理 解决方法一](#vue-打包过大处理-解决方法一)
@@ -9504,13 +9507,6 @@ Vue 各种语法 入门讲解
         - [为什么打包后文件过大？](https://blog.csdn.net/qq_19666289/article/details/95330025)
         - []()
     
-        - [参数说明](https://blog.csdn.net/zzzyyc/article/details/89084705)
-            ```
-            externals: {
-                "v-charts": "VeIndex",
-            }
-            ```
-            - externals 配置中，左边 “v-charts” 表示 引入的模块名称，右边的 VeIndex 表示cdn中 v-charts 的全局实例变量（即可以被引入的变量名称，可以查看cdn源码发现）。
     - 再次遇到问题：
         - 1.用了上面这种方法后，发现
             - 不知道 你引入的 cdn js 所暴露的全局变量名是什么。导致你不知道在externals的左右两边应该怎么写
@@ -9550,7 +9546,43 @@ Vue 各种语法 入门讲解
                                     ^
                 ```
         - 所以，还是用 webpack 的分别打包比较好，每个模块单独打包成一个js文件，而不是所有用到的 js 都打包到一个 vender.js 里。这样会导致，首次打开页面时，非常慢
-    - ##### vue 打包过大处理 解决方法一
+    - ### [webpack之externals操作三部曲--正确的姿势](https://blog.csdn.net/qq_15243963/article/details/82255540)
+        - 排除误区：
+            - 看到有人误解externals的作用，所以必须先正确认识externals的作用
+        - ##### 1.作用
+            - 首先webpack提供这个`externals`选项作用是`从打包的bundle文件中排除依赖`。换句话说就是让在项目中通过import引入的依赖在打包的时候不会打包到bundle包中去，而是通过script的方式去访问这些依赖。
+        - ##### 2.怎么用？
+            - 以jquery为例子，目的是在runtime时通过cdn获取jquery依赖，在打包时忽略他的打包
+            - ###### 步骤一：
+                ```html
+                //index.html
+                <script
+                src="https://code.jquery.com/jquery-3.1.0.js"
+                integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+                crossorigin="anonymous">
+                </script>
+                ```
+            - ###### 步骤二：
+                ```js
+                //webpack.config.js
+
+                module.exports = {
+                    //...
+                    externals: {
+                        jquery: 'jQuery' 
+                        //将需要忽略打包的都写在这个里面，但前提是index.html文件里面必须script引入
+                    }
+                };
+                //属性名jquery指的是  import  $ from 'jquery'中的  'jquery'
+                属性值 jQuery指的是jquery插件暴露出来的全局对象名。按理来说$应该也是可以写在属性值里面的，（也是jquery暴露的啊，但我没试过行不行）。
+                ```
+            - ###### 步骤三：
+                ```js
+                文件中的
+                import $ from 'jquery';
+                千万不能去掉。  很重要，好多人就是把它去掉了跑过来问我为啥我的还是报错jquery is  undefined。  
+                ```
+    - ### vue 打包过大处理 解决方法一
         - 下面总结一下自己的打包优化心得：
         - 方法一: 路由懒加载
             - 1.像Vue 、element-ui 、vue-router 、vuex 、babel-polyfill 这些都不用打包，打包后很大的，可以引用cdn
@@ -9597,3 +9629,143 @@ Vue 各种语法 入门讲解
             - 项目中用到了vue-image-crop-upload图片上传插件
             - 如果在组件中直接 `import  MyUpload from ‘vue-image-crop-upload’` 会直接打包到vendor，增加vendor体积
             - 如果 `const MyUpload=()=>import('vue-image-crop-upload')` 这样调用，就不会打包到vendor
+- ### 拆包 CommonsChunkPlugin, 解决vue打包后vendor.js文件过大问题 - 解决方法二
+    - 原因分析：
+        - vue打包后vendor.js文件过大，首屏载入时间过长的问题
+        - 本质上就是：同一段时间内，有且只有一个vendor.js被载入，而且这个文件又很大，从而导致了 首屏载入时间过长 ( 相当于单线程工作 )
+    - 解决思路：
+        - 由于问题的产生，是因为 单线程载入的 ( 同一段时间内，有且只有一个vendor.js被载入 )
+        - 那么，我们就把这个大文件vendor.js 拆分成一小份 一小份的，然后同时启用多个线程，同时载入，不就快了吗？
+        - > 这里只是引用 单线程，多线程 的概念，实际上并不一定是真正的线程。打开浏览器 - 开发者工具 - Network 即可看到类似于多线程多资源请求
+    - ## CommonsChunkPlugin webpack 拆包插件
+        - 0.参考文章
+            - [详解CommonsChunkPlugin的配置和用法 【segmentfault】](https://segmentfault.com/a/1190000012828879)
+            - [Webpack3 代码分割 CommonsChunkPlugin 【掘金】](https://juejin.im/post/5d5b4ed4f265da03ec2e6517)
+            - [CommonsChunkPlugin 【webpack官方文档】](https://www.webpackjs.com/plugins/commons-chunk-plugin/#manifest-file)
+        - ### 1.先看一个拆包例子
+            - 把 vue、juqery 分别拆分出来，形成一个独立的文件
+            ```js
+            // webpack.conf.js
+
+            const path = require('path')
+            const webpack =require('webpack')
+            const HtmlWebpackPlugin = require('html-webpack-plugin')
+            const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+            const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+            module.exports = {
+                entry: {
+                    index: path.resolve(__dirname, '../src/index.js'),
+                    vue: ['vue'],       // 入口处指定name
+                    jquery: ['jquery']
+                },
+                output: {
+                    path: path.resolve(__dirname, '../dist'),
+                    filename: 'js/[name].[chunkhash].js'
+                },
+                resolve: { alias: { 'vue': 'vue/dist/vue.js' } },
+                plugins: [
+                    new CleanWebpackPlugin({
+                        cleanAfterEveryBuildPatterns: ['dist']
+                    }),
+                    new HtmlWebpackPlugin({
+                        filename: 'index.html',
+                        template: './src/index.html',
+                        inject: true
+                    }),
+
+                    // 拆分模块
+                    new webpack.optimize.CommonsChunkPlugin({
+                        names: ['vue', 'jquery'],
+                        minChunks: Infinity
+                    }),
+
+                    new BundleAnalyzerPlugin()
+                ]
+            }
+            ```
+            ```js
+            // /src/index.js
+
+            import Vue from 'vue';
+            import $ from 'jquery';
+
+            new Vue({
+                el: '#app',
+                data: {
+                    vue_test: 'vue is loaded!!!'
+                }
+            })
+
+            $(function() {
+                $('.jq_test').html('jquery is loaded!')
+            })
+            ```
+            ```html
+            // /src/index.html
+
+            <!doctype html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport"
+                    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+                <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                <title>Document</title>
+            </head>
+            <body>
+                <div id="app">
+                    <p>{{ vue_test }}</p>
+                </div>
+                <div class="jq_test"></div>
+            </body>
+            </html>
+            ```
+            ```json
+            // package.json
+
+            {
+                "name": "webpack_pack_test",
+                "version": "1.0.0",
+                "description": "",
+                "main": "index.js",
+                "scripts": {
+                    "build": "webpack --config ./build/webpack.conf.js"
+                },
+                "keywords": [],
+                "author": "",
+                "license": "ISC",
+                "dependencies": {
+                    "clean-webpack-plugin": "^3.0.0",
+                    "jquery": "^3.5.1",
+                    "vue": "^2.6.11",
+                    "webpack": "^3.6.0",
+                    "webpack-bundle-analyzer": "^3.7.0",
+                    "webpack-cli": "^3.3.11"
+                },
+                "devDependencies": {
+                    "html-webpack-plugin": "^3.2.0"
+                }
+            }
+            ```
+        - ### 2.CommonsChunkPlugin 参数说明
+            ```js
+            minChunks: Infinity, // 确保无其他模块侵入. 用意是让插件别管其他，就按照设置的数组提取文件就好
+            ```
+            - #### manifest
+                - 参考文章 [webpack之manifest解读 【github】](https://github.com/younth/blog/issues/3)
+                - 什么是manifest?
+                    - webpackBootstrap, webpack引导程序
+                    - 记录着各个模块的依赖
+                    ![webpack manifest](./img/webpack_manifest.png)
+                - #### 如何将 manifest 文件单独提出成一个文件？
+                    > To extract the webpack bootstrap logic into a separate file, use the CommonsChunkPlugin on a name which is not defined as entry. Commonly the name manifest is used. <br>
+                    - [Manifest file 【webpack文档】](https://www.webpackjs.com/plugins/commons-chunk-plugin/#manifest-file)
+
+                    > 意思是：只要你在 CommonsChunkPlugin 中定义的 name 不存在于 entry 里，那么他就会被单独出来，成为 manifest 文件
+                    ```js
+                    new webpack.optimize.CommonsChunkPlugin({
+                        name: "manifest",
+                        minChunks: Infinity
+                    })
+                    ```
