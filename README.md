@@ -4414,6 +4414,36 @@ Vue 各种语法 入门讲解
                             height: 26.66vw
                     </style>
                     ```
+                - 4.最优写法，兼容性最好的
+                    - 上述方案只提及如何不依赖容器内容来撑开容器，那么，在撑开容器后，如何给容器添加内容（图片、文本等）呢？
+                    - 答案很简单，那就是利用position: absolute;
+                    ```css
+                    #container {
+                        width: 50%;
+                        position: relative;
+                        background-color: red;
+                        overflow: hidden;  //需要触发BFC消除margin折叠的问题
+                    }
+                    .placeholder:after {
+                        content: '';
+                        display: block;
+                        margin-top: 100%; //margin 百分比相对父元素宽度计算
+                    } 
+                    img {
+                        position: absolute;
+                        top: 0;
+                        width: 100%;
+                    }
+                    ```
+                    ```html
+                    <div id="container" class="placeholder">
+                        <img src="http://img.arrayhuang.cn/product/miya-1060079/multiple/0.jpg@1e_415w_415h_1c_0i_1o_1x.jpg" />
+                    </div>
+                    ```
+                    - 效果如下：
+                        - ![](./img/7-3.padding.png)
+                    - 参考文章：
+                        - [《巧用margin/padding的百分比值实现高度自适应（多用于占位，避免闪烁）》](https://segmentfault.com/a/1190000004231995)
         - ##### 8.vue 中 css scoped 穿透问题
             - 1.轮播图底部的 小白点
                 ```html
