@@ -11,6 +11,8 @@ Vue 各种语法 入门讲解
 
 看视频整理要点笔记：
 
+[2020千锋Vue全套教程全开源（强烈推荐）【youtube 视频课程】](https://www.youtube.com/watch?v=MwuOyaOd_ZQ&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj)
+
 ----
 ## 补充
 - ### 移动端适配方案：手淘的 lib-flexible px2rem-loader
@@ -9799,3 +9801,84 @@ Vue 各种语法 入门讲解
                         minChunks: Infinity
                     })
                     ```
+
+----
+
+- ## [vue手势事件](https://www.youtube.com/watch?v=15k5j2YSUXE&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=103)
+    - ### [vue-touch](https://github.com/vuejs/vue-touch/tree/next#api)
+        - vue-touch 是基于 hammer.js 封装的组件库
+    - [Hammer.js](https://github.com/hammerjs/hammer.js) 是一个优秀的、轻量级的触屏设备手势库
+        - 平移、双指缩放、长按、跳转、滑动、点击
+        - hammerjs是什么
+            - hammerjs是一个短小精悍的库，他可以让我们轻松的实现移动端上的手势。 hammerjs的两大优势如下：
+            - 为移动端网页添加相关手势。
+            - 去除移动端上的点击事宜的300ms延迟。
+    - 如何使用 vue-touch ?
+    ```html
+    <v-touch v-on:onSwipeLeft='onSwipeLeft'>
+        touch me left !
+    </v-touch>
+
+    <script>
+        import Vue from 'vue'
+        var VueTouch = require('vue-touch')
+        Vue.use(VueTouch)
+
+        export default {
+            methods: {
+                onSwipeLeft () {
+                    console.log('left')
+                }
+            }
+        }
+    </script>
+    ```
+
+# [vue-ssr 服务端渲染 【vue官网】](https://ssr.vuejs.org/zh/)
+[【YouTube视频教程地址】千锋Web前端教程：104 vue ssr 1](https://www.youtube.com/watch?v=4qQVWbjRrRw&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=104)
+
+## 什么是服务器端渲染 (SSR)？
+* 将vue渲染为服务器端的 HTML 字符串，将它们直接发送到浏览器
+
+## 为什么使用服务器端渲染 (SSR)？
+* 更好的 SEO，由于搜索引擎爬虫抓取工具可以直接查看完全渲染的页面。
+* 更快的内容到达时间 (time-to-content)，特别是对于缓慢的网络情况或运行缓慢的设备。
+
+一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+
+# [Nuxt.js](https://zh.nuxtjs.org/guide) 真·服务器渲染
+## Nuxt.js 是什么？
+nuxt.js 是一个基于 vue 的通用应用框架，可以将整站都渲染为 html 字符串。
+
+## Nuxt.js 目录结构：
+```
+.nuxt           // Nuxt自动生成，临时的用于编辑的文件，build
+
+assets          // 用于组织未编译的静态资源如LESS、SASS或JavaScript
+
+components      // 用于自己编写的Vue组件，比如波动组件、日历组件、分页组件
+
+layouts         // 布局目录，用于组织应用的布局组件，不可更改
+
+middleware      // 用于存放中间件
+
+pages           // 用于存放写的页面，我们主要的工作区域
+
+plugins         // 用于存放JavaScript插件的地方
+
+static          // 用于存放静态资源文件，比如图片
+
+store           // 用于组织应用的Vuex 状态管理
+
+.editorconfig   // 开发工具格式配置
+
+.eslintrc.js    // ESLint的配置文件，用于检查代码格式
+
+.gitignore      // 配置git不上传的文件
+
+nuxt.config.json // 用于组织Nuxt.js应用的个性化配置，已覆盖默认配置
+
+package-lock.json // npm自动生成，用于帮助package的统一设置的，yarn也有相同的操作
+
+package.json    // npm 包管理配置文件
+```
