@@ -9801,10 +9801,95 @@ Vue 各种语法 入门讲解
                         minChunks: Infinity
                     })
                     ```
+----
+
+# [Vue中的render函数render: h => h(App)](https://zhuanlan.zhihu.com/p/37524034)
+
+在学习Vue.js时，使用vue-cli创建了一个Vue项目，main.js文件中有一行经典代码 render: h => h(App)，那她是什么意思呢？
+
+<br>
+
+main.js 文件内容
+```js
+import Vue from 'vue'
+import App from './App.vue'
+new Vue({
+    el: '#app',
+    render: h => h(App)
+})
+```
+
+接下来就是答案喽
+
+
+```js
+{
+    render: h => h(App);
+}
+```
+
+等价于
+
+
+```js
+{
+    render: h => {
+        return h(App);
+    }
+}
+```
+
+等价于
+
+
+```js
+{
+    render: function(h) {
+        return h(App);
+    }
+}
+```
+
+即：
+
+
+```js
+{
+    render: function(createElement) {
+        return createElement(App);
+    }
+}
+```
+
+上一个示例
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="text/javascript" src="https://unpkg.com/vue"></script>
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app', // 提供一个在页面上已经存在的 DOM 元素作为 Vue 实例挂载目标
+            render: function (createElement) {
+                return createElement('h2', 'Hello Vue!');
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/37524034)
 
 ----
 
-- ## [vue手势事件](https://www.youtube.com/watch?v=15k5j2YSUXE&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=103)
+- ## [vue手势事件 移动端手势操作库](https://www.youtube.com/watch?v=15k5j2YSUXE&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=103)
     - ### [vue-touch](https://github.com/vuejs/vue-touch/tree/next#api)
         - vue-touch 是基于 hammer.js 封装的组件库
     - [Hammer.js](https://github.com/hammerjs/hammer.js) 是一个优秀的、轻量级的触屏设备手势库
