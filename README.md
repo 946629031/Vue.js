@@ -9805,7 +9805,16 @@ Vue 各种语法 入门讲解
 
 # [Vue中的render函数render: h => h(App)](https://zhuanlan.zhihu.com/p/37524034)
 
-在学习Vue.js时，使用vue-cli创建了一个Vue项目，main.js文件中有一行经典代码 render: h => h(App)，那她是什么意思呢？
+> 在学习Vue.js时，使用vue-cli创建了一个Vue项目，main.js文件中有一行经典代码 render: h => h(App)，那她是什么意思呢？
+
+简单的说，在vue中我们使用模板HTML语法来组建页面的，使用render函数我们可以用js语言来构建DOM。因为vue是虚拟DOM，所以在拿到template模板时也要转译成VNode的函数，而用render函数构建DOM，vue就免去了转译的过程。
+
+当使用render函数描述虚拟DOM时，vue提供一个函数，这个函数是就构建虚拟DOM所需要的工具。官网上给他起了个名字叫createElement。***还有约定它的简写叫h***
+
+## render函数的参数
+render 函数即渲染函数，它是个函数，render 函数的返回值是VNode（即：虚拟节点，也就是我们要渲染的节点）
+
+> **createElement 是 render 函数的参数，它本身也是个函数**，并且有三个参数。
 
 <br>
 
