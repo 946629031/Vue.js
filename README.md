@@ -9938,7 +9938,38 @@ createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/3752
 * 更好的 SEO，由于搜索引擎爬虫抓取工具可以直接查看完全渲染的页面。
 * 更快的内容到达时间 (time-to-content)，特别是对于缓慢的网络情况或运行缓慢的设备。
 
-一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+### 过去的 SPA (single page application) 方案存在什么问题？
+- **问题1：首屏问题**
+    - 在传统的 web渲染技术, 如asp.net, php, jsp 等，他们都是在收到client的请求后，在server端 查询数据库，取到数据后，拼接html字符串，然后返回 html
+    - 在SPA技术中，先是client发起请求，服务端返回基础html 和 Vue.js (SPA 核心渲染脚本)，然后 client 计算完后 知道要请求什么数据了，又再次发送请求去 server 获取数据，才得到最终的 html 页面
+    - ***问题：*** 由于多次的请求往返，造成时间上的首屏速度慢的问题，还有多次 网络IO 的性能浪费问题
+![](./img/why-ssr.jpg)
+- **问题2：SEO问题**
+    - 由于网络爬虫 (除了 Google.com 和 Bing.com 之外), 大多数都不能执行解析 JS脚本，所以 所有通过计算 或异步请求的数据，爬虫都爬取不到
+    - 这就造成了 **SEO不友好的问题**
+    - 例如 爬虫爬取到的 index.html 类似下面这种样子, **里面什么有意义的内容都没有**
+    ```html
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
+        <title>longyu</title>
+        <link href=/static/css/app.c29375437617d522ebc8d5b567c5c48d.css rel=stylesheet>
+    </head>
+
+    <body>
+        <div id=app></div>
+        <script type=text/javascript src=/static/js/manifest.2ae2e69a05c33dfc65f8.js> </script>
+        <script type=text/javascript src=/static/js/vendor.35bad3707fbf72be48d5.js> </script>
+        <script type=text/javascript src=/static/js/app.6821a6844dfe50de4ec0.js> </script> 
+    </body>
+    </html>
+    ```
+
+
+> 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
 
 # [Nuxt.js](https://zh.nuxtjs.org/guide) 真·服务器渲染
 ## Nuxt.js 是什么？
@@ -9963,3 +9994,5 @@ Nuxt.js 项目目录结构
 |- package.json       // npm 包管理配置文件
 |- .nuxt              // Nuxt自动生成，临时的用于编辑的文件，build
 ```
+
+[手把手教你打造Vue SSR 【BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
