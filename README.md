@@ -3484,8 +3484,8 @@ Vue 各种语法 入门讲解
         - 3.在github仓库中 - 设置 - SSH公钥中，添加该公钥
     - 3.项目初始化
         ```
-        # 全局安装 vue-cli
-        $ npm install --global vue-cli
+        # 全局安装 vue-cli@2
+        $ npm install --global vue-cli@2
 
         # 创建一个基于 webpack 模板的新项目
         $ vue init webpack my-project
@@ -9848,9 +9848,7 @@ new Vue({
 }
 ```
 
-等价于
-
-
+等价于:
 ```js
 {
     render: function(h) {
@@ -9860,8 +9858,6 @@ new Vue({
 ```
 
 即：
-
-
 ```js
 {
     render: function(createElement) {
@@ -9931,23 +9927,39 @@ createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/3752
 # [vue-ssr 服务端渲染 【vue官网】](https://ssr.vuejs.org/zh/)
 [【YouTube视频教程地址】千锋Web前端教程：104 vue ssr 1](https://www.youtube.com/watch?v=4qQVWbjRrRw&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=104)
 
+[【Express Vue SSR 教程】手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
+
+[【Koa2 Vue SSR 教程】通过vue-cli3构建一个SSR应用程序【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
+
+<br>
+
+Vue SSR 项目源码
+- https://github.com/lentoo/vue-cli-ssr-example
+- https://github.com/muwoo/doubanMovie-ssr
+----
+<br>
+
 ## 什么是服务器端渲染 (SSR)？
-* 将vue渲染为服务器端的 HTML 字符串，将它们直接发送到浏览器
+* 什么是渲染？这里说的渲染，指的是将client请求等网页，通过各种工具或手段 拼接为目标 HTML , 就说我们说的渲染。
+* 什么是服务端渲染？在服务器端 将vue渲染为 HTML 字符串，将它们直接发送到浏览器
 
 ## 为什么使用服务器端渲染 (SSR)？
 * 更好的 SEO，由于搜索引擎爬虫抓取工具可以直接查看完全渲染的页面。
 * 更快的内容到达时间 (time-to-content)，特别是对于缓慢的网络情况或运行缓慢的设备。
+![](./img/vue-ssr.jpg)
 
 ### 过去的 SPA (single page application) 方案存在什么问题？
 - **问题1：首屏问题**
     - 在传统的 web渲染技术, 如asp.net, php, jsp 等，他们都是在收到client的请求后，在server端 查询数据库，取到数据后，拼接html字符串，然后返回 html
     - 在SPA技术中，先是client发起请求，服务端返回基础html 和 Vue.js (SPA 核心渲染脚本)，然后 client 计算完后 知道要请求什么数据了，又再次发送请求去 server 获取数据，才得到最终的 html 页面
     - ***问题：*** 由于多次的请求往返，造成时间上的首屏速度慢的问题，还有多次 网络IO 的性能浪费问题
+        - 来回次数太多了
+        - 如果在网络慢，或者网络差等环境里，这种过多的 网络IO 会导致很多问题
 ![](./img/why-ssr.jpg)
 - **问题2：SEO问题**
     - 由于网络爬虫 (除了 Google.com 和 Bing.com 之外), 大多数都不能执行解析 JS脚本，所以 所有通过计算 或异步请求的数据，爬虫都爬取不到
     - 这就造成了 **SEO不友好的问题**
-    - 例如 爬虫爬取到的 index.html 类似下面这种样子, **里面什么有意义的内容都没有**
+    - 例如 爬虫爬取到的 index.html 类似下面这种样子, **里面没有任何价值。里面什么有意义的内容都没有**
     ```html
     <!DOCTYPE html>
     <html>
@@ -9967,13 +9979,180 @@ createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/3752
     </body>
     </html>
     ```
+> 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的 <br>
+> 把首页的内容填上，拼接好字符串，<br>
+> 然后首页拼接好后，再带上 Vue.js、 Bundle.js ...等这些js，为后面其它页面的SPA做好准备
+
+## Vue SSR 存在什么缺点？
+- 1.开发条件受限
+    - 有些代码只会在浏览器中执行。比如，有些生命周期钩子 在服务端渲染的时候 是不会执行的，比如 mounted
+        - 服务端只是做了个 **字符串拼接的工作**, 像 mounted 这种操作 只有在浏览器中 才会被执行
+    - 这就导致了一个问题，由于某些生命周期钩子 不会执行，这就会导致 我们在使用某些第三方的库 的时候会出问题
+- 2.构建部署要求多
+    - 由于服务端渲染，而且是用 node.js 运行的，所以 你用来做服务端渲染的服务器 必须是 node.js 才能去渲染
+        - 所以就导致了 你必须会 类似于 koa express hapi ... 等 的这些 node 服务器框架
+    - 如果不用 node.js 服务器渲染，用 JAVA 等其它语言 来做 SSR，虽然也是可行的，但是你要具备很多服务器端的知识
+        - 如果你要用 非Node.js 语言的服务器来做 SSR，那么你应该创建一个 Node.js 服务器中间层
+        - Node.js服务器负责渲染，数据从 JAVA 或 PHP 请求
+- 3.服务端负载变大，服务器压力变大
+    - 每一次用户请求都时候，我们都要创建一个全新都 Vue实例
+    - 可以想一下这个过程，对于 CPU的负载、对于内存的负载 都会比以前大。远远大于SPA方案 和 传统JSP方案
+        - 如果要做这些的话，要保证服务器有**足够的负载力**，并发比较高的情况下 **要做很多的缓存工作，后续的优化工作**还是很重的
+
+----
+
+# 实现 Vue SSR 具体过程
+## 创建工程 [vue-cli 3](https://cli.vuejs.org/zh/guide/creating-a-project.html)
+```
+vue create ssr-project
+```
+```
+vue-cli3 项目目录结构
++ |- /node_modules
++ |- /public
++ |- /src
+      + |- /assets
+      + |- /components
+        |- App.vue
+        |- main.js
+|- .gitignore
+|- babel.config.js
+|- package-lock.json
+|- package.json
+|- README.md
+```
 
 
-> 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+## 安装依赖
+`vue-server-renderer` 服务端渲染器
+
+`express` nodejs 服务器
+
+```
+npm i vue-server-renderer express -D
+```
+
+## 编写服务端启动脚本
+```js
+// /server/index.js
+
+const express = require('express')
+const Vue = require('vue')
+
+// 第一步
+// 创建 服务器express 实例
+// 创建 Vue 实例
+// 创建 渲染器
+
+// 第二步，把 Vue 实例 传给 渲染器实例，它就能 把Vue实例里的内容，生成 HTML页面
+
+const app = express()
+const renderer = require('vue-server-renderer').createRenderer()
+
+// 将来用渲染器渲染page 可以得到 html内容
+const page = new Vue({
+    template: '<div>hello, vue ssr!</div>'
+})
+
+app.get('/', async (req, res) => {  // 因为 callback 是一个异步函数，所以可以使用 promise 来做
+    try {
+        const html = await renderer.renderToString(apge)
+        console.log(html)
+        res.send(html)
+    } catch (error) {
+        res.status(500).send('服务器内部错误')
+    }
+})
+
+app.listen(3000, () => {
+    console.log('server is running at 3000 port')
+})
+```
+## 启动服务器脚本
+```
+nodemon server
+```
+> [nodemon 用来监视node.js应用程序中的任何更改并自动重启服务,非常适合用在开发环境中](https://juejin.im/post/5b5005f7f265da0f66401fe7)
+
+----
+
+## 路由
+### 路由问题
+* 当我们输入当路由是：`localhost:3000/movie` 或者 `localhost:3000/poster` 的时候。
+* 我们可以通过配置 不同的 `app.get('/:page' async ()=>{})` 来分别处理
+    ```js
+    app.get('/:page', async (req, res) => {  // 路由变量
+        try {
+            const html = await renderer.renderToString(apge)
+            res.send(html)
+        } catch (error) {
+            res.status(500).send('服务器内部错误')
+        }
+    })
+    ```
+* 当然这种方法，也是可行的。***但是不够 Vue.js***
+* 下面, 我们希望通过纯 Vue.js 的方法来解决这个问题，也就是***使用 vue router 来解决这个问题***
+
+## 用 Vue-Router 来解决
+
+新建 `/src/router/index.js` 文件和文件夹
+
+### 安装 vue-router
+```
+npm i vue-router
+```
+
+```js
+// /src/router/index.js
+
+import Vue from 'vue'
+import Router from 'vue-router'
+
+import Index from '@/components/Index'
+import Detail from '@/components/Detail'
+
+Vue.use(Router)
+
+// 这里为什么不像 client端 一样，到处一个router实例？
+// 因为每次用户请求都需要创建router实例
+// 如果只导出一个 router实例，会导致不同端用户 共用一个router
+// 就会导致 不同用户之间端 router 串行、混乱
+export default function createRouter () {
+    return new Router({
+        mode: 'history',
+        routes: [
+            { path: '/', component: Index },
+            { path: '/detail', component: Detail }
+        ]
+    })
+}
+```
+- #### 为什么服务端渲染，服务器负载很大？
+    - 因为 每一个用户 过来请求，都需要 一个独立端 Vue实例、一个 Router实例、一个 Vuex实例
+    - 这就对服务器内存要求 就变高了
+> 你想要得到什么，你就得付出另外的一些什么
+
+<br>
+
+- #### 解决 服务器负载压力大的办法
+    - 我们有很多策略 可以解决这个问题
+    - 比如说，我们可以做 ***页面缓存***，用户来了以后 如果这个页面渲染过了，就别再渲染了
+
+## [构建流程](https://ssr.vuejs.org/zh/guide/structure.html)
+![vue-ssr-architecture.png](./img/vue-ssr-architecture.png)
+
+第三节 10:23
+
+----
 
 # [Nuxt.js](https://zh.nuxtjs.org/guide) 真·服务器渲染
 ## Nuxt.js 是什么？
 nuxt.js 是一个基于 vue 的通用应用框架，可以将整站都渲染为 html 字符串。
+
+## 为什么需要 Nuxt.js ?
+- 前面，我们既然已经有了 vue ssr , 那么我们为什么还需要 Nuxt.js ?
+- > 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+- 但是，Nuxt.js 可以将整站都渲染为 html 
 
 ## Nuxt.js 目录结构：
 ```
@@ -9994,7 +10173,3 @@ Nuxt.js 项目目录结构
 |- package.json       // npm 包管理配置文件
 |- .nuxt              // Nuxt自动生成，临时的用于编辑的文件，build
 ```
-
-[手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
-
-[通过vue-cli3构建一个SSR应用程序 【Koa2 Vue SSR】【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
