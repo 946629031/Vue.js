@@ -9995,4 +9995,6 @@ Nuxt.js 项目目录结构
 |- .nuxt              // Nuxt自动生成，临时的用于编辑的文件，build
 ```
 
-[手把手教你打造Vue SSR 【BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
+[手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
+
+[通过vue-cli3构建一个SSR应用程序 【Koa2 Vue SSR】【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
