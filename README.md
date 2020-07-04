@@ -10004,7 +10004,10 @@ Vue SSR 项目源码
 ----
 
 # 实现 Vue SSR 具体过程
-## 创建工程 [vue-cli 3](https://cli.vuejs.org/zh/guide/creating-a-project.html)
+## 本项目完整源码 [vue-ssr-express 点这里](https://github.com/946629031/Vue.js/tree/master/vue-ssr-express)
+<br>
+
+## 创建工程 [vue-cli3](https://cli.vuejs.org/zh/guide/creating-a-project.html)
 ```
 vue create project-name
 ```
@@ -10092,7 +10095,9 @@ nodemon server
         }
     })
     ```
-* 当然这种方法，也是可行的。***但是不够 Vue.js***
+* 当然这种方法，也是可行的。***但是不够 Vue.js***,
+    - 就相当于过去传统到JSP了，每个页面到资源全部重载，例如一个Jquery.js 在不同到页面中用到，打开多少个页面，就要被重载多少次，这种情况是 ***非常浪费网络IO*** 的
+    - 如果能把他做成 SPA，每个资源只加载一次，这样就非常的节省流量 且 响应迅速
 * 下面, 我们希望通过纯 Vue.js 的方法来解决这个问题，也就是***使用 vue router 来解决这个问题***
 
 ## 用 Vue-Router 来解决
@@ -10135,7 +10140,7 @@ export default function createRouter () {  // 工厂函数
 - #### 为什么服务端渲染，服务器负载很大？
     - 因为 每一个用户 过来请求，都需要 一个独立端 Vue实例、一个 Router实例、一个 Vuex实例
     - 这就对服务器内存要求 就变高了
-> 你想要得到什么，你就得付出另外的一些什么
+> 你想要得到什么，你就得付出另外的一些什么。【 等价交换原则 】
 
 <br>
 
@@ -10169,7 +10174,7 @@ src
 └── entry-server.js # 仅运行于服务器
 ```
 
-### app.js
+## app.js
 > app.js 的核心作用是 创建vue实例
 ```js
 // app.js 核心作用是 创建vue实例
@@ -10192,7 +10197,7 @@ export default function createApp () {
 }
 ```
 
-### entry-server.js
+## entry-server.js
 > entry-server.js 核心作用是 渲染首屏
 ```js
 // entry-server.js 核心作用是 渲染首屏
@@ -10207,7 +10212,7 @@ import createApp from './app'
 // 让 node服务器 调用它不就OK了吗？context 不就传进来了吗？
 export default context => {
     return new Promise((resolve, reject) => {
-        const { app, router } = createApp
+        const { app, router } = createApp()
 
         // 进入首屏
         router.push(context.url)    // 想要 跳转到 哪个页面，就 router.push() 哪个链接进来?
@@ -10218,7 +10223,7 @@ export default context => {
 }
 ```
 
-### entry-client.js
+## entry-client.js
 > entry-client.js 核心作用是 挂载、激活 app <br>
 > 而且只有这一件事情，所以 entry-client.js 非常简单
 ```js
@@ -10240,7 +10245,7 @@ router.onReady(() => {      // 等待 router 准备好后，才执行 $mount 挂
 - 让我们创建的这个 `vue实例`，把我们页面中已经填满内容的 `#app` 把 `vue实例` 挂载一下、激活一下就行<br>
 - ***它就变成了一个真正的SPA*** 
 
-### vue.config.js 修改webpack打包配置
+## vue.config.js 修改webpack打包配置
 在根目录下 新建文件 `/vue.config.js`
 ```js
 // /vue.config.js
@@ -10248,8 +10253,8 @@ router.onReady(() => {      // 等待 router 准备好后，才执行 $mount 挂
 // webpack插件
 const VueSSRServerPlugin = require("vue-server-renderer/server-plugin");    // 用于生成 Server Bundle
 const VueSSRClientPlugin = require("vue-server-renderer/client-plugin");    // 用于生成 Client Bundle
-const nodeExternals = require("webpack-node-externals");
-const merge = require("lodash.merge");
+const nodeExternals = require("webpack-node-externals");    // 优化东西？
+const merge = require("lodash.merge");      // 选项合并
 
 // 环境变量：决定入口是客户端还是服务端
 const TARGET_NODE = process.env.WEBPACK_TARGET === "node";
@@ -10302,6 +10307,20 @@ module.exports = {
   }
 };
 ```
+### 添加 启动项目/打包项目 脚本
+```json
+// /package.json
+
+"scripts": {
+    "build:client": "vue-cli-service build",
+    "build:server": "cross-env WEBPACK_TARGET=node vue-cli-service build --mode server",
+    "build:all": "npm run build:server && npm run build:client",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+}
+```
+在启动脚本前，先安装 下面依赖，不然 windows电脑 可能报错
 
 
 #### 安装依赖
@@ -10331,50 +10350,92 @@ npm i cross-env
             - 安装cross-env:npm install cross-env --save-dev
             - 在NODE_ENV=xxxxxxx前面添加cross-env就可以了。
 
-## 改造server.js 代码
-这里，我不想让 这里，像下面这样写死一个页面了<br>
-而是应该非常灵活的，根据用户传入的URL，来决定渲染什么内容
+## 服务器入口 server.js 代码改造
+- 1.不写死页面
+    - 这里，我不想让 这里，像下面这样写死一个页面了
+    - 而是应该非常灵活的，根据用户传入的URL，来决定渲染什么内容
+    ```js
+    // /server/index.js
+
+    const VuePage = new Vue({
+        template: '<div>Hello, vue ssr!!!</div>'
+    })
+    // ... other code
+    ```
+- 2.改用 `BundleRenderer()`
+    - 如果要做到这一点，我们这里就不能用这个 `.createRenderer()` 了，而应该是 `.BundleRenderer()`
+- 3.取消默认 读取默认文件 index.html，否则还是会读取到空内容到 html
+    ```js
+    app.use(express.static('../dist/client', {index: false}))  // 默认读取index.html文件 关闭
+    // app.use(express.static('../dist/client'))  // 不关闭 默认读取index.html文件
+    ```
+    - 否则还是会读取到空内容到 html，而不能真正实现真正到 SSR
+        ```html
+        读到到html内，#app div 为空
+
+        <div id="app"></div>
+        ```
 ```js
 // /server/index.js
 
-// ... other code
-const VuePage = new Vue({
-    template: '<div>Hello, vue ssr!!!</div>'
+const fs = require('fs')
+const path = require('path')
+const express = require('express')
+const app = new express()
+// const renderer = require('vue-server-renderer').createRenderer()
+const {createBundleRenderer} = require('vue-server-renderer')
+const serverBundle = require('../dist/server/vue-ssr-server-bundle.json')
+const clientManifest = require('../dist/client/vue-ssr-client-manifest.json') // 客户端清单
+
+// createBundleRenderer() 的第二个选项，是要告诉它 客户端的清单是什么？
+// 将来生成的页面，要把 manifest清单 解析出来，附加到这个页面中
+// 最终生成的 HTML 文件中，会有些js文件需要附加. 那到底要附加哪些js呢？ clientManifest 会告诉他
+const renderer = createBundleRenderer(serverBundle, {   // 这里的 bundle 应该是服务端的 bundle
+    runInNewContext: false,  // 为false时: bundle 代码将与服务器进程在同一个 global 上下文中运行，所以请留意在应用程序代码中尽量避免修改 global。为true时 虽然不会污染全局变量, 但是开销巨大, 应尽量避免
+    // template: fs.readFileSync('../public/index.temp.html', 'utf-8'),  // 宿主模版文件  // 这里写相对地址，有可能找不到文件，推荐使用绝对地址
+    template: fs.readFileSync(path.resolve('./public/index.temp.html'), 'utf-8'),  // 宿主模版文件
+    clientManifest
 })
-// ... other code
+
+// 中间件, 去处理静态文件的请求
+app.use(express.static('../dist/client', {index: false}))  // 默认读取index.html文件 关闭
+// app.use(express.static('../dist/client'))  // 不关闭 默认读取index.html文件
+
+// 路由处理交给vue
+app.get('*', async (req, res) => {  // 允许所有的 url地址请求
+    try {
+        const url = req.path
+        // 这里要做一个拦截，如果请求的是非 .html文件，就给他返回对应的 静态文件，如js, css, img, font...等
+        // 否则，站内跳转到其他页面时候，全部资源都重新加载的，不是SPA
+        if (url.includes('.')) {
+            let filePath = path.join(__dirname, '../dist/client', url)
+          return await res.sendFile(filePath)
+        }
+
+        const context = {
+            url: req.url,  // 拿到请求地址 url
+            title: 'ssr test'
+        }
+        const html = await renderer.renderToString(context)     // 之前是接受 vue实例，现在是接收 context上下文
+        // const html = await renderer.renderToString(VuePage)  // 接受 vue实例
+        res.send(html)
+    } catch (error) {
+        res.status(500).send('服务器内部错误', error)
+    }
+})
+
+let port = process.env.PORT || 3001
+app.listen(port, () => {
+    console.log(`server is running at locahost:${port} port`)
+})
 ```
-如果要做到这一点，我们这里就不能用这个 `.createRenderer()` 了，而应该是 `.BundleRenderer()`
+## 本项目完整源码 [vue-ssr-express 点这里](https://github.com/946629031/Vue.js/tree/master/vue-ssr-express)
 
 
 
-
-
-
-
-```
-到目前为止的目录结构
-+ |- /node_modules
-+ |- /public
-+ |- /src
-      + |- /assets
-      + |- /components
-        │   ├── Foo.vue
-        │   ├── Bar.vue
-        │   └── Baz.vue
-        ├── App.vue         # 根页面
-        ├── app.js          # 通用 entry (universal entry)
-        ├── entry-client.js # 仅运行于浏览器
-        ├── entry-server.js # 仅运行于服务器
-        └── main.js
-|- .gitignore
-|- babel.config.js
-|- package-lock.json
-|- package.json
-|- README.md
-```
 
 ----
-# vue-cli 3.x 如何使用？
+# vue-cli3.x 如何使用？
 - 1.创建项目
 ```
 vue create project-name
@@ -10389,7 +10450,7 @@ npm run serve           // 相当于 npm run dev
 npm run build
 ```
 
-## vue-cli 2.x 和 vue-cli 3.x 的区别
+## vue-cli 2.x 和 vue-cli3.x 的区别
 - 1.先看目录结构
 ```
 vue-cli 2.x 目录结构
@@ -10430,8 +10491,10 @@ vue-cli 2.x 目录结构
 |- README.md
 ```
 ```
-vue-cli 3.x 目录结构
+vue-cli3.x 目录结构
 + |- /dist                 # 打包后的目录
+      + ├── /client        # client 要让它成为静态目录，不然 js, css, img, font 等文件都无法访问
+      + └── /server
 + |- /node_modules
 + |- /public
       ├── favicon.ico
@@ -10455,25 +10518,25 @@ vue-cli 3.x 目录结构
 |- vue.config.js    // (可选。该文件可有可无)
 ```
 ### 2.目录、文件区别：
-| 区别 | vue-cli 2.x | vue-cli 3.x |
+| 区别 | vue-cli 2.x | vue-cli3.x |
 | ---- | ---- | ---- |
 | /build 文件夹 | 存在, 用于配置webpack | 不存在 |
 | /config 文件夹 | config 文件夹一般用于全局配置，<br> 例如定义全局变量；全局开启 gzip 压缩 | 不存在 |
 | /index.html 入口文件 | 在根目录里 | 移动到 /public/index.html |
 | /static 静态文件夹 | static 文件夹用于存放静态文件 | 不存在 |
-| webpack配置文件 <br> /vue.config.js | 不需要 | vue-cli 3.x 中已经没有 /build 和 /config 配置文件夹了, 如果要配置webpack 就在 /vue.config.js 中配置 |
+| webpack配置文件 <br> /vue.config.js | 不需要 | vue-cli3.x 中已经没有 /build 和 /config 配置文件夹了, <br> 如果要配置webpack 就在 /vue.config.js 中配置 |
 |  |  |  |
 
 ### 总结：
-- vue-cli 3.x 把我们的项目目录精简了很多
+- vue-cli3.x 把我们的项目目录精简了很多
     - 为什么？
-    - 因为 vue-cli 3.x 已经集成了大部分的webpack配置
+    - 因为 vue-cli3.x 已经集成了大部分的webpack配置
     - 以至于 我们可以很容易的上手，开包即用
     - 而不像 vue-cli 2.x 那样需要进行 复杂的webpack配置，降低了学习门槛
 
 ## vue.config.js 配置文件讲解
 - 参考链接
-    - [让vue-cli3.0 配置简单起来(vue.config.js编结) 【掘金】](https://juejin.im/post/5bd02f98e51d457a944b634f)
+    - [让vue-cli3.0 配置简单起来(vue.config.js编结) 【掘金 详细讲解 vue.config.js】](https://juejin.im/post/5bd02f98e51d457a944b634f)
     - [构建vue项目的利器—脚手架vue-cli3详解【B站】](https://www.bilibili.com/video/BV1L54y1B7gt)
 
 ```js
