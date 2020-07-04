@@ -5,6 +5,12 @@
 npm install
 ```
 
+## 打包构建项目, 运行项目
+```
+npm run build:all
+node server
+```
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve

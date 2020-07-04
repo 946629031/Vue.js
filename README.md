@@ -10430,7 +10430,14 @@ app.listen(port, () => {
 })
 ```
 ## 本项目完整源码 [vue-ssr-express 点这里](https://github.com/946629031/Vue.js/tree/master/vue-ssr-express)
+- 下载后, 打包构建项目, 运行项目
+    ```
+    npm i
 
+    npm run build:all
+
+    node server
+    ```
 
 
 
