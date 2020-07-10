@@ -10585,7 +10585,7 @@ module.exports = {
 
 ----
 
-# 怎么让刷新后 数据不变？本地持久化
+# 怎么让刷新后 数据不变？本地持久化, Cookie, Session, LocalStorage
 ### vuex
 > **vuex** 是各个组件间的数据共享机制<br>
 > 如果数据不大，可以存本地；<br>
@@ -10595,7 +10595,7 @@ module.exports = {
 - #### 为什么有 Cookie ?
     - 一个会话 是由一组请求与响应组成的，是围绕一件事情 所进行的 多次请求与响应。所以这些请求与响应之间 一定是需要有数据传递的，即是需要进行会话状态跟踪的。
         - (就跟 打电话 很类似，多次来回交流，关于一件事的具体细节)
-    - 然而 HTTP协议 是一种无状态协议，在不同的请求间 是无法进行数据传递的。
+    - > 然而 **HTTP协议 是一种无状态协议，在不同的请求间 是无法进行数据传递的。**
     - 此时就需要一种可以进行 请求间数据传递的 会话跟踪技术，而 Cookie 就是一种这样的技术
 - #### 什么是 Cookie ?
     - Cookie 是由服务器生成的，保存在客户端的一种信息载体
@@ -10622,6 +10622,8 @@ module.exports = {
 
     cookie.setMaxAge(60 * 60);  // 设置cookie的有效期为1小时
     cookie.setMaxAge(60 * 60 * 24 * 10) // 设置cookie的有效值为10天
+
+    // java cookie写法
     ```
 - #### 获取 Cookie
     ```
@@ -10632,6 +10634,73 @@ module.exports = {
     - 虽然客户端禁用 Cookie，但是服务器还是可以 生成并传递 cookie。但是 当客户端接收到响应的时候，**不处理 Cookie 而已**
     - 注意：很多网站 如果禁用 Cookie 会直接导致很多功能不能用，如 126 Email 直接不让登陆了。
 ## 2.Session
+- #### 什么是 Session ?
+    - Session 就是 会话，是 web 开发中的一种会话状态跟踪技术。
+    - 当然，前面所讲的 Cookie 也是一种会话跟踪技术。
+    - 不同的是 Cookie 是将会话状态保存在 客户端，而 Session 则是将会话状态保存在 服务端
+- #### 什么是会话？
+    - 当用户打开浏览器，从发出第一次请求开始，一直到最终关闭浏览器，就表示一次会话的完成
+- #### Session 的访问?
+    ```java
+    // java 创建 Session
+
+    getSession()    // 有 session 就获取 session, 没有就创建
+    ```
+- #### Session 的工作原理
+    - 在服务器系统会为每个会话 维护一个 Session。不同的会话，对于不同的 Session
+    - 问题：那么，系统是如何识别各个 Session 对象的？即是如何做到在同一会话过程中，一直使用的是 同一个 Session 对象呢？
+    - ##### Session 现象
+        ```
+        浏览器A
+        访问 http://localhost/temp/someServlet
+        获得 Session A : 1878aab4
+
+        
+        浏览器A
+        访问另一个 http://localhost/temp/otherServlet
+        获得的 Session 还是    Session A : 1878aab4
+        ```
+        ```
+        浏览器B
+        访问 http://localhost/temp/someServlet
+        获得 Session B : 78dded51
+
+        
+        浏览器B
+        访问另一个 http://localhost/temp/otherServlet
+        获得的 Session 还是    Session B : 78dded51
+        ```
+        > 注意：在测试 Session 到时候，每次测试前 都要关闭浏览器，重新打开。这样才能完整的经历一次 "会话" 的生命周期
+    - 那么问题来了，同一台电脑，不同的浏览器访问同一个页面，**服务器 为什么不会把 两个Session 弄串 弄混乱了？**
+    - ##### (1) 写入 Session 列表
+        - 服务器对当前应用中的 Session 是以 Map 的形式进行管理的，这个 Map 成为 Session 列表。
+            - 该 Map 的 key 为一个 32 位长度是随机串，这个随机串称为 JSessionID
+            - value 则为 Session 对象的引用
+        - 当用户第一次提交请求时，服务端 Servlet 中执行到 request.getSession() 方法后, 会自动生成一个 Map.Entry 对象
+            - key 为一个根据某种算法新生成的 JSessionID
+            - value 则为新创建的 HttpSession 对象，Session 对象里 可以有 各种信息和值
+        - ![session list](./img/session.jpg)
+    - ##### (2) 服务器生成并发送 Cookie
+        - 在将 Session 信息写入 Session 列表后
+        - 系统还会将 JSessionID 作为 Name
+        - 这个 32 位长度的随机串作为 value
+        - 以 Cookie 的形式存放到 ***响应报头***中，并随着响应，将该 Cookie 发送到客户端
+        - ![session-http-cookie](./img/session-http-cookie.jpg)
+    - ##### (3) 客户端接收并发送 Cookie
+        - 客户端接收到这个 Cookie 后，会将其存放到 浏览器到缓存中
+            - ( 即，只要客户端浏览器不关闭，浏览器缓存中到 Cookie 就不会消失 )
+        - 当用户提交第二次请求时，会将缓存中的这个 Cookie，伴随着 ***请求头*** 一并发送到服务端
+        - ![session-request-cookie](./img/session-request-cookie.jpg)
+        > 所以 Session 是依赖于 Cookie 到，只不过她到生命周期是在一次会话中<br>
+        > Session 也是基于 Cookie ？？
+    - ##### (4) 从 Session 列表中查找
+        - 服务端 从请求中读取到客户端发送来到 Cookie
+        - 并根据 Cookie 到 JSessionID 到值，从 Map 中查找相应到 key 所对应到 value，即 Session 对象
+        - 然后，对该 Session 对象的域属性 进行读写操作
+- #### Session 的失效 (超时)        
+    - 从你最后一次 访问Session 开始计时，超过30分钟后，Session 自动失效。默认 Session 有效时长为 30分钟
+    - 在一次强调，Session 的生命周期 不是从创建Session时开始计算，而是最后一次被访问 开始计时，在规定的失效时长内 如果一直未被再次访问 该Session 就会失效
+
 ## 3.LocalStorage
 
 ----
