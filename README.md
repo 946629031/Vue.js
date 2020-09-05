@@ -3486,8 +3486,8 @@ Vue版本：Vue 2.x
         - 3.在github仓库中 - 设置 - SSH公钥中，添加该公钥
     - 3.项目初始化
         ```
-        # 全局安装 vue-cli
-        $ npm install --global vue-cli
+        # 全局安装 vue-cli@2
+        $ npm install --global vue-cli@2
 
         # 创建一个基于 webpack 模板的新项目
         $ vue init webpack my-project
@@ -9850,9 +9850,7 @@ new Vue({
 }
 ```
 
-等价于
-
-
+等价于:
 ```js
 {
     render: function(h) {
@@ -9862,8 +9860,6 @@ new Vue({
 ```
 
 即：
-
-
 ```js
 {
     render: function(createElement) {
@@ -9929,27 +9925,45 @@ createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/3752
         }
     </script>
     ```
+----
+时间分割线：以下开始于 2020年6月
 
 # [vue-ssr 服务端渲染 【vue官网】](https://ssr.vuejs.org/zh/)
 [【YouTube视频教程地址】千锋Web前端教程：104 vue ssr 1](https://www.youtube.com/watch?v=4qQVWbjRrRw&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj&index=104)
 
+[【Express Vue SSR 教程】手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
+
+[【Koa2 Vue SSR 教程】通过vue-cli3构建一个SSR应用程序【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
+
+<br>
+
+Vue SSR 项目源码
+- https://github.com/lentoo/vue-cli-ssr-example
+- https://github.com/muwoo/doubanMovie-ssr
+----
+<br>
+
 ## 什么是服务器端渲染 (SSR)？
-* 将vue渲染为服务器端的 HTML 字符串，将它们直接发送到浏览器
+* 什么是渲染？这里说的渲染，指的是将client请求等网页，通过各种工具或手段 拼接为目标 HTML , 就说我们说的渲染。
+* 什么是服务端渲染？在服务器端 将vue渲染为 HTML 字符串，将它们直接发送到浏览器
 
 ## 为什么使用服务器端渲染 (SSR)？
 * 更好的 SEO，由于搜索引擎爬虫抓取工具可以直接查看完全渲染的页面。
 * 更快的内容到达时间 (time-to-content)，特别是对于缓慢的网络情况或运行缓慢的设备。
+![](./img/vue-ssr.jpg)
 
 ### 过去的 SPA (single page application) 方案存在什么问题？
 - **问题1：首屏问题**
     - 在传统的 web渲染技术, 如asp.net, php, jsp 等，他们都是在收到client的请求后，在server端 查询数据库，取到数据后，拼接html字符串，然后返回 html
     - 在SPA技术中，先是client发起请求，服务端返回基础html 和 Vue.js (SPA 核心渲染脚本)，然后 client 计算完后 知道要请求什么数据了，又再次发送请求去 server 获取数据，才得到最终的 html 页面
     - ***问题：*** 由于多次的请求往返，造成时间上的首屏速度慢的问题，还有多次 网络IO 的性能浪费问题
+        - 来回次数太多了
+        - 如果在网络慢，或者网络差等环境里，这种过多的 网络IO 会导致很多问题
 ![](./img/why-ssr.jpg)
 - **问题2：SEO问题**
     - 由于网络爬虫 (除了 Google.com 和 Bing.com 之外), 大多数都不能执行解析 JS脚本，所以 所有通过计算 或异步请求的数据，爬虫都爬取不到
     - 这就造成了 **SEO不友好的问题**
-    - 例如 爬虫爬取到的 index.html 类似下面这种样子, **里面什么有意义的内容都没有**
+    - 例如 爬虫爬取到的 index.html 类似下面这种样子, **里面没有任何价值。里面什么有意义的内容都没有**
     ```html
     <!DOCTYPE html>
     <html>
@@ -9969,13 +9983,738 @@ createElement 有这么几个重要的[参数](https://zhuanlan.zhihu.com/p/3752
     </body>
     </html>
     ```
+> 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的 <br>
+> 把首页的内容填上，拼接好字符串，<br>
+> 然后首页拼接好后，再带上 Vue.js、 Bundle.js ...等这些js，为后面其它页面的SPA做好准备
+
+## Vue SSR 存在什么缺点？
+- 1.开发条件受限
+    - 有些代码只会在浏览器中执行。比如，有些生命周期钩子 在服务端渲染的时候 是不会执行的，比如 mounted
+        - 服务端只是做了个 **字符串拼接的工作**, 像 mounted 这种操作 只有在浏览器中 才会被执行
+    - 这就导致了一个问题，由于某些生命周期钩子 不会执行，这就会导致 我们在使用某些第三方的库 的时候会出问题
+- 2.构建部署要求多
+    - 由于服务端渲染，而且是用 node.js 运行的，所以 你用来做服务端渲染的服务器 必须是 node.js 才能去渲染
+        - 所以就导致了 你必须会 类似于 koa express hapi ... 等 的这些 node 服务器框架
+    - 如果不用 node.js 服务器渲染，用 JAVA 等其它语言 来做 SSR，虽然也是可行的，但是你要具备很多服务器端的知识
+        - 如果你要用 非Node.js 语言的服务器来做 SSR，那么你应该创建一个 Node.js 服务器中间层
+        - Node.js服务器负责渲染，数据从 JAVA 或 PHP 请求
+- 3.服务端负载变大，服务器压力变大
+    - 每一次用户请求都时候，我们都要创建一个全新都 Vue实例
+    - 可以想一下这个过程，对于 CPU的负载、对于内存的负载 都会比以前大。远远大于SPA方案 和 传统JSP方案
+        - 如果要做这些的话，要保证服务器有**足够的负载力**，并发比较高的情况下 **要做很多的缓存工作，后续的优化工作**还是很重的
+
+----
+
+# 实现 Vue SSR 具体过程
+## 本项目完整源码 [vue-ssr-express 点这里](https://github.com/946629031/Vue.js/tree/master/vue-ssr-express)
+<br>
+
+## 创建工程 [vue-cli3](https://cli.vuejs.org/zh/guide/creating-a-project.html)
+```
+vue create project-name
+```
+```
+vue-cli3 创建的项目目录结构
++ |- /node_modules
++ |- /public
++ |- /src
+      + |- /assets
+      + |- /components
+        |- App.vue
+        |- main.js
+|- .gitignore
+|- babel.config.js
+|- package-lock.json
+|- package.json
+|- README.md
+```
 
 
-> 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+## 安装依赖
+`vue-server-renderer` 服务端渲染器
+
+`express` nodejs 服务器
+
+```
+npm i vue-server-renderer express -D
+```
+
+## 编写服务端启动脚本
+```js
+// /server/index.js
+
+const express = require('express')
+const Vue = require('vue')
+
+// 第一步
+// 创建 服务器express 实例
+// 创建 Vue 实例
+// 创建 渲染器
+
+// 第二步，把 Vue 实例 传给 渲染器实例，它就能 把Vue实例里的内容，生成 HTML页面
+
+const app = express()
+const renderer = require('vue-server-renderer').createRenderer()
+
+// 将来用渲染器渲染page 可以得到 html内容
+const page = new Vue({
+    template: '<div>hello, vue ssr!</div>'
+})
+
+app.get('/', async (req, res) => {  // 因为 callback 是一个异步函数，所以可以使用 promise 来做
+    try {
+        const html = await renderer.renderToString(apge)
+        console.log(html)
+        res.send(html)
+    } catch (error) {
+        res.status(500).send('服务器内部错误')
+    }
+})
+
+app.listen(3000, () => {
+    console.log('server is running at 3000 port')
+})
+```
+## 启动服务器脚本
+```
+nodemon server
+```
+> [nodemon 用来监视node.js应用程序中的任何更改并自动重启服务,非常适合用在开发环境中](https://juejin.im/post/5b5005f7f265da0f66401fe7)
+
+----
+
+## 路由
+### 路由问题
+* 当我们输入当路由是：`localhost:3000/movie` 或者 `localhost:3000/poster` 的时候。
+* 我们可以通过配置 不同的 `app.get('/:page' async ()=>{})` 来分别处理
+    ```js
+    app.get('/:page', async (req, res) => {  // 路由变量
+        try {
+            const html = await renderer.renderToString(apge)
+            res.send(html)
+        } catch (error) {
+            res.status(500).send('服务器内部错误')
+        }
+    })
+    ```
+* 当然这种方法，也是可行的。***但是不够 Vue.js***,
+    - 就相当于过去传统到JSP了，每个页面到资源全部重载，例如一个Jquery.js 在不同到页面中用到，打开多少个页面，就要被重载多少次，这种情况是 ***非常浪费网络IO*** 的
+    - 如果能把他做成 SPA，每个资源只加载一次，这样就非常的节省流量 且 响应迅速
+* 下面, 我们希望通过纯 Vue.js 的方法来解决这个问题，也就是***使用 vue router 来解决这个问题***
+
+## 用 Vue-Router 来解决
+
+新建 `/src/router/index.js` 文件和文件夹
+
+### 安装 vue-router
+```
+npm i vue-router
+```
+
+```js
+// /src/router/index.js
+
+import Vue from 'vue'
+import Router from 'vue-router'
+
+import Index from '@/components/Index'
+import Detail from '@/components/Detail'
+
+Vue.use(Router)
+
+// 这里为什么不像 client端 一样，导出一个 new router() 实例？
+// 因为每次用户请求都需要创建router实例
+// 如果只导出一个 router实例，会导致不同端用户 共用一个router
+// 就会导致 不同用户之间端 router 串行、混乱
+// ----
+// 每一次用户请求，都需要全新的用户实例，所以 这里应该是一个工厂 (工厂函数)
+// 而不应该是一个单实例
+export default function createRouter () {  // 工厂函数
+    return new Router({
+        mode: 'history',    // history模式 就是 url 中没有#号的
+        routes: [
+            { path: '/', component: Index },
+            { path: '/detail', component: Detail }
+        ]
+    })
+}
+```
+- #### 为什么服务端渲染，服务器负载很大？
+    - 因为 每一个用户 过来请求，都需要 一个独立端 Vue实例、一个 Router实例、一个 Vuex实例
+    - 这就对服务器内存要求 就变高了
+> 你想要得到什么，你就得付出另外的一些什么。【 等价交换原则 】
+
+<br>
+
+- #### 解决 服务器负载压力大的办法
+    - 我们有很多策略 可以解决这个问题
+    - 比如说，我们可以做 ***页面缓存***，用户来了以后 如果这个页面渲染过了，就别再渲染了
+
+----
+
+## [构建流程](https://ssr.vuejs.org/zh/guide/structure.html)
+![vue-ssr-architecture.png](./img/vue-ssr-architecture.png)
+看图说重点
+- Server Bundle
+    - 前端有一个请求过来了，我该渲染哪个页面呢？
+    - 这个就由 Server Bundle 来处理
+- Client Bundle
+    - 你这个程序 如果需要它成为 可交互到 SPA，他就需要 Client Bundle
+    - Client Bundle 就是传统的前端，把 HTML、js、css 等资源 发送到 Client ，然后 Client 执行对应程序引擎，将其渲染为 前端页面
+- 最后，Server Bundle 和 Client Bundle 会结合起来，一起实现我们到前端页面
+
+### [使用 webpack 的源码结构](https://ssr.vuejs.org/zh/guide/structure.html#%E4%BD%BF%E7%94%A8-webpack-%E7%9A%84%E6%BA%90%E7%A0%81%E7%BB%93%E6%9E%84)
+```
+src
+├── components
+│   ├── Foo.vue
+│   ├── Bar.vue
+│   └── Baz.vue
+├── App.vue         # 根页面
+├── app.js          # 通用 entry (universal entry)
+├── entry-client.js # 仅运行于浏览器
+└── entry-server.js # 仅运行于服务器
+```
+
+## app.js
+> app.js 的核心作用是 创建vue实例
+```js
+// app.js 核心作用是 创建vue实例
+
+import Vue from 'vue'
+import App from './App.vue'     // 引入根页面
+import createRouter from './router'  // 引入路由工厂函数
+
+// 每一次用户请求，都需要全新的用户实例，所以 这里应该是一个工厂 (工厂函数)
+// 而不应该是一个单实例
+export default function createApp () {
+    const router = createRouter()   // 创建router实例
+    const app = new Vue({           // 创建vue实例
+        router,
+        render: h => h(App)         // 把App.vue 渲染生成一下
+    // }).$mount(root)              // 不能挂载，也没地方挂载。因为在服务器上，且没有这个生命周期钩子
+    })
+
+    return { app, router }
+}
+```
+
+## entry-server.js
+> entry-server.js 核心作用是 渲染首屏
+```js
+// entry-server.js 核心作用是 渲染首屏
+
+import createApp from './app'
+
+// context 哪来的？
+// 这里暴露出去的 还是一个 工厂函数
+// 所以个函数将来一定会被调用
+// 会被谁调用？
+// 会被 node服务器 调用，只有 node服务器 才知道用户请求的地址是什么
+// 让 node服务器 调用它不就OK了吗？context 不就传进来了吗？
+export default context => {
+    return new Promise((resolve, reject) => {
+        const { app, router } = createApp()
+
+        // 进入首屏
+        router.push(context.url)    // 想要 跳转到 哪个页面，就 router.push() 哪个链接进来?
+        router.onReady(() => {      // router 不是一蹴而就的，他需要准备时间，这里有可能是异步的，所以需要等待
+            resolve(app)            // 把 app 返回出去
+        }, reject)                  // 这里有可能会报错，如果报错了，就执行 reject
+    })
+}
+```
+
+## entry-client.js
+> entry-client.js 核心作用是 挂载、激活 app <br>
+> 而且只有这一件事情，所以 entry-client.js 非常简单
+```js
+// entry-client.js 核心作用是 挂载、激活 app
+// 而且只有这一件事情，所以 entry-client.js 非常简单
+
+// 挂载、激活 app
+
+import createApp from './app'
+
+const { app, router } = createApp()
+router.onReady(() => {      // 等待 router 准备好后，才执行 $mount 挂载
+    app.$mount('#app')
+})
+
+```
+- 我们来想象一下将来发生的事情：<br>
+- 界面中 已经有一篇已经写好的 所有的 SPA程序的页面内容了，我们现在需要做的、唯一的事情就是：<br>
+- 让我们创建的这个 `vue实例`，把我们页面中已经填满内容的 `#app` 把 `vue实例` 挂载一下、激活一下就行<br>
+- ***它就变成了一个真正的SPA*** 
+
+## vue.config.js 修改webpack打包配置
+在根目录下 新建文件 `/vue.config.js`
+```js
+// /vue.config.js
+
+// webpack插件
+const VueSSRServerPlugin = require("vue-server-renderer/server-plugin");    // 用于生成 Server Bundle
+const VueSSRClientPlugin = require("vue-server-renderer/client-plugin");    // 用于生成 Client Bundle
+const nodeExternals = require("webpack-node-externals");    // 优化东西？
+const merge = require("lodash.merge");      // 选项合并
+
+// 环境变量：决定入口是客户端还是服务端
+const TARGET_NODE = process.env.WEBPACK_TARGET === "node";
+const target = TARGET_NODE ? "server" : "client";
+
+module.exports = {
+  css: {
+    extract: false
+    // extract: process.env.NODE_ENV === 'production'
+  },
+  outputDir: './dist/'+target,
+  configureWebpack: () => ({
+    // 将 entry 指向应用程序的 server / client 文件
+    entry: `./src/entry-${target}.js`,
+    // 对 bundle renderer 提供 source map 支持
+    devtool: 'source-map',
+    // 这允许 webpack 以 Node 适用方式处理动态导入(dynamic import)，
+    // 并且还会在编译 Vue 组件时告知 `vue-loader` 输送面向服务器代码(server-oriented code)。
+    target: TARGET_NODE ? "node" : "web",
+    node: TARGET_NODE ? undefined : false,
+    output: {
+      // 此处告知 server bundle 使用 Node 风格导出模块
+      libraryTarget: TARGET_NODE ? "commonjs2" : undefined
+    },
+    // 外置化应用程序依赖模块。可以使服务器构建速度更快，并生成较小的 bundle 文件。
+    externals: TARGET_NODE
+      ? nodeExternals({
+          // 不要外置化 webpack 需要处理的依赖模块。
+          // 可以在这里添加更多的文件类型。例如，未处理 *.vue 原始文件，
+          // 你还应该将修改 `global`（例如 polyfill）的依赖模块列入白名单
+          whitelist: [/\.css$/]
+        })
+      : undefined,
+    optimization: {
+      splitChunks: undefined
+    },
+    // 这是将服务器的整个输出构建为单个 JSON 文件的插件。
+    // 服务端默认文件名为 `vue-ssr-server-bundle.json`
+    plugins: [TARGET_NODE ? new VueSSRServerPlugin() : new VueSSRClientPlugin()]
+  }),
+  chainWebpack: config => {
+    config.module
+      .rule("vue")
+      .use("vue-loader")
+      .tap(options => {
+        merge(options, {
+          optimizeSSR: false
+        });
+      });
+  }
+};
+```
+### 添加 启动项目/打包项目 脚本
+```json
+// /package.json
+
+"scripts": {
+    "build:client": "vue-cli-service build",
+    "build:server": "cross-env WEBPACK_TARGET=node vue-cli-service build --mode server",
+    "build:all": "npm run build:server && npm run build:client",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+}
+```
+在启动脚本前，先安装 下面依赖，不然 windows电脑 可能报错
+
+
+#### 安装依赖
+```
+npm i cross-env
+```
+- ##### 什么是 cross-env ?
+    - [使用cross-env解决跨平台设置NODE_ENV的问题【思否】](https://segmentfault.com/a/1190000005811347)
+        - 问题: 
+            ```json
+            // package.json
+
+            "scripts": {
+                "clear": "rm -rf build&& mkdir build",
+                "start": "npm run clear&& NODE_ENV=development webpack-dev-server --host 0.0.0.0 --devtool eval --progress --color --profile",
+                "deploy": "npm run pre&& npm run clear&& NODE_ENV=production webpack -p --progress"
+            }
+            ```
+            - 简单来说，就是windows不支持NODE_ENV=development的设置方式。
+            > cross-env是跨平台设置和使用环境变量的脚本。<br><br>
+            > 在大多数Windows命令行中在使用NODE_ENV = production设置环境变量时会报错。同样，Windows和Linux命令如何设置环境变量也有所不同。<br><br>
+            > 使用cross-env可以设置在不同的平台上有相同的NODE_ENV参数。<br><br>
+            > [vue中cross-env的使用【掘金】](https://juejin.im/post/5d78a11ee51d4561af16dd9f)
+        - 解决方式: 
+            - cross-env, 这个迷你的包能够提供一个设置环境变量的scripts，让你能够以unix方式设置环境变量，然后在windows上也能兼容运行。
+        - 使用方法：
+            - 安装cross-env:npm install cross-env --save-dev
+            - 在NODE_ENV=xxxxxxx前面添加cross-env就可以了。
+
+## 服务器入口 server.js 代码改造
+- 1.不写死页面
+    - 这里，我不想让 这里，像下面这样写死一个页面了
+    - 而是应该非常灵活的，根据用户传入的URL，来决定渲染什么内容
+    ```js
+    // /server/index.js
+
+    const VuePage = new Vue({
+        template: '<div>Hello, vue ssr!!!</div>'
+    })
+    // ... other code
+    ```
+- 2.改用 `BundleRenderer()`
+    - 如果要做到这一点，我们这里就不能用这个 `.createRenderer()` 了，而应该是 `.BundleRenderer()`
+- 3.取消默认 读取默认文件 index.html，否则还是会读取到空内容到 html
+    ```js
+    app.use(express.static('../dist/client', {index: false}))  // 默认读取index.html文件 关闭
+    // app.use(express.static('../dist/client'))  // 不关闭 默认读取index.html文件
+    ```
+    - 否则还是会读取到空内容到 html，而不能真正实现真正到 SSR
+        ```html
+        读到到html内，#app div 为空
+
+        <div id="app"></div>
+        ```
+```js
+// /server/index.js
+
+const fs = require('fs')
+const path = require('path')
+const express = require('express')
+const app = new express()
+// const renderer = require('vue-server-renderer').createRenderer()
+const {createBundleRenderer} = require('vue-server-renderer')
+const serverBundle = require('../dist/server/vue-ssr-server-bundle.json')
+const clientManifest = require('../dist/client/vue-ssr-client-manifest.json') // 客户端清单
+
+// createBundleRenderer() 的第二个选项，是要告诉它 客户端的清单是什么？
+// 将来生成的页面，要把 manifest清单 解析出来，附加到这个页面中
+// 最终生成的 HTML 文件中，会有些js文件需要附加. 那到底要附加哪些js呢？ clientManifest 会告诉他
+const renderer = createBundleRenderer(serverBundle, {   // 这里的 bundle 应该是服务端的 bundle
+    runInNewContext: false,  // 为false时: bundle 代码将与服务器进程在同一个 global 上下文中运行，所以请留意在应用程序代码中尽量避免修改 global。为true时 虽然不会污染全局变量, 但是开销巨大, 应尽量避免
+    // template: fs.readFileSync('../public/index.temp.html', 'utf-8'),  // 宿主模版文件  // 这里写相对地址，有可能找不到文件，推荐使用绝对地址
+    template: fs.readFileSync(path.resolve('./public/index.temp.html'), 'utf-8'),  // 宿主模版文件
+    clientManifest
+})
+
+// 中间件, 去处理静态文件的请求
+app.use(express.static('../dist/client', {index: false}))  // 默认读取index.html文件 关闭
+// app.use(express.static('../dist/client'))  // 不关闭 默认读取index.html文件
+
+// 路由处理交给vue
+app.get('*', async (req, res) => {  // 允许所有的 url地址请求
+    try {
+        const url = req.path
+        // 这里要做一个拦截，如果请求的是非 .html文件，就给他返回对应的 静态文件，如js, css, img, font...等
+        // 否则，站内跳转到其他页面时候，全部资源都重新加载的，不是SPA
+        if (url.includes('.')) {
+            let filePath = path.join(__dirname, '../dist/client', url)
+          return await res.sendFile(filePath)
+        }
+
+        const context = {
+            url: req.url,  // 拿到请求地址 url
+            title: 'ssr test'
+        }
+        const html = await renderer.renderToString(context)     // 之前是接受 vue实例，现在是接收 context上下文
+        // const html = await renderer.renderToString(VuePage)  // 接受 vue实例
+        res.send(html)
+    } catch (error) {
+        res.status(500).send('服务器内部错误', error)
+    }
+})
+
+let port = process.env.PORT || 3001
+app.listen(port, () => {
+    console.log(`server is running at locahost:${port} port`)
+})
+```
+## 本项目完整源码 [vue-ssr-express 点这里](https://github.com/946629031/Vue.js/tree/master/vue-ssr-express)
+- 下载后, 打包构建项目, 运行项目
+    ```
+    npm i
+
+    npm run build:all
+
+    node server
+    ```
+
+
+
+----
+# vue-cli3.x 如何使用？
+- 1.创建项目
+```
+vue create project-name
+```
+- 2.启动项目
+```
+cd project-name
+npm run serve           // 相当于 npm run dev
+```
+- 3.打包生产环境代码
+```
+npm run build
+```
+
+## vue-cli 2.x 和 vue-cli3.x 的区别
+- 1.先看目录结构
+```
+vue-cli 2.x 目录结构
++ |- /build
+      ├── webpack.base.conf.js
+      ├── webpack.dev.conf.js
+      └── webpack.prod.conf.js
++ |- /config                    // config 文件夹一般用于全局配置，例如定义全局变量；全局开启 gzip 压缩
+      ├── dev.env.js
+      ├── index.js
+      └── prod.env.js
++ |- /dist
++ |- /node_modules
++ |- /src
+      + |- /assets
+      + |- /router
+      + |- /store
+      + |- /pages
+        │   + |- /Audio
+        │   + |- /Player
+        │   + |- /User
+        │   + |- /index
+        │         + │- /components
+        │           │   ├── Header.vue
+        │           │   ├── Swiper.vue
+        │           │   └── Footer.vue
+        │           └── Index.vue
+        ├── App.vue         # 根页面
+        └── main.js
++ |- /static                    // static 文件夹用于存放静态文件
+|- .gitignore
+|- .babelrc
+|- .eslintignore
+|- .eslintrc.js
+|- index.html
+|- package-lock.json
+|- package.json
+|- README.md
+```
+```
+vue-cli3.x 目录结构
++ |- /dist                 # 打包后的目录
+      + ├── /client        # client 要让它成为静态目录，不然 js, css, img, font 等文件都无法访问
+      + └── /server
++ |- /node_modules
++ |- /public
+      ├── favicon.ico
+      └── index.html
++ |- /src
+      + |- /assets
+      + |- /components
+        │   ├── Foo.vue
+        │   ├── Bar.vue
+        │   └── Baz.vue
+        ├── App.vue         # 根页面
+        ├── app.js          # 通用 entry (universal entry)
+        ├── entry-client.js # 仅运行于浏览器
+        ├── entry-server.js # 仅运行于服务器
+        └── main.js
+|- .gitignore
+|- babel.config.js
+|- package-lock.json
+|- package.json
+|- README.md
+|- vue.config.js    // (可选。该文件可有可无)
+```
+### 2.目录、文件区别：
+| 区别 | vue-cli 2.x | vue-cli3.x |
+| ---- | ---- | ---- |
+| /build 文件夹 | 存在, 用于配置webpack | 不存在 |
+| /config 文件夹 | config 文件夹一般用于全局配置，<br> 例如定义全局变量；全局开启 gzip 压缩 | 不存在 |
+| /index.html 入口文件 | 在根目录里 | 移动到 /public/index.html |
+| /static 静态文件夹 | static 文件夹用于存放静态文件 | 不存在 |
+| webpack配置文件 <br> /vue.config.js | 不需要 | vue-cli3.x 中已经没有 /build 和 /config 配置文件夹了, <br> 如果要配置webpack 就在 /vue.config.js 中配置 |
+
+### 总结：
+- vue-cli3.x 把我们的项目目录精简了很多
+    - 为什么？
+    - 因为 vue-cli3.x 已经集成了大部分的webpack配置
+    - 以至于 我们可以很容易的上手，开包即用
+    - 而不像 vue-cli 2.x 那样需要进行 复杂的webpack配置，降低了学习门槛
+
+## vue.config.js 配置文件讲解
+- 参考链接
+    - [让vue-cli3.0 配置简单起来(vue.config.js编结) 【掘金 详细讲解 vue.config.js】](https://juejin.im/post/5bd02f98e51d457a944b634f)
+    - [构建vue项目的利器—脚手架vue-cli3详解【B站】](https://www.bilibili.com/video/BV1L54y1B7gt)
+
+```js
+// vue.config.js 常用配置
+module.exports = {
+    // 基本路径。vue cli 3.3以前使用baseUrl
+    publicPath: '/',
+    // 输出文件目录
+    outputDir: 'dist',
+    // 用于嵌套生成的静态资产 (js, css, img, fonts) 的目录
+    assetsDir: '',
+    // 生产环境 sourceMap, 用于报错追溯，告诉你报错位置
+    productionSourceMap: false,
+    // webapck 配置。下面两个都是 webpack 配置, 自己去查一下他们的区别
+    configureWebpack: () => {},
+    chainWebpack: () => {},
+    // css 相关配置
+    css: {
+        // 启用 css modules
+        modules: false,
+        // 是否使用 css 分离插件
+        extract: true,
+        // 开启 css source maps ?
+        sourceMap: false,
+        // css 预处理器配置项. 如scss, sass, stylus
+        loaderOptions: {}
+    },
+    // webpack-dev-server 配置项
+    devServer: {
+        host: '0.0.0.0',
+        port: 8080,
+        proxy: {}   // 设置代理
+    },
+    // 第三方插件配置
+    pluginOptions: {
+        // ...
+    }
+}
+```
+
+----
+
+# 怎么让刷新后 数据不变？本地持久化, Cookie, Session, LocalStorage
+### vuex
+> **vuex** 是各个组件间的数据共享机制<br>
+> 如果数据不大，可以存本地；<br>
+> 如果数据比较大, 可以存 token 或 Data ID, 在刷新页面的时候 一并取回
+## 1.Cookie
+- 如果数据比较大的话，在 Cookie里 可以存一个 Session ID, 在刷新的时候把 Session ID 的内容一起取回来
+- #### 为什么有 Cookie ?
+    - 一个会话 是由一组请求与响应组成的，是围绕一件事情 所进行的 多次请求与响应。所以这些请求与响应之间 一定是需要有数据传递的，即是需要进行会话状态跟踪的。
+        - (就跟 打电话 很类似，多次来回交流，关于一件事的具体细节)
+    - > 然而 **HTTP协议 是一种无状态协议，在不同的请求间 是无法进行数据传递的。**
+    - 此时就需要一种可以进行 请求间数据传递的 会话跟踪技术，而 Cookie 就是一种这样的技术
+- #### 什么是 Cookie ?
+    - Cookie 是由服务器生成的，保存在客户端的一种信息载体
+    - 这个载体 存放着用户访问该站点的会话状态信息
+    - 只要 Cookie 没有被清空，或 Cookie 没有失效，那么，保存在其中的会话状态就有效
+- #### 使用思路
+    - 用户提交第一次请求后，有服务器生成 Cookie，并将其封装到 ***响应头*** 中，以响应的形式发送给客户端
+    - 客户端接收到 这个响应后，将 Cookie 保存到客户端
+    - 当客户端再次发送 ***同类请求*** 后，在请求中会携带保存在客户端的 Cookie 数据，发送到服务器端，由服务器 ***对会话进行跟踪处理***
+        - 什么是 **同类请求** ?
+            - 如：`www.google.com/public/common/data/jack`
+            - 其中 `www.google.com/public/common/data/` 被称为 ***资源路径***
+            - `jack` 被称为 ***资源名称***
+            - > 只要 **资源路径** 相同的，都称为 **同类请求**
+- Cookie 是由若干键值对构成，Name & Value,  ***键值对都是 字符串***
+- #### Cookie 存放在哪？
+    - ***存放在浏览器缓存里 (内存)***，如果关闭浏览器(会话结束), 则缓存被删除，**Cookie也被删除**。再次打开页面 也找不到之前都 Cookie 了
+- #### Cookie 的有效期
+    ```java
+    // 设置Cookie的有效期。这个值为一个整型值，单位为秒
+    // 该值大于0，表示将Cookie存放到客户端的 硬盘
+    // 该值小于0，于不设置效果相同，会将Cookie存放到 浏览器到缓存。会话结束时，或关闭浏览器时，就失效
+    // 该值等于0，表示Cookie一生成，马上失效
+
+    cookie.setMaxAge(60 * 60);  // 设置cookie的有效期为1小时
+    cookie.setMaxAge(60 * 60 * 24 * 10) // 设置cookie的有效值为10天
+
+    // java cookie写法
+    ```
+- #### 获取 Cookie
+    ```
+    request.getCookies()
+    ```
+- #### 禁用 Cookie
+    - 如何禁用 Cookie: 打开浏览器设置，禁用 Cookie
+    - 虽然客户端禁用 Cookie，但是服务器还是可以 生成并传递 cookie。但是 当客户端接收到响应的时候，**不处理 Cookie 而已**
+    - 注意：很多网站 如果禁用 Cookie 会直接导致很多功能不能用，如 126 Email 直接不让登陆了。
+## 2.Session
+- #### 什么是 Session ?
+    - Session 就是 会话，是 web 开发中的一种会话状态跟踪技术。
+    - 当然，前面所讲的 Cookie 也是一种会话跟踪技术。
+    - 不同的是 Cookie 是将会话状态保存在 客户端，而 Session 则是将会话状态保存在 服务端
+- #### 什么是会话？
+    - 当用户打开浏览器，从发出第一次请求开始，一直到最终关闭浏览器，就表示一次会话的完成
+- #### Session 的访问?
+    ```java
+    // java 创建 Session
+
+    getSession()    // 有 session 就获取 session, 没有就创建
+    ```
+- #### Session 的工作原理
+    - 在服务器系统会为每个会话 维护一个 Session。不同的会话，对于不同的 Session
+    - 问题：那么，系统是如何识别各个 Session 对象的？即是如何做到在同一会话过程中，一直使用的是 同一个 Session 对象呢？
+    - ##### Session 现象
+        ```
+        浏览器A
+        访问 http://localhost/temp/someServlet
+        获得 Session A : 1878aab4
+
+        
+        浏览器A
+        访问另一个 http://localhost/temp/otherServlet
+        获得的 Session 还是    Session A : 1878aab4
+        ```
+        ```
+        浏览器B
+        访问 http://localhost/temp/someServlet
+        获得 Session B : 78dded51
+
+        
+        浏览器B
+        访问另一个 http://localhost/temp/otherServlet
+        获得的 Session 还是    Session B : 78dded51
+        ```
+        > 注意：在测试 Session 到时候，每次测试前 都要关闭浏览器，重新打开。这样才能完整的经历一次 "会话" 的生命周期
+    - 那么问题来了，同一台电脑，不同的浏览器访问同一个页面，**服务器 为什么不会把 两个Session 弄串 弄混乱了？**
+    - ##### (1) 写入 Session 列表
+        - 服务器对当前应用中的 Session 是以 Map 的形式进行管理的，这个 Map 成为 Session 列表。
+            - 该 Map 的 key 为一个 32 位长度是随机串，这个随机串称为 JSessionID
+            - value 则为 Session 对象的引用
+        - 当用户第一次提交请求时，服务端 Servlet 中执行到 request.getSession() 方法后, 会自动生成一个 Map.Entry 对象
+            - key 为一个根据某种算法新生成的 JSessionID
+            - value 则为新创建的 HttpSession 对象，Session 对象里 可以有 各种信息和值
+        - ![session list](./img/session.jpg)
+    - ##### (2) 服务器生成并发送 Cookie
+        - 在将 Session 信息写入 Session 列表后
+        - 系统还会将 JSessionID 作为 Name
+        - 这个 32 位长度的随机串作为 value
+        - 以 Cookie 的形式存放到 ***响应报头***中，并随着响应，将该 Cookie 发送到客户端
+        - ![session-http-cookie](./img/session-http-cookie.jpg)
+    - ##### (3) 客户端接收并发送 Cookie
+        - 客户端接收到这个 Cookie 后，会将其存放到 浏览器到缓存中
+            - ( 即，只要客户端浏览器不关闭，浏览器缓存中到 Cookie 就不会消失 )
+        - 当用户提交第二次请求时，会将缓存中的这个 Cookie，伴随着 ***请求头*** 一并发送到服务端
+        - ![session-request-cookie](./img/session-request-cookie.jpg)
+        > 所以 Session 是依赖于 Cookie 到，只不过她到生命周期是在一次会话中<br>
+        > Session 也是基于 Cookie ？？
+    - ##### (4) 从 Session 列表中查找
+        - 服务端 从请求中读取到客户端发送来到 Cookie
+        - 并根据 Cookie 到 JSessionID 到值，从 Map 中查找相应到 key 所对应到 value，即 Session 对象
+        - 然后，对该 Session 对象的域属性 进行读写操作
+- #### Session 的失效 (超时)        
+    - 从你最后一次 访问Session 开始计时，超过30分钟后，Session 自动失效。默认 Session 有效时长为 30分钟
+    - 在一次强调，Session 的生命周期 不是从创建Session时开始计算，而是最后一次被访问 开始计时，在规定的失效时长内 如果一直未被再次访问 该Session 就会失效
+
+## 3.LocalStorage
+
+----
 
 # [Nuxt.js](https://zh.nuxtjs.org/guide) 真·服务器渲染
 ## Nuxt.js 是什么？
 nuxt.js 是一个基于 vue 的通用应用框架，可以将整站都渲染为 html 字符串。
+
+## 为什么需要 Nuxt.js ?
+- 前面，我们既然已经有了 vue ssr , 那么我们为什么还需要 Nuxt.js ?
+- > 一般情况下，vue-ssr 只是渲染首页，其它页面跟传统的vue是一样的
+- 但是，Nuxt.js 可以将整站都渲染为 html 
 
 ## Nuxt.js 目录结构：
 ```
@@ -9996,7 +10735,3 @@ Nuxt.js 项目目录结构
 |- package.json       // npm 包管理配置文件
 |- .nuxt              // Nuxt自动生成，临时的用于编辑的文件，build
 ```
-
-[手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
-
-[通过vue-cli3构建一个SSR应用程序 【Koa2 Vue SSR 教程】【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
