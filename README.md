@@ -9,6 +9,8 @@ Vue 各种语法 入门讲解
 
 课程出品时间：2017.x ~ 2018.4
 
+Vue版本：Vue 2.x
+
 看视频整理要点笔记：
 
 [2020千锋Vue全套教程全开源（强烈推荐）【youtube 视频课程】](https://www.youtube.com/watch?v=MwuOyaOd_ZQ&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj)
@@ -4813,7 +4815,7 @@ Vue 各种语法 入门讲解
         </style>
         ```
     - #### 7-5-2 css函数 mixins
-        - 有时候我们需要：一行字，如果超出规定长度，就显示省略号，如：'广州热门旅游景...'
+        - 有时候我们需要：一行字，如果超出规定长度，就显示省略号，如：'广州热门旅���景...'
         - 解决方法：
             - 我们只要给对应的选择器，加上3行css即可
                 ```css
@@ -9997,4 +9999,4 @@ Nuxt.js 项目目录结构
 
 [手把手教你打造Vue SSR 【视频教程 BiliBili】](https://www.bilibili.com/video/BV1dE411C7f5?from=search&seid=2815669626691524756)
 
-[通过vue-cli3构建一个SSR应用程序 【Koa2 Vue SSR】【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
+[通过vue-cli3构建一个SSR应用程序 【Koa2 Vue SSR 教程】【掘金】](https://juejin.im/post/5b98e5875188255c8320f88a)
