@@ -7029,7 +7029,7 @@ Vue版本：Vue 2.x
                 - Action: 可以包含任意异步操作
                 - Mutations: 同步的对数据的改变
                   - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
-                - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
+                - **`组件 调用 --> Actions`** , **`Actions调用 --> Mutations`** , **`Mutations 里面放的是一个一个同步的对 State 的修改`**
     - #### 8-9-4 使用 Vuex
         - 1.安装 ```npm install vuex --save```
         - 2.新建文件夹 ```/src/store```
@@ -7114,7 +7114,7 @@ Vue版本：Vue 2.x
         - ##### 6.如何改变 vuex 中 state 的数据？
             - 思路
                 - 如果想要改变 state数据，我们不能直接让组件改变 state数据，必须要走一个流程，这个流程就是 图中的回圈
-                - 组件 调用 --> Actions, Actions调用 --> Mutations , Mutations 里面放的是一个一个同步的对 State 的修改
+                - **`组件 调用 --> Actions`** , **`Actions调用 --> Mutations`** , **`Mutations 里面放的是一个一个同步的对 State 的修改`**
                 - ![vuex示意图](https://vuex.vuejs.org/vuex.png)
             - 改变数据 示例
                 - 思路
