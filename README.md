@@ -1,4 +1,4 @@
-# Vue 语法入门
+# Vue 从语法入门到项目工程化
 Vue 各种语法 入门讲解
 
 从零开始掌握大型互联网公司NodeJS实际使用
@@ -14,6 +14,7 @@ Vue版本：Vue 2.x
 看视频整理要点笔记：
 
 [2020千锋Vue全套教程全开源（强烈推荐）【youtube 视频课程】](https://www.youtube.com/watch?v=MwuOyaOd_ZQ&list=PLwDQt7s1o9J57JQNXG7UooKI3Kpzw9fkj)
+[前端面试官必问系列-后台系统的权限控制与管理【完结】【bilibili】](https://www.bilibili.com/video/BV15Q4y1K79c)
 
 ----
 ## 补充
@@ -528,8 +529,8 @@ Vue版本：Vue 2.x
     - 凡是已 $ 开头的符号，都是指 Vue 实例的 **实例属性/实例方法**
 
 - ### 3-2 Vue实例生命周期
+    - **`生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数`**
     ![lifecycle](https://github.com/946629031/Vue.js/blob/master/img/5.lifecycle.jpg)
-    - 生命周期函数，就是 Vue 实例在某一个时间点会自动执行的函数
     ```html
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js'></script>
     <div id="app"></div>
@@ -7449,7 +7450,7 @@ Vue版本：Vue 2.x
               }
             }
             ```
-    - ### 8-10-4 Vuex的高级使用 ...mapState
+    - ### 8-10-4 Vuex的高级使用 `...mapState`
         - 1.存在的问题
             - 在之前的代码中，我们读取 vuex 公用数据的时候，需要这样写一长串 ```{{this.$store.state.city}}```
         - 2.但是，vuex 给我们这样一个高级的 api 来简化这个问题
@@ -7463,9 +7464,9 @@ Vue版本：Vue 2.x
                 - 它是什么意思呢？
                     - **mapState 是指，我把 vuex 里面的数据，映射到这个组件的 computed 计算属性里**
                     - 那映射什么呢？
-                        - 映射的就是 ```[]``` 数组里的数据，这个例子中 就只映射了 ```city``` 数据
+                        - 映射的就是 `[]` 数组里的数据，这个例子中 就只映射了 `city` 数据
                         - 映射的结果，就把 city 数据，最终成为了这个组件的 **计算属性**
-            - 3.第三步，使用数据 ```{{this.city}}```
+            - 3.第三步，使用数据 `{{this.city}}`
         - 3.所以，在之前的代码中，我们可以这样优化
             ```html
             // /src/pages/home/components/Header.vue
@@ -7487,10 +7488,10 @@ Vue版本：Vue 2.x
             }
             </script>
             ```
-        - 4.vuex ...mapState 的对象用法
-            - 在上面的示例中，我们往 mapState 传的是数组 ```...mapState(['city'])```
+        - 4.`vuex` `...mapState` 的对象用法
+            - 在上面的示例中，我们往 mapState 传的是数组 `...mapState(['city'])`
             - 现在，我们来看看 mapState 的对象用法
-                - mapState 的对象用法，实际上就是 把vuex里的某个变量，改个名字
+                - `mapState` 的对象用法，实际上就是 把vuex里的某个变量，改个名字
             ```html
             // /src/pages/city/components/List.vue
             <template>
@@ -7509,9 +7510,7 @@ Vue版本：Vue 2.x
             export default{
               name: 'CityList',
               computed: {
-                ...mapState({
-                  currentCity: 'city'
-                })
+                ...mapState({ currentCity: 'city' })
               }
             }
             </script>
