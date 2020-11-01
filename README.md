@@ -10701,8 +10701,224 @@ module.exports = {
 - #### Session 的失效 (超时)        
     - 从你最后一次 访问Session 开始计时，超过30分钟后，Session 自动失效。默认 Session 有效时长为 30分钟
     - 在一次强调，Session 的生命周期 不是从创建Session时开始计算，而是最后一次被访问 开始计时，在规定的失效时长内 如果一直未被再次访问 该Session 就会失效
+    - ***手动失效：*** Session 也可以通过调用api 的方法来手动触发 session失效
+- #### Session 禁用
+    - 由于 Session 依赖于 cookie，所以当浏览器 禁用 Cookie 当时候，session 也没法正常工作
+    - 但是可以通过别的方法来变通。如 可以通过 ***URL传参*** 当方式，如 `www.google.com/data/1;sessionid=xxx`
+> 如果不使用数据库，session是保存在内存中的。在服务端通常会使用redis等方案来使session持久化。
+- #### Session 如何使用？
+    - Session 存信息的方法
+    ```js
+    session.user_name === 'zhangsan'
+
+    session.views = ++n
+    ```
+    
+    - 下面是 Session 的简单使用：
+    ```js
+    const Koa = require('koa')
+    const app = new Koa()
+    const session = require('koa-session')
+    app.keys = ['secret']   // session加密字段
+    app.use(session({
+        key: 'koa:sess', //cookie key (default is koa:sess)
+        maxAge: 86400000, // cookie的过期时间 maxAge in ms (default is 1 days)
+        overwrite: true, //是否可以overwrite    (默认default true)
+        httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+        signed: true, //签名默认true
+        rolling: false, //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
+        renew: false, //(boolean) renew session when session is nearly expired,
+    }, app))
+    app.use(ctx => {
+        // ignore favicon
+        if (ctx.path === '/favicon.ico') return
+        console.log(ctx.session)
+        let n = ctx.session.views || 0
+        ctx.session.views = ++n
+        ctx.body = n + ' views'
+    });
+    app.listen(8000)
+    ```
+    - 下面我们来模拟一个简单的登陆：
+        [koa2学习笔记（六）学会使用session](https://juejin.im/post/5cd5052451882535d06e5a3d)
+    ```js
+    const Koa = require('koa')
+    const app = new Koa()
+    const session = require('koa-session')
+    app.keys = ['secret']   // session加密字段
+    app.use(session({}, app))
+
+    app.use(async (ctx, next) => {
+        if (ctx.url === '/login') {
+            ctx.session.user_name = 'zhangsan'
+            ctx.body = {
+                msg: '登录成功'
+            }
+        }
+        await next()
+    })
+
+    app.use(async (ctx, next) => {
+        if (ctx.url === '/logout') {
+            ctx.session = null
+            ctx.body = {
+                msg: '退出成功'
+            }
+        }
+        await next()
+    })
+
+    app.use(async ctx => {
+        console.log(ctx.session)
+        if (ctx.url === '/index') {
+            if (ctx.session.user_name === 'zhangsan') {
+                ctx.body = {
+                    msg: '成功匹配到用户zhangsan'
+                }
+            } else {
+                ctx.body = {
+                    msg: '登陆验证失败'
+                }
+            }
+        }
+    })
+    app.listen(8000)
+    ```
+- #### 基于Session的方案存在的问题
+    - 服务端需要存储Session
+    - 由于Session需要经常进行快速查找,因此我们一般存储在内存中或者内- 存服务器中,当用户数量大的时候,需要占用大量的服务器资源
+    - 当你需要扩展时候,创建Session服务器不一定是验证Session的服务器,因此你需要把所有Session单独存储并共享
+    - 由于客户端使用 Cookie 存储 SessionID，在跨域场景下需要进行兼容性处理，同时这种方式也难以防范 CSRF 攻击。
 
 ## 3.LocalStorage
+
+## 4.token
+
+## 5.MD5加密
+[加密算法 入门 从零到一](https://github.com/946629031/Blog/blob/master/7.%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95.md)
+
+> MD5 和 SHA-1 加密算法 已经被密码学家 王小云 于2004-2005年 破解
+- ### 什么是 MD5加密？
+    - MD5加密是 ***一种 基于Hash函数 的函数型加密算法***。就是 对于同一段文字，每次加密的结果一定相同，没有随机位。
+    - 特点：
+        - **不管加密的文字，多长多短，永远都是 16位 或者 32位 英语字母、数字混合**
+        - **哪怕只改一个字，密文都会大变**
+        - **MD5 没有反函数破解的可能。**
+            - 网上的破解工具，都是通过字典模式，通过大量列出 `明文 - 密文` 对应的字典，找到明码。
+            - 两次加密网上也有对应的字典，所以我们不要直接用一层 md5，这样对黑客来说和明码是一样的
+                - 为了加强密码，可以套娃 `md5(md5(md5( password )))`, 对加密后的密文，多次加密
+                - 也可以把加密后的密文，颠倒顺序，如：把后16位字符 调转到前面
+    > 永远不要用明码写密码！！<br>
+    > CSDN 2018年 泄漏用户密码，并且泄漏的是明码。<br>
+    > 黑客拿到用户的密码的加密信息，所以也没用，因为他无法翻译成明码。
+
+    - [md5加密 【youtube】](https://www.youtube.com/watch?v=Dot8r-K-8KY)
+
+- ### 如何实现 MD5加密?
+    - 加密过程使用了 node.js 原生库 crypto
+    ```js
+    // MD5加密 核心算法
+
+    const crypto = require('crypto')
+
+    function md5 (password) {
+        let md5 = crypto.createHash('md5')         // 使用 md5算法 生成对应 Hash
+        return md5.update(password).digest('hex')  // 将使用了 md5加密的密码返回，把输出变成16进制的格式
+    }
+    ```
+    - 参数说明
+        - 1.创建hash实例
+            - 通过 `crypto.createHash()` 函数, 创建一个hash实例，但是需要调用 `md5，sha1，sha256，sha512` 算法来实现实例的创建。
+        - 2.加密数据
+            - `.update()` 告诉md5加密需要对哪个字符串进行加密
+        - 3.获取hash对象
+            - `.digest()` 可接受的参数：hex(16进制)、base64(base64格式)等
+            - 直接运行 `.digest()` 出现了乱码，因为它默认返回的是2进制的数据
+            - `md5.digest()` 这个方法被调用了，hash 对象就被清空了是不能被重用的
+
+- ### 使用实例1: [Node.js密码加密 【掘金】](https://juejin.im/post/5d40e51e5188255d46595a63)
+    ```js
+    // cryp.js
+
+    const crypto = require('crypto')
+
+    // 加盐/密匙
+    const SECRET_KEY = 'WJiol_8776#' // 加盐/密匙是自定的，但需要保存好
+
+    // md5 加密
+    function md5(content) {
+        let md5 = crypto.createHash('md5')
+        return md5.update(content).digest('hex') // 把输出编程16进制的格式
+    }
+
+    // 加密函数
+    function genPassword(password) {
+        const str = `password=${password}&key=${SECRET_KEY}` // 拼接方式是自定的，只要包含 加盐/密匙 即可
+        return md5(str)
+    }
+
+    module.exports = {
+        genPassword
+    }
+    ```
+    ```js
+    // 使用加密方法
+
+    const { genPassword } = require('../utils/cryp')
+
+    // 生成加密密码
+    password = genPassword(password)
+    ```
+    
+
+- ### 使用实例2: [学习后端鉴权系列: 基于Cookie, Session认证 【掘金】](https://juejin.im/post/5d98272be51d4578176b4b6e)
+    ```js
+    // 创建用户
+    
+    // 先对密码md5
+    const md5PassWord = md5(String(password)).toString();
+    // 生成随机salt
+    const salt = String(Math.random()).substring(2, 10);
+    // 加盐再md5
+    const saltMD5PassWord = md5(`${md5PassWord}:${salt}`).toString();
+
+
+    const user = new User({
+        name: username,
+        password: saltMD5PassWord,
+        salt,
+        isAdmin,
+        age
+    });
+    const result = await user.save();  // mongodb 保存用户信息
+    ```
+    ```js
+    // 验证用户登陆密码
+    const searchUser = await User.findOne({ name: username });  // mongodb 搜索用户信息
+
+    const md5PassWord = md5(String(password)).toString();
+    const saltMD5PassWord = md5(
+      `${md5PassWord}:${searchUser.salt}`
+    ).toString();
+
+    if (saltMD5PassWord === searchUser.password) {
+      const store = new Store();
+      const sid = await store.set(
+        {
+          id: searchUser._id
+        },
+        {
+          maxAge: 1000 * 60 * 2 // 设定只有120s的有效时间
+        }
+      );
+      ctx.cookies.set("jssessionId", sid);
+      ctx.body = {
+        success: true,
+        msg: "登陆成功"
+      };
+    }
+    ```
+
 
 ----
 
