@@ -172,6 +172,7 @@ Vue版本：Vue 2.x
     - [10-3 Vue项目的联调测试上线 - 打包上线](#10-3-Vue项目的联调测试上线---打包上线)
     - [10-4 Vue项目的联调测试上线 - 异步组件实现按需加载](#10-4-Vue项目的联调测试上线---异步组件实现按需加载)
     - [10-5 Vue项目的联调测试上线 - 课程总结与后续学习指南](#10-5-Vue项目的联调测试上线---课程总结与后续学习指南)
+- [eslintrc.js 配置文件](#eslintrcjs-配置文件)
 
 ----
 
@@ -10950,3 +10951,78 @@ Nuxt.js 项目目录结构
 |- package.json       // npm 包管理配置文件
 |- .nuxt              // Nuxt自动生成，临时的用于编辑的文件，build
 ```
+
+- # eslintrc.js 配置文件
+    - 通用(vue, react项目) eslint 个人最佳实践, eslint 的配置文件
+    ```js
+    // .eslintrc.js
+    // 更新时间 2021.4.1
+
+    module.exports = {
+        'env': {
+            'browser': true,
+            'es6': true,
+            'node': true
+        },
+        'extends': 'eslint:recommended',
+        'parserOptions': {
+            'ecmaVersion': 2017,
+            'sourceType': 'module',
+            'ecmaFeatures': {
+                "jsx": true
+            }
+        },
+        'rules': {
+            // 缩进
+            'indent': [
+                'error',
+                4 //我的是编辑器自动格式化，不是使用tabs，而是四个空格
+            ],
+            'linebreak-style': [
+                // 'error',
+                'off',
+                'windows'
+            ],
+
+            // // 引号
+            // 'quotes': [
+            //     1,
+            //     'single'
+            // ],
+
+
+            // // 分号结尾
+            // 'semi': [
+            //     'error',
+            //     'always'
+            // ],
+
+
+            // 允许声明未使用变量  args:参数检查
+            'no-unused-vars': [2, { 'vars': 'local', 'args': 'none' }],
+            // 'no-unused-vars': ['error', { 'vars': 'all', 'args': 'after-used', 'ignoreRestSiblings': false }],
+
+
+            // 最大空行100
+            'no-multiple-empty-lines': [0, { 'max': 100 }],
+            'no-mixed-spaces-and-tabs': [0],
+            //不能使用console
+            'no-console': 'off',
+
+            //未定义变量不能使用
+            'no-undef': 1,
+            // 0 或 off, 一样，表示关闭该功能
+            // 1, 表示仅提示
+            // 2, 表示报错
+
+            //一行结束后面不要有空格
+            'no-trailing-spaces': 1,
+            //强制驼峰法命名
+            'camelcase': 2,
+            //对象字面量项尾不能有逗号
+            'comma-dangle': [2, 'never'],
+            //this别名
+            'consistent-this': [2, 'that']
+        }
+    };
+    ```
