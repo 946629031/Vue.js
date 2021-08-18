@@ -173,7 +173,8 @@ Vue版本：Vue 2.x
     - [10-4 Vue项目的联调测试上线 - 异步组件实现按需加载](#10-4-Vue项目的联调测试上线---异步组件实现按需加载)
     - [10-5 Vue项目的联调测试上线 - 课程总结与后续学习指南](#10-5-Vue项目的联调测试上线---课程总结与后续学习指南)
 - [eslintrc.js 配置文件](#eslintrcjs-配置文件)
-- [怎么让刷新后 数据不变？本地持久化, Cookie, Session, LocalStorage](https://github.com/946629031/Blog/blob/master/d.%E5%A4%A7%E5%89%8D%E7%AB%AF.md#%E6%80%8E%E4%B9%88%E8%AE%A9%E5%88%B7%E6%96%B0%E5%90%8E-%E6%95%B0%E6%8D%AE%E4%B8%8D%E5%8F%98%E6%9C%AC%E5%9C%B0%E6%8C%81%E4%B9%85%E5%8C%96-cookie-session-localstorage)
+<!-- - [怎么让刷新后 数据不变？本地持久化, Cookie, Session, LocalStorage](https://github.com/946629031/Blog/blob/master/d.%E5%A4%A7%E5%89%8D%E7%AB%AF.md#%E6%80%8E%E4%B9%88%E8%AE%A9%E5%88%B7%E6%96%B0%E5%90%8E-%E6%95%B0%E6%8D%AE%E4%B8%8D%E5%8F%98%E6%9C%AC%E5%9C%B0%E6%8C%81%E4%B9%85%E5%8C%96-cookie-session-localstorage) -->
+- <a target='_blank' href='https://github.com/946629031/Blog/blob/master/d.%E5%A4%A7%E5%89%8D%E7%AB%AF.md#%E6%80%8E%E4%B9%88%E8%AE%A9%E5%88%B7%E6%96%B0%E5%90%8E-%E6%95%B0%E6%8D%AE%E4%B8%8D%E5%8F%98%E6%9C%AC%E5%9C%B0%E6%8C%81%E4%B9%85%E5%8C%96-cookie-session-localstorage'>怎么让刷新后 数据不变？本地持久化, Cookie, Session, LocalStorage</a>
 ----
 
 
@@ -7336,13 +7337,13 @@ Vue版本：Vue 2.x
             },
             actions: {
                 changeCity (ctx, city) {
-                ctx.commit('changeCity', city)
+                    ctx.commit('changeCity', city)
                 }
             },
             mutations: {
                 changeCity (state, city) {
-                state.city = city
-                localStorage.city = city   // 将数据 存储在 localStorage
+                    state.city = city
+                    localStorage.city = city   // 将数据 存储在 localStorage
                 }
             }
             })
@@ -7365,30 +7366,30 @@ Vue版本：Vue 2.x
             Vue.use(Vuex) // 通过 Vue.use() 来使用插件
 
             let city = '上海'
-            try {    // 外层包裹一层 try {} catch (){}
-            if (localStorage.city) {
-                city = localStorage.city
-            }
+            try { // 外层包裹一层 try {} catch (){}
+                if (localStorage.city) {
+                    city = localStorage.city
+                }
             } catch (e) {}
 
             export default new Vuex.Store({
-            state: {
-                city: city
-            },
-            actions: {
-                changeCity (ctx, city) {
-                ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
-                }
-            },
-            mutations: {
-                changeCity (state, city) {
-                state.city = city // mutations 调用 state, 将其重新赋值
+                state: {
+                    city: city
+                },
+                actions: {
+                    changeCity(ctx, city) {
+                        ctx.commit('changeCity', city) // 通过 ctx.commit 调用 mutations 里的 changeCity
+                    }
+                },
+                mutations: {
+                    changeCity(state, city) {
+                        state.city = city // mutations 调用 state, 将其重新赋值
 
-                try {    // 外层包裹一层 try {} catch (){}
-                    localStorage.city = city
-                } catch (e) {}
+                        try { // 外层包裹一层 try {} catch (){}
+                            localStorage.city = city
+                        } catch (e) {}
+                    }
                 }
-            }
             })
             ```
 
