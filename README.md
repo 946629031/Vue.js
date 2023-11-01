@@ -11155,6 +11155,7 @@ Nuxt.js 项目目录结构
 
     - ## 11.Observer-defineReactive
         ```js
+        // Observer.js
         class Observer {
             constructor (data) {
                 this.walk(data)
@@ -11173,6 +11174,7 @@ Nuxt.js 项目目录结构
 
             // defineReactive 的作用 是 调用 Ojbect.defineProperty 把属性变成 getter/setter
             defineReactive (obj, key, val) {
+        +       let that = this
         +       // 如果val是对象，把val内部的属性 转换成响应式数据
         +       this.walk(val) // 递归调用
                 Object.defineProperty(obj, key, {
@@ -11186,7 +11188,7 @@ Nuxt.js 项目目录结构
                             return
                         }
                         val = newValue
-
+        +               that.walk(newValue)
                         // 发送通知. 如果值发生变化之后, 发送通知
                     }
                 })
@@ -11213,6 +11215,7 @@ Nuxt.js 项目目录结构
             + isElementNode(node)
             ```
         ```js
+        // Compiler.js
         class Compiler {
             constructor (vm) {
                 this.el = vm.el
@@ -11327,3 +11330,258 @@ Nuxt.js 项目目录结构
             }
         }
         ```
+    - ## 17.Dep
+        > Denpendency 依赖的意思
+        - ![](./img/vue-dep.jpg)
+        - 功能
+            - 搜集依赖, 添加观察者 (watcher)
+            - 通知所有观察者
+        - 类图
+            ```
+            Dep
+            --------
+            + subs
+            --------
+            + addSub(sub)
+            + notify()
+            ```
+        - 实现
+            ```js
+            // dep.js
+
+            class Dep {
+                constructor () {
+                    // 存储所有观察者
+                    this.subs = []
+                }
+
+                // 添加观察者
+                addSub (sub) {
+                    if (sub && sub.update) {
+                        this.subs.push(sub)
+                    }
+                }
+                // 发送通知
+                notify () {
+                    this.subs.forEach(sub => {
+                        sub.update()
+                    })
+                }
+            }
+            ```
+            ```js
+            // Observer.js
+            class Observer {
+                constructor (data) {
+                    this.walk(data)
+                }
+                // walk 的作用 是 遍历对象的所有属性
+                walk (data) {
+                    // 1. 判断data是否 是对象
+                    if (!data || typeof data !== 'object') {
+                        returnn
+                    }
+                    // 2. 遍历 data对象的所有属性
+                    Object.keys(data).forEach(key => {
+                        this.defineReactive(data, key, data[key])
+                    })
+                }
+
+                // defineReactive 的作用 是 调用 Ojbect.defineProperty 把属性变成 getter/setter
+                defineReactive (obj, key, val) {
+                    let that = this
+            +       // 负责收集依赖，并发送通知
+            +       let dep = new Dep()
+                    // 如果val是对象，把val内部的属性 转换成响应式数据
+                    this.walk(val) // 递归调用
+                    Object.defineProperty(obj, key, {
+                        enumerable: true,
+                        configurable: true,
+                        get () {
+            +               // 搜集依赖
+            +               Dep.target && Dep.addSub(Dep.target)
+                            return val
+                        },
+                        set (newValue) {
+                            if (newValue === val) {
+                                return
+                            }
+                            val = newValue
+                            that.walk(newValue)
+            +               // 发送通知. 如果值发生变化之后, 发送通知
+            +               dep.notify()
+                        }
+                    })
+                }
+            }
+            ```
+    - ## 18.Watcher
+        ![](./img/vue-watcher.jpg)
+        - 功能
+            - 当数据变化 触发依赖，dep 通知所有 watcher 实例 更新视图
+            - 自身实例化的时候，往dep对象中添加自己
+        - 类图
+            ```
+            Watcher
+            --------
+            + vm
+            + key
+            + cb
+            + oldValue
+            --------
+            + update()
+            ```
+        - 实现
+            ```js
+            // Watcher.js
+            class Watcher {
+                constructor (vm, key, cb) {
+                    this.vm = vm
+                    // data中的属性名称
+                    this.key = key
+                    // 回调函数负责更新视图
+                    this.cb = cb
+
+                    // 把watcher对象 记录到Dep类的静态属性 target
+                    Dep.target = this
+                    // 触发get方法，在get方法中 会调用 addsub. (下面 vm[key] 会触发get方法)
+                    this.oldValue = vm[key]
+                    Dep.target = null // 设为空， 防止将来重复渲染添加
+                }
+                // 当数据发生变化时，更新视图
+                update () {
+                    let newValue = this.vm[this.key]
+                    if (newValue === this.oldValue) {
+                        return
+                    }
+                    this.cb(newValue)
+                }
+            }
+            ```
+            - 1.创建 Watcher 的时候，要把 watcher对象添加到 subs数组中
+            - 2.当数据发生变化时，更新视图
+
+            ```js
+            // Compiler.js
+            class Compiler {
+                constructor (vm) {
+                    this.el = vm.el
+                    this.vm = vm
+                    this.compiler(this.el)
+                }
+                // 编译模版，处理文本节点和元素节点
+                compiler (el) {
+                    let childNodes = el.childNodes
+                    Object.keys(childNodes).forEach(node => {
+                        // 处理文本节点
+                        if (this.isTextNode(node)) {
+                            this.compilerText(node)
+                        } else {
+                            // 处理元素节点
+                            this.compilerElement(node)
+                        }
+
+                        // 如果有子节点，递归调用compiler
+                        if (node.childNodes && node.childNodes.length) {
+                            this.compiler(node)
+                        }
+                    })
+                }
+                // 编译元素节点, 处理指令
+                compilerElement (node) {
+                    // node.attributes
+                    Array.from(node.attributes).forEach(attr => {
+                        let attrName = attr.name
+                        if (this.isDirective(attrName)) {
+                            // v-text ==> text
+                            attrName = attrName.substr(2)
+                            let key = attr.value
+                            this.update(node, key, attrName)
+                        }
+                    })
+                }
+                update (node, key, attrName) {
+                    // 拼接 function name
+                    // 这样写的好处是，不用写多重if 的繁琐判断，要新增 Updater 类别的时候，直接新增对应方法即可
+                    let updateFn = this[attrName + 'Updater']
+            +       updateFn && updateFn.call(this, node, this.vm[key], key)
+            -       updateFn && updateFn()
+                }
+                // 处理 v-text 指令
+            +   textUpdater (node, value, key) {
+            -   textUpdater (node, value) {
+                    node.textContext = value
+
+            +       new Watcher(this.vm, key, (newValue) => {
+            +           node.textContext = value
+            +       })
+                }
+                // 处理 v-model 指令
+            +   modelUpdater (node, value, key) {
+            -   modelUpdater (node, value) {
+                    node.value = value
+
+            +       new Watcher(this.vm, key, (newValue) => {
+            +           node.value = value
+            +       })
+                }
+
+                // 编译文本节点, 处理差值表达式
+                compilerText (node) {
+                    // {{   msg  }}
+                    let regExp = /\{\{(.+?)\}\}/
+                    let value = node.textContent
+                    if (regExp.text(value)) {
+                        let key = RegExp.$1.trim()
+                        node.textContent = value.replace(regExp, this.vm[key])
+
+            +           // 创建对象，当数据改变 更新视图
+            +           new Watcher(this.vm, key, (newValue) => {
+            +               node.textContent = newValue
+            +           })
+                    }
+                }
+                // 判断元素是否是 指令
+                isDirective (attrName) {
+                    return attrName.startsWith('v-')
+                }
+                // 判断是否是文本节点
+                isTextNode (node) {
+                    return node.nodeType === 3
+                }
+                // 判断是否是元素节点
+                isElementNode (node) {
+                    return node.nodeType === 1
+                }
+            }
+            ```
+        - 测试
+            ```html
+            <div id="app">
+                <h1>差值表达式<h1>
+                <h3>{{ msg }}</h3>
+                <h3>{{ count }}</h3>
+                <h1>v-text</h1>
+                <div v-text="msg"></div>
+                <h1>v-model</h1>
+                <input type="text" v-model="msg">
+                <input type="text" v-model="count">
+            </div>
+            <script src="./js/dep.js"></script>
+            <script src="./js/watcher.js"></script>
+            <script src="./js/compiler.js"></script>
+            <script src="./js/observer.js"></script>
+            <script src="./js/vue.js"></script>
+            <script>
+                let vm = new Vue({
+                    el: '#app',
+                    data: {
+                        msg: 'Hello Vue',
+                        count: 20
+                    }
+                })
+            </script>
+            ```
+            - 在 console 控制台输入 `vm.msg = "xxx"` 发现视图也能跟着变化了
+            - 但是 当我在 input框 输入的时候，视图并不会跟着改变
+                - 这是下面要实现的 双向绑定 功能了
