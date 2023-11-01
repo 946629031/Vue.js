@@ -11495,7 +11495,7 @@ Nuxt.js 项目目录结构
                         if (this.isDirective(attrName)) {
                             // v-text ==> text
                             attrName = attrName.substr(2)
-                            let key = attr.value
+                            let key = attr.value // data 数据中的 key name
                             this.update(node, key, attrName)
                         }
                     })
@@ -11585,3 +11585,103 @@ Nuxt.js 项目目录结构
             - 在 console 控制台输入 `vm.msg = "xxx"` 发现视图也能跟着变化了
             - 但是 当我在 input框 输入的时候，视图并不会跟着改变
                 - 这是下面要实现的 双向绑定 功能了
+    - ## 21.双向绑定
+        - 代码
+            ```js
+            // Compiler.js
+            class Compiler {
+                constructor (vm) {
+                    this.el = vm.el
+                    this.vm = vm
+                    this.compiler(this.el)
+                }
+                // 编译模版，处理文本节点和元素节点
+                compiler (el) {
+                    let childNodes = el.childNodes
+                    Object.keys(childNodes).forEach(node => {
+                        // 处理文本节点
+                        if (this.isTextNode(node)) {
+                            this.compilerText(node)
+                        } else {
+                            // 处理元素节点
+                            this.compilerElement(node)
+                        }
+
+                        // 如果有子节点，递归调用compiler
+                        if (node.childNodes && node.childNodes.length) {
+                            this.compiler(node)
+                        }
+                    })
+                }
+                // 编译元素节点, 处理指令
+                compilerElement (node) {
+                    // node.attributes
+                    Array.from(node.attributes).forEach(attr => {
+                        let attrName = attr.name
+                        if (this.isDirective(attrName)) {
+                            // v-text ==> text
+                            attrName = attrName.substr(2)
+                            let key = attr.value
+                            this.update(node, key, attrName)
+                        }
+                    })
+                }
+                update (node, key, attrName) {
+                    // 拼接 function name
+                    // 这样写的好处是，不用写多重if 的繁琐判断，要新增 Updater 类别的时候，直接新增对应方法即可
+                    let updateFn = this[attrName + 'Updater']
+                    updateFn && updateFn.call(this, node, this.vm[key], key)
+                }
+                // 处理 v-text 指令
+                textUpdater (node, value, key) {
+                    node.textContext = value
+
+                    new Watcher(this.vm, key, (newValue) => {
+                        node.textContext = value
+                    })
+                }
+                // 处理 v-model 指令
+                modelUpdater (node, value, key) {
+                    node.value = value
+                    new Watcher(this.vm, key, (newValue) => {
+                        node.value = value
+                    })
+
+                +   // 双向绑定
+                +   node.addEventListener('input', () => {
+                +       this.vm[key] = node.value
+                +   })
+                }
+
+                // 编译文本节点, 处理差值表达式
+                compilerText (node) {
+                    // {{   msg  }}
+                    let regExp = /\{\{(.+?)\}\}/
+                    let value = node.textContent
+                    if (regExp.text(value)) {
+                        let key = RegExp.$1.trim()
+                        node.textContent = value.replace(regExp, this.vm[key])
+
+                        // 创建对象，当数据改变 更新视图
+                        new Watcher(this.vm, key, (newValue) => {
+                            node.textContent = newValue
+                        })
+                    }
+                }
+                // 判断元素是否是 指令
+                isDirective (attrName) {
+                    return attrName.startsWith('v-')
+                }
+                // 判断是否是文本节点
+                isTextNode (node) {
+                    return node.nodeType === 3
+                }
+                // 判断是否是元素节点
+                isElementNode (node) {
+                    return node.nodeType === 1
+                }
+            }
+            ```
+        - 测试
+            - 打开浏览器，在input框输入，发现 差值表达式内容随之改变，v-text 内容也随之改变
+            - vm 实例中 data 中的内容也随之改变
