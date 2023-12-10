@@ -11059,7 +11059,7 @@ Nuxt.js 项目目录结构
                         // 遍历data中的所有属性
                         Object.keys(data).forEach(key => {
                             // 把data的属性注入到vue实例中
-                            Object.definedProperty(this, key, { // 这里的this 指向vue实例
+                            Object.defineProperty(this, key, { // 这里的this 指向vue实例
                                 enumerable: true,
                                 configurable: true,
                                 get () {
@@ -11312,7 +11312,7 @@ Nuxt.js 项目目录结构
                     // 遍历data中的所有属性
                     Object.keys(data).forEach(key => {
                         // 把data的属性注入到vue实例中
-                        Object.definedProperty(this, key, { // 这里的this 指向vue实例
+                        Object.defineProperty(this, key, { // 这里的this 指向vue实例
                             enumerable: true,
                             configurable: true,
                             get () {
@@ -11685,3 +11685,9 @@ Nuxt.js 项目目录结构
         - 测试
             - 打开浏览器，在input框输入，发现 差值表达式内容随之改变，v-text 内容也随之改变
             - vm 实例中 data 中的内容也随之改变
+
+    - ## 22.调试-首次渲染
+    - ## 23.调试-数据改变
+    - ## 24.总结-问题
+    - ## 25.总结-整体流程
+        - ![](./img/vue-Summary-Overall-Process.jpg)
