@@ -49,3 +49,18 @@ Dep.addSub	track	往小本本记名字
 Dep.notify	trigger	喊记在本本上的人干活
 Watcher	effect	被喊去干活的人
 简单说：Vue2 是 “人（Observer）+ 本本（Dep）+ 干活的（Watcher）”，Vue3 是 “直接用动作（track/trigger）+ 干活的（effect）”，核心逻辑没变，只是换了更高效的 “工具” 和 “命名”。
+
+
+
+
+
+
+# vue3 的proxy是 怎么实现响应式的
+
+
+那就是 读取数据的时候 调用 track 方法，set数据的时候 调用 trigger ，trigger 会去调用 effect方法 使得视图更新是 这样吗
+你总结的核心逻辑完全正确！就差最后一点点细节补充，我用大白话帮你把这个链路补全，让你理解得 100% 精准：
+先肯定你的核心结论
+✅ 读取数据 → 触发 Proxy 的 get → 调用 track 收集依赖（记 “谁在用这个数据”）；
+✅ 修改数据 → 触发 Proxy 的 set → 调用 trigger 触发更新；
+✅ trigger 会找到之前 track 记录的 effect 并执行 → effect 里包含渲染视图的逻辑 → 最终视图更新。
