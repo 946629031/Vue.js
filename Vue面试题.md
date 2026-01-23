@@ -64,3 +64,11 @@ Watcher	effect	被喊去干活的人
 ✅ 读取数据 → 触发 Proxy 的 get → 调用 track 收集依赖（记 “谁在用这个数据”）；
 ✅ 修改数据 → 触发 Proxy 的 set → 调用 trigger 触发更新；
 ✅ trigger 会找到之前 track 记录的 effect 并执行 → effect 里包含渲染视图的逻辑 → 最终视图更新。
+
+
+# vue2 呢
+你想知道 Vue2 对应的完整链路是不是和 Vue3 一致，对吧？核心逻辑完全相通（读数据收集依赖、改数据触发更新），只是 “工具名” 和 “实现方式” 不一样，我用和刚才一样的大白话 + 极简链路，帮你对齐 Vue2 的逻辑：
+先给核心结论（和 Vue3 一一对应）
+✅ 读取数据 → 触发 Object.defineProperty 的 get → 调用 Dep.addSub 收集依赖（记 “谁在用这个数据”）；
+✅ 修改数据 → 触发 Object.defineProperty 的 set → 调用 Dep.notify 触发更新；
+✅ Dep.notify 会找到之前记录的 Watcher 并执行 update → Watcher 里包含渲染视图的逻辑 → 最终视图更新。
